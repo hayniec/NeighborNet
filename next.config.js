@@ -9,6 +9,7 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 const nextConfig = {
     // reactStrictMode: true,
     output: "standalone",
+    // Explicitly disable Turbopack config to valid build errors on Vercel with Next.js 16
     turbopack: {},
 };
 
