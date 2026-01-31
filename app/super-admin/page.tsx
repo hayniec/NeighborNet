@@ -100,7 +100,7 @@ export default function SuperAdminPage() {
                 <div>
                     <h1 style={{ fontSize: '2rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#111827' }}>
                         <Shield size={32} color="#4f46e5" />
-                        Super Admin Console
+                        Super Admin Console <span style={{ fontSize: '1rem', color: '#6b7280', fontWeight: 400 }}>v2.0</span>
                     </h1>
                     <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>Master control for all NeighborNet tenants.</p>
                 </div>
