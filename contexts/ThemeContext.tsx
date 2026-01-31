@@ -22,6 +22,8 @@ interface ThemeContextType {
     setTheme: (theme: ThemeColor) => void;
     communityName: string;
     setCommunityName: (name: string) => void;
+    communityLogo: string;
+    setCommunityLogo: (url: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -29,10 +31,12 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [theme, setThemeState] = useState<ThemeColor>(THEMES[0]);
     const [communityName, setCommunityNameState] = useState("HOA NeighborNet");
+    const [communityLogo, setCommunityLogoState] = useState("");
 
     useEffect(() => {
         const savedThemeName = localStorage.getItem("neighborNet_themeName");
         const savedCommunityName = localStorage.getItem("neighborNet_communityName");
+        const savedCommunityLogo = localStorage.getItem("neighborNet_communityLogo");
 
         // Environment defaults
         const envTheme = process.env.NEXT_PUBLIC_DEFAULT_THEME;
@@ -51,6 +55,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         } else if (envCommunity) {
             setCommunityNameState(envCommunity);
         }
+
+        if (savedCommunityLogo) {
+            setCommunityLogoState(savedCommunityLogo);
+        }
     }, []);
 
     const setTheme = (newTheme: ThemeColor) => {
@@ -66,6 +74,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("neighborNet_communityName", name);
     };
 
+    const setCommunityLogo = (url: string) => {
+        setCommunityLogoState(url);
+        localStorage.setItem("neighborNet_communityLogo", url);
+    };
+
     // Apply theme on initial load as well to prevent flash
     useEffect(() => {
         document.documentElement.style.setProperty("--primary", theme.primary);
@@ -73,7 +86,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, [theme]);
 
     return (
-        <ThemeContext.Provider value={{ theme, setTheme, communityName, setCommunityName }}>
+        <ThemeContext.Provider value={{ theme, setTheme, communityName, setCommunityName, communityLogo, setCommunityLogo }}>
             {children}
         </ThemeContext.Provider>
     );
