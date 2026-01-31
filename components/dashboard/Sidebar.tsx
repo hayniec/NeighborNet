@@ -48,6 +48,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         if (item.name === "Events" && !enabledModules?.events) return false;
         if (item.name === "Documents" && !enabledModules?.documents) return false;
 
+        // New Modules
+        if (item.name === "Forum" && !enabledModules?.forum) return false;
+        if (item.name === "Messages" && !enabledModules?.messages) return false;
+        if (item.name === "Service Pros" && !enabledModules?.services) return false;
+        if (item.name === "Local Guide" && !enabledModules?.local) return false;
+
         return true;
     });
 
