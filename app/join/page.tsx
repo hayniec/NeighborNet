@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
+import styles from "./join.module.css";
 
 export default function JoinPage() {
     const router = useRouter();
@@ -49,147 +50,106 @@ export default function JoinPage() {
     };
 
     return (
-        <div style={{
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "var(--background)",
-            color: "var(--foreground)",
-            padding: "1rem"
-        }}>
-            <div style={{
-                width: "100%",
-                maxWidth: "400px",
-                backgroundColor: "var(--card)",
-                padding: "2rem",
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--border)",
-                boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)"
-            }}>
-                <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-                    <div style={{
-                        width: 48, height: 48, background: 'var(--primary)',
-                        borderRadius: 12, margin: '0 auto 1rem', display: 'flex',
-                        alignItems: 'center', justifyContent: 'center', color: 'white'
-                    }}>
+        <div className={styles.container}>
+            <div className={styles.card}>
+                <div className={styles.header}>
+                    <div className={styles.logoBox}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}>
                             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                     </div>
-                    <h1 style={{ fontSize: "1.5rem", fontWeight: 700 }}>Join NeighborNet</h1>
-                    <p style={{ color: "var(--muted-foreground)" }}>
+                    <h1 className={styles.title}>Join NeighborNet</h1>
+                    <p className={styles.subtitle}>
                         {step === 1 ? "Enter your invitation code to get started." : "Complete your profile."}
                     </p>
                 </div>
 
                 {step === 1 && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                            <label style={{ fontSize: "0.875rem", fontWeight: 500 }}>Invitation Code</label>
+                    <div className={styles.formCol}>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor="invite-code" className={styles.label}>Invitation Code</label>
                             <input
+                                id="invite-code"
                                 type="text"
                                 placeholder="e.g. A1B2C3"
                                 value={formData.code}
                                 onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                                style={{
-                                    padding: "0.75rem",
-                                    borderRadius: "var(--radius)",
-                                    border: "1px solid var(--border)",
-                                    backgroundColor: "var(--background)",
-                                    color: "var(--foreground)",
-                                    fontSize: "1.1rem",
-                                    letterSpacing: "2px",
-                                    textAlign: "center",
-                                    textTransform: "uppercase"
-                                }}
+                                className={styles.codeInput}
                             />
                         </div>
-                        {error && <p style={{ color: "red", fontSize: "0.875rem" }}>{error}</p>}
+                        {error && <p className={styles.error}>{error}</p>}
                         <button
                             onClick={verifyCode}
-                            style={{
-                                marginTop: "0.5rem",
-                                padding: "0.75rem",
-                                borderRadius: "var(--radius)",
-                                backgroundColor: "var(--primary)",
-                                color: "white",
-                                border: "none",
-                                fontWeight: 600,
-                                cursor: "pointer"
-                            }}
+                            className={styles.button}
                         >
                             Verify Code
                         </button>
-                        <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>
-                            Already have an account? <a href="/login" style={{ color: 'var(--primary)' }}>Sign in</a>
+                        <p className={styles.footerText}>
+                            Already have an account? <a href="/login" className={styles.link}>Sign in</a>
                         </p>
                     </div>
                 )}
 
                 {step === 2 && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        <div style={{ display: "flex", gap: "1rem" }}>
-                            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1 }}>
-                                <label style={{ fontSize: "0.875rem", fontWeight: 500 }}>First Name</label>
+                    <div className={styles.formCol}>
+                        <div className={styles.row}>
+                            <div className={`${styles.fieldGroup} ${styles.flex1}`}>
+                                <label htmlFor="first-name" className={styles.label}>First Name</label>
                                 <input
+                                    id="first-name"
                                     value={formData.firstName}
                                     onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-                                    style={{ padding: "0.6rem", borderRadius: "var(--radius)", border: "1px solid var(--border)", backgroundColor: "var(--background)", color: "var(--foreground)" }}
+                                    className={styles.input}
                                 />
                             </div>
-                            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1 }}>
-                                <label style={{ fontSize: "0.875rem", fontWeight: 500 }}>Last Name</label>
+                            <div className={`${styles.fieldGroup} ${styles.flex1}`}>
+                                <label htmlFor="last-name" className={styles.label}>Last Name</label>
                                 <input
+                                    id="last-name"
                                     value={formData.lastName}
                                     onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                                    style={{ padding: "0.6rem", borderRadius: "var(--radius)", border: "1px solid var(--border)", backgroundColor: "var(--background)", color: "var(--foreground)" }}
+                                    className={styles.input}
                                 />
                             </div>
                         </div>
 
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                            <label style={{ fontSize: "0.875rem", fontWeight: 500 }}>Email Address</label>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor="email" className={styles.label}>Email Address</label>
                             <input
+                                id="email"
                                 value={formData.email}
                                 disabled
-                                style={{ padding: "0.6rem", borderRadius: "var(--radius)", border: "1px solid var(--border)", backgroundColor: "var(--muted)", color: "var(--muted-foreground)", cursor: 'not-allowed' }}
+                                className={`${styles.input} ${styles.inputDisabled}`}
                             />
                         </div>
 
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                            <label style={{ fontSize: "0.875rem", fontWeight: 500 }}>Home Address</label>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor="address" className={styles.label}>Home Address</label>
                             <input
+                                id="address"
                                 placeholder="123 Maple Drive"
                                 value={formData.address}
                                 onChange={e => setFormData({ ...formData, address: e.target.value })}
-                                style={{ padding: "0.6rem", borderRadius: "var(--radius)", border: "1px solid var(--border)", backgroundColor: "var(--background)", color: "var(--foreground)" }}
+                                className={styles.input}
                             />
                         </div>
 
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                            <label style={{ fontSize: "0.875rem", fontWeight: 500 }}>Password</label>
+                        <div className={styles.fieldGroup}>
+                            <label htmlFor="password" className={styles.label}>Password</label>
                             <input
+                                id="password"
                                 type="password"
                                 value={formData.password}
                                 onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                style={{ padding: "0.6rem", borderRadius: "var(--radius)", border: "1px solid var(--border)", backgroundColor: "var(--background)", color: "var(--foreground)" }}
+                                className={styles.input}
                             />
                         </div>
 
                         <button
                             onClick={handleRegister}
-                            style={{
-                                marginTop: "1rem",
-                                padding: "0.75rem",
-                                borderRadius: "var(--radius)",
-                                backgroundColor: "var(--primary)",
-                                color: "white",
-                                border: "none",
-                                fontWeight: 600,
-                                cursor: "pointer"
-                            }}
+                            className={styles.button}
+                            style={{ marginTop: '1rem' }}
                         >
                             Create Account
                         </button>

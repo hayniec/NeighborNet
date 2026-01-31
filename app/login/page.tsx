@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
+import styles from "../join/join.module.css";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -48,80 +49,45 @@ export default function LoginPage() {
     };
 
     return (
-        <div style={{
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "var(--background)",
-            color: "var(--foreground)"
-        }}>
-            <div style={{
-                width: "100%",
-                maxWidth: "400px",
-                padding: "2rem",
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--border)",
-                backgroundColor: "var(--card)",
-                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
-            }}>
-                <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-                    <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>Welcome Back</h1>
-                    <p style={{ color: "var(--muted-foreground)" }}>Sign in to NeighborNet</p>
+        <div className={styles.container}>
+            <div className={styles.card}>
+                <div className={styles.header}>
+                    <h1 className={styles.title}>Welcome Back</h1>
+                    <p className={styles.subtitle}>Sign in to NeighborNet</p>
                 </div>
 
-                <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div>
-                        <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem" }}>Email</label>
+                <form onSubmit={handleLogin} className={styles.formCol}>
+                    <div className={styles.fieldGroup}>
+                        <label htmlFor="email" className={styles.label}>Email</label>
                         <input
+                            id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                             placeholder="Type 'admin' to be admin..."
-                            style={{
-                                width: "100%",
-                                padding: "0.75rem",
-                                borderRadius: "var(--radius)",
-                                border: "1px solid var(--border)",
-                                backgroundColor: "var(--background)",
-                                color: "var(--foreground)"
-                            }}
+                            className={styles.input}
                         />
                     </div>
-                    <div>
-                        <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem" }}>Password</label>
+                    <div className={styles.fieldGroup}>
+                        <label htmlFor="password" className={styles.label}>Password</label>
                         <input
+                            id="password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             placeholder="Any password works"
-                            style={{
-                                width: "100%",
-                                padding: "0.75rem",
-                                borderRadius: "var(--radius)",
-                                border: "1px solid var(--border)",
-                                backgroundColor: "var(--background)",
-                                color: "var(--foreground)"
-                            }}
+                            className={styles.input}
                         />
                     </div>
 
-                    {error && <p style={{ color: "red", fontSize: "0.875rem" }}>{error}</p>}
+                    {error && <p className={styles.error}>{error}</p>}
 
                     <button
                         type="submit"
-                        style={{
-                            padding: "0.75rem",
-                            borderRadius: "var(--radius)",
-                            backgroundColor: "var(--primary)",
-                            color: "var(--primary-foreground)",
-                            border: "none",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            marginTop: "1rem"
-                        }}
+                        className={styles.button}
+                        style={{ marginTop: "1rem" }}
                     >
                         Sign In
                     </button>
@@ -132,8 +98,8 @@ export default function LoginPage() {
                         <p>Use email containing "resident" for Resident role.</p>
                     </div>
                 </form>
-                <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem' }}>
-                    Don't have an account? <a href="/join" style={{ color: 'var(--primary)' }}>Join with Code</a>
+                <p className={styles.footerText} style={{ marginTop: '1.5rem' }}>
+                    Don't have an account? <a href="/join" className={styles.link}>Join with Code</a>
                 </p>
             </div>
         </div>
