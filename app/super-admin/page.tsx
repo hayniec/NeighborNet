@@ -6,10 +6,92 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { UserProvider } from "@/contexts/UserContext"; // Wrap if needed, or just standard html/body
 import { Shield, Plus, Settings, Check, X, Building, Download, Trash2, Power, PowerOff } from "lucide-react";
 
-// ... (skipping type definitions) ...
+// Mock Data for Communities (mimicking the DB schema)
+type Community = {
+    id: string;
+    name: string;
+    slug: string;
+    plan: 'starter_100' | 'growth_250' | 'pro_500';
+    features: {
+        marketplace: boolean;
+        resources: boolean;
+        events: boolean;
+        documents: boolean;
+        forum: boolean;
+        messages: boolean;
+        services: boolean; // service pros
+        local: boolean; // local guide
+    };
+    isActive: boolean;
+    branding: {
+        logoUrl: string;
+        primaryColor: string;
+        secondaryColor: string;
+        accentColor: string;
+    };
+};
+
+const MOCK_COMMUNITIES: Community[] = [
+    {
+        id: 'c1',
+        name: 'Oak Hills HOA',
+        slug: 'oak-hills',
+        plan: 'growth_250',
+        features: {
+            marketplace: true,
+            resources: true,
+            events: true,
+            documents: true,
+            forum: true,
+            messages: true,
+            services: true,
+            local: true
+        },
+        isActive: true,
+        branding: {
+            logoUrl: 'https://cdn-icons-png.flaticon.com/512/3590/3590453.png',
+            primaryColor: '#059669', // Forest green
+            secondaryColor: '#064e3b', // Dark green
+            accentColor: '#fbbf24' // Amber
+        }
+    },
+    {
+        id: 'c2',
+        name: 'Sunset Valley',
+        slug: 'sunset-valley',
+        plan: 'starter_100',
+        features: {
+            marketplace: false,
+            resources: false,
+            events: true,
+            documents: true,
+            forum: false, // Default off for starter maybe?
+            messages: true,
+            services: false,
+            local: true
+        },
+        isActive: true,
+        branding: {
+            logoUrl: '',
+            primaryColor: '#ea580c', // Orange
+            secondaryColor: '#7c2d12', // Dark orange
+            accentColor: '#38bdf8' // Sky blue
+        }
+    }
+];
 
 export default function SuperAdminPage() {
-    // ... (skipping state) ...
+    const [communities, setCommunities] = useState<Community[]>(MOCK_COMMUNITIES);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newCommunity, setNewCommunity] = useState<Partial<Community>>({
+        name: '',
+        slug: '',
+        plan: 'starter_100',
+        features: {
+            marketplace: true, resources: true, events: true, documents: true,
+            forum: true, messages: true, services: true, local: true
+        }
+    });
 
     const toggleFeature = (id: string, feature: keyof Community['features']) => {
         // ... (existing)
