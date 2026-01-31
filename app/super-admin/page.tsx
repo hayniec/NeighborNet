@@ -86,7 +86,11 @@ export default function SuperAdminPage() {
             slug: newCommunity.slug,
             plan: newCommunity.plan as any,
             features: newCommunity.features as any,
-            isActive: true
+            isActive: true,
+            branding: {
+                logoUrl: '',
+                primaryColor: '#4f46e5' // Default indigo
+            }
         };
 
         setCommunities([...communities, newComm]);
