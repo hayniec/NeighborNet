@@ -136,8 +136,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // Apply theme on initial load as well to prevent flash
     useEffect(() => {
-        document.documentElement.style.setProperty("--primary", theme.primary);
-        document.documentElement.style.setProperty("--ring", theme.ring);
+        // Only apply the "theme" state if there are NO custom overrides in local storage.
+        // Otherwise, the custom override logic (in the other useEffect) handles it.
+        // This prevents the default 'Indigo' theme from clobbering our custom colors on reload.
+        const customPrimary = localStorage.getItem('neighborNet_customPrimary');
+        if (!customPrimary) {
+            document.documentElement.style.setProperty("--primary", theme.primary);
+            document.documentElement.style.setProperty("--ring", theme.ring);
+        }
     }, [theme]);
 
     return (
