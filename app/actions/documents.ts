@@ -23,11 +23,11 @@ export async function getCommunityDocuments(communityId: string): Promise<Docume
             data: results.map(doc => ({
                 id: doc.id,
                 title: doc.name,
-                type: 'External Link', // Default for now since we don't have file storage
+                type: 'External Link',
                 source: 'external',
-                size: 'N/A',
+                size: doc.size || 'N/A',
                 date: doc.uploadDate?.toLocaleDateString(),
-                url: doc.filePath,
+                url: doc.url, // Correct property from schema
                 category: doc.category
             }))
         };
@@ -41,7 +41,7 @@ export async function createDocument(data: {
     communityId: string;
     name: string;
     category: string;
-    filePath: string; // URL
+    filePath: string;
     uploadedBy: string;
 }): Promise<DocumentActionState> {
     try {
@@ -49,13 +49,16 @@ export async function createDocument(data: {
             communityId: data.communityId,
             name: data.name,
             category: data.category,
-            filePath: data.filePath,
-            uploadedBy: data.uploadedBy,
+            url: data.filePath, // Mapping usage of filePath to db column url
+            uploaderId: data.uploadedBy, // Mapping usage of uploadedBy to db column uploaderId
         }).returning();
 
         return {
             success: true,
-            data: newDoc
+            data: {
+                ...newDoc,
+                url: newDoc.url // Ensure return data is consistent
+            }
         };
     } catch (error: any) {
         console.error("Failed to create document:", error);
