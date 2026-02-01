@@ -57,7 +57,7 @@ export async function createEvent(data: {
             date: data.date,
             time: data.time,
             location: data.location,
-            category: data.category,
+            category: data.category as "Social" | "HOA" | "Maintenance" | "Security",
             organizerId: data.organizerId,
             attendeesCount: 1
         }).returning();
