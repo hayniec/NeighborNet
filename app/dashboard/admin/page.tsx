@@ -482,44 +482,23 @@ export default function AdminPage() {
                             <span className={styles.cardTitle}>Invitations</span>
                         </div>
                         <div className={styles.cardContent}>
-                            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                            <div className={styles.filterContainer}>
                                 <button
                                     onClick={() => setInviteFilter('pending')}
-                                    style={{
-                                        padding: '0.25rem 0.5rem',
-                                        borderRadius: '0.25rem',
-                                        background: inviteFilter === 'pending' ? 'var(--muted)' : 'transparent',
-                                        opacity: inviteFilter === 'pending' ? 1 : 0.6,
-                                        fontWeight: inviteFilter === 'pending' ? 600 : 400,
-                                        border: 'none',
-                                        cursor: 'pointer'
-                                    }}>
+                                    className={`${styles.filterButton} ${inviteFilter === 'pending' ? styles.filterButtonActive : ''}`}
+                                >
                                     Pending
                                 </button>
                                 <button
                                     onClick={() => setInviteFilter('used')}
-                                    style={{
-                                        padding: '0.25rem 0.5rem',
-                                        borderRadius: '0.25rem',
-                                        background: inviteFilter === 'used' ? 'var(--muted)' : 'transparent',
-                                        opacity: inviteFilter === 'used' ? 1 : 0.6,
-                                        fontWeight: inviteFilter === 'used' ? 600 : 400,
-                                        border: 'none',
-                                        cursor: 'pointer'
-                                    }}>
+                                    className={`${styles.filterButton} ${inviteFilter === 'used' ? styles.filterButtonActive : ''}`}
+                                >
                                     Accepted
                                 </button>
                                 <button
                                     onClick={() => setInviteFilter('expired')}
-                                    style={{
-                                        padding: '0.25rem 0.5rem',
-                                        borderRadius: '0.25rem',
-                                        background: inviteFilter === 'expired' ? 'var(--muted)' : 'transparent',
-                                        opacity: inviteFilter === 'expired' ? 1 : 0.6,
-                                        fontWeight: inviteFilter === 'expired' ? 600 : 400,
-                                        border: 'none',
-                                        cursor: 'pointer'
-                                    }}>
+                                    className={`${styles.filterButton} ${inviteFilter === 'expired' ? styles.filterButtonActive : ''}`}
+                                >
                                     Expired
                                 </button>
                             </div>
