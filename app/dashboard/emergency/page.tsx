@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import styles from "./emergency.module.css";
 import { Phone, Heart, Zap, ShieldAlert, Siren, Flame, Info, AlertOctagon, Settings } from "lucide-react";
