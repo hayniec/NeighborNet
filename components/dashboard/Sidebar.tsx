@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, Users, Calendar, Settings, Home, LogOut, Siren, BoxSelect, ShoppingBag, MessageCircle, MessageSquare, FileText, Wrench, MapPin, Shield } from "lucide-react";
 import styles from "./dashboard.module.css";
 
@@ -31,6 +31,13 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const pathname = usePathname();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        localStorage.removeItem('neighborNet_user');
+        localStorage.removeItem('neighborNet_invites');
+        router.push('/login');
+    };
     const { communityName, enabledModules } = useTheme();
     const { user } = useUser();
 
@@ -110,7 +117,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         <span className={styles.userName}>{user.name}</span>
                         <span className={styles.userRole} style={{ textTransform: 'capitalize' }}>{user.role}</span>
                     </div>
-                    <button className={styles.iconButton} style={{ marginLeft: 'auto' }} aria-label="Sign out">
+                    <button
+                        className={styles.iconButton}
+                        style={{ marginLeft: 'auto' }}
+                        aria-label="Sign out"
+                        onClick={handleLogout}
+                    >
                         <LogOut size={18} />
                     </button>
                 </div>

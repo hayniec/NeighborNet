@@ -1,19 +1,32 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import styles from "@/components/dashboard/dashboard.module.css";
-import { MOCK_EVENTS } from "@/lib/data";
-
 import { useTheme } from "@/contexts/ThemeContext";
 import { useUser } from "@/contexts/UserContext";
+import { getCommunityEvents } from "@/app/actions/events";
+import { Event } from "@/types/event";
 
 export default function DashboardPage() {
     const { communityName } = useTheme();
     const { user } = useUser();
+    const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
 
-    // Sort events by date and take the first 3
-    const upcomingEvents = [...MOCK_EVENTS]
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .slice(0, 3);
+    useEffect(() => {
+        const fetchEvents = async () => {
+            if (user.communityId) {
+                const res = await getCommunityEvents(user.communityId);
+                if (res.success && res.data) {
+                    // Sort by date ascending for "Upcoming"
+                    const sorted = res.data
+                        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                        .slice(0, 3);
+                    setUpcomingEvents(sorted);
+                }
+            }
+        };
+        fetchEvents();
+    }, [user.communityId]);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

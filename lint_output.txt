@@ -1,0 +1,271 @@
+
+> neighbor-net@0.1.0 lint
+> eslint
+
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\actions\communities.ts
+   11:12  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   16:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   46:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   57:45  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:14  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+   98:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:14  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  107:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:37  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  131:14  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  131:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:69  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  145:14  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\actions\invitations.ts
+   10:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   48:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   77:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  156:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  176:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\actions\neighbors.ts
+   10:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  111:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  131:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\admin\page.tsx
+    4:44  warning  'AlertTriangle' is defined but never used                                                                       @typescript-eslint/no-unused-vars
+    4:59  warning  'Key' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+   25:40  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+   26:12  warning  'isLoadingUsers' is assigned a value but never used                                                             @typescript-eslint/no-unused-vars
+   29:52  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+   36:12  warning  'isLoadingInvites' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
+   60:8   warning  React Hook useEffect has a missing dependency: 'loadInvites'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   67:8   warning  React Hook useEffect has a missing dependency: 'loadUsers'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  382:51  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\documents\page.tsx
+    5:46  warning  'Home' is defined but never used                                 @typescript-eslint/no-unused-vars
+   40:36  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  215:46  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  215:66  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\emergency\page.tsx
+   5:24  warning  'Zap' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   5:49  warning  'Flame' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  29:21  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\emergency\page.tsx:29:21
+  27 |                 // Load External Contacts
+  28 |                 if (profile.externalContacts && Array.isArray(profile.externalContacts)) {
+> 29 |                     setExternalContacts(profile.externalContacts);
+     |                     ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  30 |                 }
+  31 |
+  32 |                 // Load Selected Medical Neighbors  react-hooks/set-state-in-effect
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\events\page.tsx
+  23:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\hoa\page.tsx
+  18:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\local\page.tsx
+  4:35  warning  'Coffee' is defined but never used  @typescript-eslint/no-unused-vars
+  4:43  warning  'Pizza' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\marketplace\page.tsx
+  6:10  warning  'ShoppingBag' is defined but never used  @typescript-eslint/no-unused-vars
+  6:29  warning  'Tag' is defined but never used          @typescript-eslint/no-unused-vars
+  6:47  warning  'Check' is defined but never used        @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\messages\page.tsx
+  13:27  warning  'setConversations' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\neighbors\[id]\page.tsx
+    8:10  warning  'notFound' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   13:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+   18:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\neighbors\[id]\page.tsx:18:9
+  16 |         // In a real app, fetch from API
+  17 |         const found = MOCK_NEIGHBORS.find(n => n.id.toString() === resolvedParams.id);
+> 18 |         setNeighbor(found || null);
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  19 |     }, [resolvedParams.id]);
+  20 |
+  21 |     if (!neighbor) {  react-hooks/set-state-in-effect
+  135:95  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  142:76  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\neighbors\page.tsx
+   13:12  warning  'adminMode' is assigned a value but never used                   @typescript-eslint/no-unused-vars
+   13:23  warning  'setAdminMode' is assigned a value but never used                @typescript-eslint/no-unused-vars
+   35:18  warning  'e' is defined but never used                                    @typescript-eslint/no-unused-vars
+  135:53  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  135:66  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\page.tsx
+  3:8  warning  'styles' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\resources\page.tsx
+  14:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\services\page.tsx
+   3:10  warning  'useState' is defined but never used                             @typescript-eslint/no-unused-vars
+   5:10  warning  'Wrench' is defined but never used                               @typescript-eslint/no-unused-vars
+  87:59  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  87:82  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\settings\page.tsx
+   5:73  warning  'Palette' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   7:20  warning  'THEMES' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  37:13  warning  'theme' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  37:20  warning  'setTheme' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  37:30  warning  'communityName' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  37:45  warning  'setCommunityName' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+  72:17  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\dashboard\settings\page.tsx:72:17
+  70 |         if (savedProfile) {
+  71 |             try {
+> 72 |                 setProfile(prev => ({ ...prev, ...JSON.parse(savedProfile) }));
+     |                 ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  73 |             } catch (e) {
+  74 |                 console.error("Failed to parse profile", e);
+  75 |             }  react-hooks/set-state-in-effect
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\join\page.tsx
+  23:12  warning  'isRegistering' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\login\page.tsx
+   13:19  warning  'setError' is assigned a value but never used                    @typescript-eslint/no-unused-vars
+   97:49  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   97:55  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   98:49  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   98:58  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  102:24  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\page.tsx
+  1:8  warning  'Image' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\app\super-admin\page.tsx
+   38:21   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:18   warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  256:101  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\CheckoutModal.tsx
+  5:10  warning  'Equipment' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\CreateEventModal.tsx
+  10:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\CreateResourceModal.tsx
+   5:13  warning  'Plus' is defined but never used          @typescript-eslint/no-unused-vars
+  10:22  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\Header.tsx
+  19:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\NeighborCard.tsx
+  5:65  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\ReservationModal.tsx
+  22:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\ReservationModal.tsx:22:13
+  20 |     useEffect(() => {
+  21 |         if (isOpen) {
+> 22 |             setDate("");
+     |             ^^^^^^^ Avoid calling setState() directly within an effect
+  23 |             setStartTime("");
+  24 |             setEndTime("");
+  25 |         }  react-hooks/set-state-in-effect
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\SearchModal.tsx
+   5:21  warning  'User' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   5:61  warning  'ArrowRight' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   7:8   warning  'Link' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  26:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\SearchModal.tsx:26:13
+  24 |         } else {
+  25 |             document.body.style.overflow = 'unset';
+> 26 |             setQuery(""); // Reset query handling
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  27 |         }
+  28 |         return () => { document.body.style.overflow = 'unset'; };
+  29 |     }, [isOpen]);  react-hooks/set-state-in-effect
+  98:50  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  98:58  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\Sidebar.tsx
+  5:54  warning  'Home' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\components\dashboard\UploadDocumentModal.tsx
+   5:21  warning  'FileText' is defined but never used      @typescript-eslint/no-unused-vars
+  10:25  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\contexts\ThemeContext.tsx
+  50:9  error  Unexpected var, use let or const instead  no-var
+  51:9  error  Unexpected var, use let or const instead  no-var
+  52:9  error  Unexpected var, use let or const instead  no-var
+  53:9  error  Unexpected var, use let or const instead  no-var
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\contexts\UserContext.tsx
+  31:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\contexts\UserContext.tsx:31:13
+  29 |         const savedUser = localStorage.getItem("neighborNet_user");
+  30 |         if (savedUser) {
+> 31 |             setUserState(JSON.parse(savedUser));
+     |             ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  32 |         }
+  33 |     }, []);
+  34 |  react-hooks/set-state-in-effect
+
+C:\Users\erich\.gemini\antigravity\scratch\neighbor-net\next.config.js
+  1:17  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 107 problems (62 errors, 45 warnings)
+  4 errors and 0 warnings potentially fixable with the `--fix` option.
+

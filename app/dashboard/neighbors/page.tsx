@@ -1,18 +1,64 @@
 "use client";
 
-import { useState } from "react";
-import { MOCK_NEIGHBORS } from "@/lib/data";
+import { useState, useEffect } from "react";
 import { NeighborCard } from "@/components/dashboard/NeighborCard";
 import styles from "./neighbors.module.css";
 import { Search, Filter, Mail, X } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
+import { getNeighbors } from "@/app/actions/neighbors";
+import { createInvitation } from "@/app/actions/invitations";
+// Import the Neighbor type locally or from a types file if available. 
+// Assuming NeighborCard expects the type from "@/types/neighbor" which matches MOCK.
+import { Neighbor } from "@/types/neighbor";
 
 export default function NeighborsPage() {
+    const { user } = useUser();
+    const [neighbors, setNeighbors] = useState<Neighbor[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [inviteEmail, setInviteEmail] = useState("");
-    const [adminMode, setAdminMode] = useState(false); // Simulate admin privileges
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSendingInvite, setIsSendingInvite] = useState(false);
 
-    const filteredNeighbors = MOCK_NEIGHBORS.filter((neighbor) => {
+    // Fetch neighbors on mount
+    useEffect(() => {
+        const fetchNeighbors = async () => {
+            if (!user.communityId) {
+                // Fallback if no community (e.g. first admin login without setup)
+                // In a real app we'd redirect or show setup. For now, try fetching with a placeholder or handle empty.
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                // Determine if we need to pass communityId. 
+                // The action expects it. 
+                const result = await getNeighbors(user.communityId);
+                if (result.success && result.data) {
+                    // Map result to Neighbor type if needed (dates might be strings/Date objects)
+                    // The action returns objects that match reasonably well, need to ensure type safety.
+                    const mapped: Neighbor[] = result.data.map((n: any) => ({
+                        ...n,
+                        // Ensure arrays exist
+                        skills: n.skills || [],
+                        equipment: n.equipment || [],
+                        // Ensure string for date if component expects string
+                        joinedDate: n.joinedDate ? new Date(n.joinedDate).toLocaleDateString() : 'Unknown',
+                        isOnline: n.isOnline || false
+                    }));
+                    setNeighbors(mapped);
+                }
+            } catch (e) {
+                console.error("Failed to load neighbors", e);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchNeighbors();
+    }, [user.communityId]);
+
+    const filteredNeighbors = neighbors.filter((neighbor) => {
         const term = searchTerm.toLowerCase();
         return (
             neighbor.name.toLowerCase().includes(term) ||
@@ -21,31 +67,34 @@ export default function NeighborsPage() {
         );
     });
 
-    const handleSendInvite = () => {
+    const handleSendInvite = async () => {
         if (!inviteEmail) return;
+        if (!user.communityId) {
+            alert("Error: You are not associated with a community ID. Cannot invite.");
+            return;
+        }
 
-        // Simulate generating code and "sending" email
-        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-
-        // Determine existing invites to append
-        let existingInvites = [];
+        setIsSendingInvite(true);
         try {
-            const stored = localStorage.getItem('neighborNet_invites');
-            if (stored) existingInvites = JSON.parse(stored);
-        } catch (e) { }
+            const result = await createInvitation({
+                communityId: user.communityId,
+                email: inviteEmail,
+                createdBy: user.id
+            });
 
-        const newInvite = {
-            email: inviteEmail,
-            code,
-            status: 'pending',
-            sentAt: new Date().toISOString()
-        };
-
-        localStorage.setItem('neighborNet_invites', JSON.stringify([...existingInvites, newInvite]));
-
-        alert(`Invitation sent to ${inviteEmail}!\n\n(DEBUG) The Code is: ${code}`);
-        setInviteEmail("");
-        setIsInviteModalOpen(false);
+            if (result.success) {
+                alert(`Invitation sent to ${inviteEmail}!\n\nCode: ${result.data.code}`);
+                setInviteEmail("");
+                setIsInviteModalOpen(false);
+            } else {
+                alert(`Failed to send invite: ${result.error}`);
+            }
+        } catch (e) {
+            console.error("Invite error:", e);
+            alert("An unexpected error occurred.");
+        } finally {
+            setIsSendingInvite(false);
+        }
     };
 
     return (
@@ -126,16 +175,20 @@ export default function NeighborsPage() {
                 </div>
             </div>
 
-            <div className={styles.grid}>
-                {filteredNeighbors.map((neighbor) => (
-                    <NeighborCard key={neighbor.id} neighbor={neighbor} />
-                ))}
-                {filteredNeighbors.length === 0 && (
-                    <div style={{ gridColumn: '1 / -1', padding: '3rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
-                        No neighbors found matching "{searchTerm}".
-                    </div>
-                )}
-            </div>
+            {isLoading ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>Loading neighbors...</div>
+            ) : (
+                <div className={styles.grid}>
+                    {filteredNeighbors.map((neighbor) => (
+                        <NeighborCard key={neighbor.id} neighbor={neighbor} />
+                    ))}
+                    {filteredNeighbors.length === 0 && (
+                        <div style={{ gridColumn: '1 / -1', padding: '3rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+                            {searchTerm ? `No neighbors found matching "${searchTerm}".` : "No neighbors found. Invite some people!"}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {isInviteModalOpen && (
                 <div style={{
@@ -182,6 +235,7 @@ export default function NeighborsPage() {
                             </div>
                             <button
                                 onClick={handleSendInvite}
+                                disabled={isSendingInvite}
                                 style={{
                                     marginTop: '0.5rem',
                                     padding: '0.75rem',
@@ -190,10 +244,11 @@ export default function NeighborsPage() {
                                     color: 'white',
                                     border: 'none',
                                     fontWeight: 600,
-                                    cursor: 'pointer'
+                                    cursor: isSendingInvite ? 'not-allowed' : 'pointer',
+                                    opacity: isSendingInvite ? 0.7 : 1
                                 }}
                             >
-                                Send Invitation
+                                {isSendingInvite ? 'Sending...' : 'Send Invitation'}
                             </button>
                         </div>
                     </div>

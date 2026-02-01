@@ -92,7 +92,9 @@ export async function getNeighbors(communityId: string): Promise<NeighborActionS
                 role: n.role,
                 address: n.address,
                 avatar: n.avatar || '👤',
-                joinedDate: n.joinedDate
+                joinedDate: n.joinedDate,
+                skills: n.skills || [],
+                equipment: [] // TODO: Add equipment table or field
             }))
         };
     } catch (error: any) {

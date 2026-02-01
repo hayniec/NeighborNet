@@ -68,6 +68,7 @@ export const neighbors = pgTable('neighbors', {
 // 2. Events
 export const events = pgTable('events', {
     id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
     title: text('title').notNull(),
     description: text('description'),
     date: date('date').notNull(),
@@ -81,6 +82,7 @@ export const events = pgTable('events', {
 // 3. Marketplace Items
 export const marketplaceItems = pgTable('marketplace_items', {
     id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
     title: text('title').notNull(),
     description: text('description'),
     price: decimal('price', { precision: 10, scale: 2 }).default('0'),
@@ -96,6 +98,7 @@ export const marketplaceItems = pgTable('marketplace_items', {
 // 4. Community Resources
 export const resources = pgTable('resources', {
     id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
     name: text('name').notNull(),
     type: text('type', { enum: ['Facility', 'Tool', 'Vehicle'] }),
     capacity: integer('capacity'),
@@ -107,6 +110,7 @@ export const resources = pgTable('resources', {
 // 5. HOA Documents
 export const documents = pgTable('documents', {
     id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
     name: text('name').notNull(),
     category: text('category'),
     uploadDate: timestamp('upload_date', { withTimezone: true }).defaultNow(),

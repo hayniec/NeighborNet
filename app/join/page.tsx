@@ -83,6 +83,9 @@ export default function JoinPage() {
 
             // 3. Simulate Login (Context/LocalStorage)
             const newUserProfile = {
+                id: registerResult.data.id,
+                communityId: registerResult.data.communityId,
+                email: registerResult.data.email,
                 name: registerResult.data.name,
                 role: "resident",
                 avatar: registerResult.data.name.charAt(0).toUpperCase()

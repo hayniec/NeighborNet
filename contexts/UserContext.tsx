@@ -5,6 +5,9 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 export type UserRole = "admin" | "resident";
 
 interface UserProfile {
+    id?: string;
+    communityId?: string;
+    email?: string;
     name: string;
     role: UserRole;
     avatar: string;

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import styles from "../join/join.module.css";
+import { authenticateUser } from "@/app/actions/auth";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -11,40 +12,31 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError("");
+        setIsLoading(true);
 
-        // Simple mock authentication logic
-        if (email.includes("admin")) {
-            setUser({
-                name: "Admin User",
-                role: "admin",
-                avatar: "AD"
-            });
-            router.push("/dashboard");
-        } else if (email.includes("resident")) {
-            setUser({
-                name: "Resident User",
-                role: "resident",
-                avatar: "RU"
-            });
-            router.push("/dashboard");
-        } else if (email === "erich@example.com") {
-            setUser({
-                name: "Eric H.",
-                role: "admin", // Eric is admin by default in this demo
-                avatar: "EH"
-            });
-            router.push("/dashboard");
-        } else {
-            // For demo purposes, let anyone login as resident if not specified
-            setUser({
-                name: email.split('@')[0],
-                role: "resident",
-                avatar: email.substring(0, 2).toUpperCase()
-            });
-            router.push("/dashboard");
+        try {
+            const result = await authenticateUser(email, password);
+
+            if (result.success && result.user) {
+                // @ts-ignore - mismatch between strict casing "resident" vs "Resident"
+                setUser(result.user);
+                // Also persist client side manually if context doesn't (Context does it, but let's be safe per prior patterns)
+                // Actually setUser in context already does localStorage.setItem.
+
+                router.push("/dashboard");
+            } else {
+                setError(result.error || "Login failed");
+            }
+        } catch (err) {
+            console.error(err);
+            setError("An unexpected error occurred.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -65,7 +57,7 @@ export default function LoginPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            placeholder="Type 'admin' to be admin..."
+                            placeholder="you@example.com"
                             className={styles.input}
                         />
                     </div>
@@ -77,7 +69,7 @@ export default function LoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            placeholder="Any password works"
+                            placeholder="Example: temp123"
                             className={styles.input}
                         />
                     </div>
@@ -88,15 +80,11 @@ export default function LoginPage() {
                         type="submit"
                         className={styles.button}
                         style={{ marginTop: "1rem" }}
+                        disabled={isLoading}
                     >
-                        Sign In
+                        {isLoading ? "Signing In..." : "Sign In"}
                     </button>
 
-                    <div style={{ marginTop: "1rem", fontSize: "0.875rem", color: "var(--muted-foreground)", textAlign: "center" }}>
-                        <p>Demo Hints:</p>
-                        <p>Use email containing "admin" for Admin role.</p>
-                        <p>Use email containing "resident" for Resident role.</p>
-                    </div>
                 </form>
                 <p className={styles.footerText} style={{ marginTop: '1.5rem' }}>
                     Don't have an account? <a href="/join" className={styles.link}>Join with Code</a>

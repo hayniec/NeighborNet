@@ -1,35 +1,76 @@
 "use client";
 
-import { useState } from "react";
-import { MOCK_EVENTS } from "@/lib/data";
+import { useState, useEffect } from "react";
 import { EventCard } from "@/components/dashboard/EventCard";
 import { CreateEventModal } from "@/components/dashboard/CreateEventModal";
 import { RsvpModal } from "@/components/dashboard/RsvpModal";
 import styles from "./events.module.css";
 import { Plus } from "lucide-react";
 import { Event } from "@/types/event";
+import { useUser } from "@/contexts/UserContext";
+import { getCommunityEvents, createEvent } from "@/app/actions/events";
 
 export default function EventsPage() {
-    const [events, setEvents] = useState<Event[]>(MOCK_EVENTS);
+    const { user } = useUser();
+    const [events, setEvents] = useState<Event[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     // RSVP State
     const [isRsvpModalOpen, setIsRsvpModalOpen] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
+    useEffect(() => {
+        const fetchEvents = async () => {
+            if (!user.communityId) {
+                setIsLoading(false);
+                return;
+            }
+            try {
+                const result = await getCommunityEvents(user.communityId);
+                if (result.success && result.data) {
+                    setEvents(result.data);
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchEvents();
+    }, [user.communityId]);
+
     // Sorting
     const sortedEvents = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    const handleCreateEvent = (newEvent: any) => {
-        const event: Event = {
-            id: Math.random().toString(36).substr(2, 9),
-            ...newEvent,
-            attendees: 1, // The creator + 0
-            organizer: "You",
-            userRsvp: 1
-        };
-        setEvents([...events, event]);
-        setIsCreateModalOpen(false);
+    const handleCreateEvent = async (newEventData: any) => {
+        if (!user.communityId) {
+            alert("Error: No community ID found.");
+            return;
+        }
+
+        try {
+            const result = await createEvent({
+                communityId: user.communityId,
+                organizerId: user.id || "",
+                title: newEventData.title,
+                description: newEventData.description,
+                date: newEventData.date,
+                time: newEventData.time,
+                location: newEventData.location,
+                category: newEventData.category
+            });
+
+            if (result.success && result.data) {
+                setEvents(prev => [...prev, result.data]);
+                setIsCreateModalOpen(false);
+            } else {
+                alert("Failed to create event: " + result.error);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("An error occurred.");
+        }
     };
 
     const handleRsvpClick = (event: Event) => {
@@ -42,11 +83,8 @@ export default function EventsPage() {
 
         setEvents(events.map(ev => {
             if (ev.id === selectedEventId) {
-                // Logic: subtract previous rsvp count if needed, then add new.
-                // For simplicity in this demo, we assume we are updating the total attendees.
                 const previousUserRsvp = ev.userRsvp || 0;
                 const newTotal = ev.attendees - previousUserRsvp + count;
-
                 return {
                     ...ev,
                     attendees: newTotal,
@@ -89,15 +127,24 @@ export default function EventsPage() {
                 </button>
             </div>
 
-            <div className={styles.grid}>
-                {sortedEvents.map((event) => (
-                    <EventCard
-                        key={event.id}
-                        event={event}
-                        onRsvp={handleRsvpClick}
-                    />
-                ))}
-            </div>
+            {isLoading ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>Loading events...</div>
+            ) : (
+                <div className={styles.grid}>
+                    {sortedEvents.map((event) => (
+                        <EventCard
+                            key={event.id}
+                            event={event}
+                            onRsvp={handleRsvpClick}
+                        />
+                    ))}
+                    {sortedEvents.length === 0 && (
+                        <div style={{ gridColumn: '1 / -1', padding: '3rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+                            No upcoming events.
+                        </div>
+                    )}
+                </div>
+            )}
 
             <CreateEventModal
                 isOpen={isCreateModalOpen}
