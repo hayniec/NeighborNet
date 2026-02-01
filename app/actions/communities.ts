@@ -135,8 +135,8 @@ export async function updateCommunityBranding(id: string, branding: any) {
 }
 
 // Seed function
-import { MOCK_COMMUNITIES } from "@/app/super-admin/page_mock_data"; // We don't have this, I'll inline the data for now or move it
-// Actually I'll copy the mock data structure here to use for seeding
+// Mock data structure inline for seeding
+
 
 export async function seedCommunitiesIfNeeded() {
     const existing = await db.select().from(communities);
