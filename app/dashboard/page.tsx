@@ -3,7 +3,13 @@
 import styles from "@/components/dashboard/dashboard.module.css";
 import { MOCK_EVENTS } from "@/lib/data";
 
+import { useTheme } from "@/contexts/ThemeContext";
+import { useUser } from "@/contexts/UserContext";
+
 export default function DashboardPage() {
+    const { communityName } = useTheme();
+    const { user } = useUser();
+
     // Sort events by date and take the first 3
     const upcomingEvents = [...MOCK_EVENTS]
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -18,8 +24,8 @@ export default function DashboardPage() {
                 border: '1px solid var(--border)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
             }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.25rem' }}>Maple Drive HOA</h1>
-                <p style={{ color: 'var(--muted-foreground)', fontSize: '1.1rem' }}>Welcome back, Eric H.</p>
+                <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.25rem' }}>{communityName || 'My Community'}</h1>
+                <p style={{ color: 'var(--muted-foreground)', fontSize: '1.1rem' }}>Welcome back, {user?.name || 'Neighbor'}.</p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
