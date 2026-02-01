@@ -39,10 +39,14 @@ const mapToUI = (row: any) => ({
 
 export async function getCommunities() {
     try {
+        console.log("[getCommunities] Starting query...");
         const rows = await db.select().from(communities);
+        console.log(`[getCommunities] Successfully fetched ${rows.length} communities`);
         return { success: true, data: rows.map(mapToUI) };
     } catch (error: any) {
         console.error("Failed to fetch communities:", error);
+        console.error("Error stack:", error.stack);
+        console.error("Error name:", error.name);
         const detail = error.detail ? ` (Detail: ${error.detail})` : '';
         const code = error.code ? ` (Code: ${error.code})` : '';
         const msg = error.message || "Failed to fetch communities";
