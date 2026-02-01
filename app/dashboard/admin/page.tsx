@@ -471,19 +471,67 @@ export default function AdminPage() {
                         </div>
                     </div>
 
+                    const [inviteFilter, setInviteFilter] = useState<'pending' | 'used' | 'expired'>('pending');
+
+    const filteredInvites = invites.filter(i => i.status === inviteFilter);
+
+                    // ... (rest of code)
+
                     <div className={styles.card}>
                         <div className={styles.cardHeader}>
                             <Mail size={20} />
-                            <span className={styles.cardTitle}>Pending Invitations</span>
+                            <span className={styles.cardTitle}>Invitations</span>
                         </div>
                         <div className={styles.cardContent}>
+                            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                                <button
+                                    onClick={() => setInviteFilter('pending')}
+                                    style={{
+                                        padding: '0.25rem 0.5rem',
+                                        borderRadius: '0.25rem',
+                                        background: inviteFilter === 'pending' ? 'var(--muted)' : 'transparent',
+                                        opacity: inviteFilter === 'pending' ? 1 : 0.6,
+                                        fontWeight: inviteFilter === 'pending' ? 600 : 400,
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}>
+                                    Pending
+                                </button>
+                                <button
+                                    onClick={() => setInviteFilter('used')}
+                                    style={{
+                                        padding: '0.25rem 0.5rem',
+                                        borderRadius: '0.25rem',
+                                        background: inviteFilter === 'used' ? 'var(--muted)' : 'transparent',
+                                        opacity: inviteFilter === 'used' ? 1 : 0.6,
+                                        fontWeight: inviteFilter === 'used' ? 600 : 400,
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}>
+                                    Accepted
+                                </button>
+                                <button
+                                    onClick={() => setInviteFilter('expired')}
+                                    style={{
+                                        padding: '0.25rem 0.5rem',
+                                        borderRadius: '0.25rem',
+                                        background: inviteFilter === 'expired' ? 'var(--muted)' : 'transparent',
+                                        opacity: inviteFilter === 'expired' ? 1 : 0.6,
+                                        fontWeight: inviteFilter === 'expired' ? 600 : 400,
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}>
+                                    Expired
+                                </button>
+                            </div>
+
                             {isLoadingInvites ? (
                                 <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>Loading invitations...</div>
-                            ) : invites.length === 0 ? (
-                                <p style={{ color: 'var(--muted-foreground)', textAlign: 'center', padding: '1rem' }}>No active invitations.</p>
+                            ) : filteredInvites.length === 0 ? (
+                                <p style={{ color: 'var(--muted-foreground)', textAlign: 'center', padding: '1rem' }}>No {inviteFilter} invitations.</p>
                             ) : (
                                 <ul style={{ listStyle: 'none', padding: 0 }}>
-                                    {invites.map((invite, idx) => (
+                                    {filteredInvites.map((invite, idx) => (
                                         <li key={idx} style={{
                                             display: 'flex',
                                             justifyContent: 'space-between',
