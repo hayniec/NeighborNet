@@ -106,10 +106,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </nav>
 
                 <div className={styles.userProfile}>
-                    <div className={styles.avatar}>EH</div>
+                    <div className={styles.avatar}>{user.avatar}</div>
                     <div className={styles.userInfo}>
-                        <span className={styles.userName}>Eric H.</span>
-                        <span className={styles.userRole}>Resident</span>
+                        <span className={styles.userName}>{user.name}</span>
+                        <span className={styles.userRole} style={{ textTransform: 'capitalize' }}>{user.role}</span>
                     </div>
                     <button className={styles.iconButton} style={{ marginLeft: 'auto' }} aria-label="Sign out">
                         <LogOut size={18} />
