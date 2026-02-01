@@ -45,6 +45,9 @@ export default function AdminPage() {
     const [newInviteEmail, setNewInviteEmail] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
     const [isLoadingInvites, setIsLoadingInvites] = useState(false);
+    const [inviteFilter, setInviteFilter] = useState<'pending' | 'used' | 'expired'>('pending');
+
+    const filteredInvites = invites.filter(i => i.status === inviteFilter);
 
     const [communityId, setCommunityId] = useState<string>("");
 
@@ -471,11 +474,7 @@ export default function AdminPage() {
                         </div>
                     </div>
 
-                    const [inviteFilter, setInviteFilter] = useState<'pending' | 'used' | 'expired'>('pending');
 
-    const filteredInvites = invites.filter(i => i.status === inviteFilter);
-
-                    // ... (rest of code)
 
                     <div className={styles.card}>
                         <div className={styles.cardHeader}>
