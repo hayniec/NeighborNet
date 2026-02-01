@@ -85,7 +85,10 @@ export default function SuperAdminPage() {
     };
 
     const handleAdd = async () => {
-        if (!newCommunity.name || !newCommunity.slug) return;
+        if (!newCommunity.name || !newCommunity.slug) {
+            alert("Please enter a name and slug.");
+            return;
+        }
 
         const res = await createCommunity({
             ...newCommunity,
@@ -109,7 +112,7 @@ export default function SuperAdminPage() {
                 }
             });
         } else {
-            alert('Failed to create community');
+            alert(`Failed to create community: ${res.error || 'Unknown error'}`);
         }
     };
 
@@ -119,7 +122,7 @@ export default function SuperAdminPage() {
         if (res.success) {
             loadCommunities();
         } else {
-            alert('Seed failed');
+            alert(`Seed failed: ${res.error || 'Unknown error'}`);
             setLoading(false);
         }
     };
