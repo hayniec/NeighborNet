@@ -35,7 +35,7 @@ interface UserProfile {
 
 export default function SettingsPage() {
     const { theme, setTheme, communityName, setCommunityName } = useTheme();
-    const { user, toggleRole } = useUser();
+    const { user, toggleRole, setUser } = useUser();
     const medicalKeywords = ["Nurse", "Doctor", "EMT", "Paramedic", "First Aid", "CPR", "Medical"];
 
     // Filter neighbors with medical skills
@@ -65,6 +65,7 @@ export default function SettingsPage() {
 
     // Load from LocalStorage on mount
     useEffect(() => {
+        // 1. Try to load detailed profile settings
         const savedProfile = localStorage.getItem('neighborNet_profile');
         if (savedProfile) {
             try {
@@ -72,8 +73,19 @@ export default function SettingsPage() {
             } catch (e) {
                 console.error("Failed to parse profile", e);
             }
+        } else if (user && user.name !== "Eric H.") {
+            // 2. Fallback: If no detailed profile, but we have a logged-in user (from registration), use that name
+            const names = user.name.split(' ');
+            const firstName = names[0] || "";
+            const lastName = names.slice(1).join(' ') || ""; // Handle multi-word last names
+            setProfile(prev => ({
+                ...prev,
+                firstName,
+                lastName,
+                // We don't have email in UserContext context yet, but we could fetch it or just leave placeholder
+            }));
         }
-    }, []);
+    }, [user]);
 
     const [notifications, setNotifications] = useState({
         emailAlerts: true,
@@ -148,7 +160,16 @@ export default function SettingsPage() {
     };
 
     const handleSave = () => {
+        // Save to local storage for persistence across reloads
         localStorage.setItem('neighborNet_profile', JSON.stringify(profile));
+
+        // Update global user context so Sidebar updates immediately
+        const fullName = `${profile.firstName} ${profile.lastName}`.trim();
+        setUser({
+            ...user,
+            name: fullName
+        });
+
         alert("Profile settings saved successfully!");
     };
 
