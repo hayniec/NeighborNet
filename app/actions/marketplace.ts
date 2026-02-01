@@ -16,7 +16,7 @@ export async function getCommunityMarketplaceItems(communityId: string): Promise
             .select()
             .from(marketplaceItems)
             .where(eq(marketplaceItems.communityId, communityId))
-            .orderBy(desc(marketplaceItems.createdAt));
+            .orderBy(desc(marketplaceItems.postedDate));
 
         return {
             success: true,
@@ -30,8 +30,8 @@ export async function getCommunityMarketplaceItems(communityId: string): Promise
                 isNegotiable: false,
                 images: [],
                 status: 'Active',
-                postedDate: item.createdAt?.toISOString(),
-                expiresAt: item.updatedAt?.toISOString(), // Mock expiry for now
+                postedDate: item.postedDate?.toISOString(),
+                expiresAt: item.expiresAt?.toISOString(),
                 sellerId: item.sellerId,
                 sellerName: "Neighbor" // TODO: Join
             }))
