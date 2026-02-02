@@ -118,8 +118,8 @@ export function CreateEventModal({ isOpen, onClose, onCreate }: CreateEventModal
                     <button
                         className={`${styles.button} ${styles.primaryButton}`}
                         onClick={handleSubmit}
-                        disabled={!formData.title || !formData.date}
-                        style={{ opacity: (!formData.title || !formData.date) ? 0.5 : 1 }}
+                        disabled={!formData.title || !formData.date || !formData.time || !formData.location}
+                        style={{ opacity: (!formData.title || !formData.date || !formData.time || !formData.location) ? 0.5 : 1 }}
                     >
                         Create Event
                     </button>
