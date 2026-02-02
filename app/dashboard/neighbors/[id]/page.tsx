@@ -1,11 +1,11 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
-import { MOCK_NEIGHBORS } from "@/lib/data";
 import styles from "./profile.module.css";
 import { MapPin, Mail, Phone, Calendar, Star, MessageCircle, Shield, Award, PenTool } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getNeighbor } from "@/app/actions/neighbors";
 
 export default function NeighborProfile({ params }: { params: Promise<{ id: string }> }) {
     // Correctly unwrap params using React.use()
@@ -13,9 +13,22 @@ export default function NeighborProfile({ params }: { params: Promise<{ id: stri
     const [neighbor, setNeighbor] = useState<any>(null);
 
     useEffect(() => {
-        // In a real app, fetch from API
-        const found = MOCK_NEIGHBORS.find(n => n.id.toString() === resolvedParams.id);
-        setNeighbor(found || null);
+        const fetchData = async () => {
+            try {
+                const result = await getNeighbor(resolvedParams.id);
+                if (result.success && result.data) {
+                    setNeighbor({
+                        ...result.data,
+                        initials: result.data.name.slice(0, 2).toUpperCase(),
+                        status: result.data.isOnline ? 'Online' : 'Offline',
+                        memberSince: result.data.joinedDate ? new Date(result.data.joinedDate).toLocaleDateString() : 'Unknown'
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to load neighbor:", error);
+            }
+        };
+        fetchData();
     }, [resolvedParams.id]);
 
     if (!neighbor) {

@@ -135,3 +135,42 @@ export async function updateNeighbor(neighborId: string, data: {
         return { success: false, error: error.message || "Failed to update neighbor" };
     }
 }
+
+/**
+ * Get a single neighbor by ID
+ */
+export async function getNeighbor(id: string): Promise<NeighborActionState> {
+    try {
+        const result = await db
+            .select()
+            .from(neighbors)
+            .where(eq(neighbors.id, id));
+
+        if (result.length === 0) {
+            return { success: false, error: "Neighbor not found" };
+        }
+
+        const n = result[0];
+        return {
+            success: true,
+            data: {
+                id: n.id,
+                name: n.name,
+                email: n.email,
+                role: n.role,
+                address: n.address,
+                avatar: n.avatar,
+                joinedDate: n.joinedDate,
+                skills: n.skills || [],
+                isOnline: n.isOnline,
+                // Defaults for missing table columns
+                phone: "",
+                interests: [],
+                equipment: []
+            }
+        };
+    } catch (error: any) {
+        console.error("Failed to fetch neighbor:", error);
+        return { success: false, error: error.message };
+    }
+}
