@@ -58,6 +58,8 @@ export const neighbors = pgTable('neighbors', {
     name: text('name').notNull(),
     role: text('role', { enum: ['Admin', 'Resident', 'Board Member', 'Event Manager'] }).default('Resident'),
     address: text('address'),
+    personalEmergencyCode: text('personal_emergency_code'),
+    personalEmergencyInstructions: text('personal_emergency_instructions'),
     avatar: text('avatar'),
     // Note: Array support in Drizzle requires specific setup or json handling if strict arrays aren't needed. 
     // For simplicity using simple arrays if supported by driver, or jsonb.

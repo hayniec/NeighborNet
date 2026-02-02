@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./settings.module.css";
-import { User, Bell, Wrench, X, Save, Stethoscope, Phone, Plus, Trash2, Palette } from "lucide-react";
+import { User, Bell, Wrench, X, Save, Stethoscope, Phone, Plus, Trash2, Palette, Key } from "lucide-react";
 import { MOCK_NEIGHBORS } from "@/lib/data";
 import { useTheme, THEMES } from "@/contexts/ThemeContext";
 import { useUser } from "@/contexts/UserContext";
@@ -27,10 +27,12 @@ interface UserProfile {
     email: string;
     address: string;
     bio: string;
-    skills: string[]; // This was missing in the original file I think? or maybe I missed it. Adding to be safe.
+    skills: string[];
     equipment: EquipmentItem[];
-    selectedMedicalNeighbors: string[]; // IDs of selected neighbors
+    selectedMedicalNeighbors: string[];
     externalContacts: ExternalContact[];
+    personalEmergencyCode?: string;
+    personalEmergencyInstructions?: string;
 }
 
 export default function SettingsPage() {
@@ -60,7 +62,9 @@ export default function SettingsPage() {
         externalContacts: [
             { id: 'mock1', name: 'Dr. Williams', relationship: 'Primary Care Physician', phone: '555-0199' },
             { id: 'mock2', name: 'Jane Doe', relationship: 'Sister', phone: '555-0123' }
-        ]
+        ],
+        personalEmergencyCode: "",
+        personalEmergencyInstructions: ""
     });
 
     // Load from LocalStorage on mount
@@ -167,7 +171,10 @@ export default function SettingsPage() {
         const fullName = `${profile.firstName} ${profile.lastName}`.trim();
         setUser({
             ...user,
-            name: fullName
+            name: fullName,
+            address: profile.address,
+            personalEmergencyCode: profile.personalEmergencyCode,
+            personalEmergencyInstructions: profile.personalEmergencyInstructions
         });
 
         alert("Profile settings saved successfully!");
@@ -337,6 +344,37 @@ export default function SettingsPage() {
                     </div>
                 </div>
                 <div className={styles.sectionContent}>
+                    {/* Personal Digital Lock */}
+                    <div className={styles.formGroup} style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)' }}>
+                        <label className={styles.label}>
+                            <Key size={14} style={{ display: 'inline', marginRight: '6px' }} />
+                            My Digital Lock Code (Optional)
+                        </label>
+                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>
+                            Providing this code allows it to be included in SOS texts sent from your account.
+                        </div>
+                        <div className={styles.row}>
+                            <div className={styles.col}>
+                                <label className={styles.label} style={{ fontSize: '0.85rem' }}>Door/Gate Code</label>
+                                <input
+                                    className={styles.input}
+                                    placeholder="#1234"
+                                    value={profile.personalEmergencyCode || ""}
+                                    onChange={e => setProfile({ ...profile, personalEmergencyCode: e.target.value })}
+                                />
+                            </div>
+                            <div className={styles.col} style={{ flex: 2 }}>
+                                <label className={styles.label} style={{ fontSize: '0.85rem' }}>Instructions</label>
+                                <input
+                                    className={styles.input}
+                                    placeholder="e.g. Front door smart lock..."
+                                    value={profile.personalEmergencyInstructions || ""}
+                                    onChange={e => setProfile({ ...profile, personalEmergencyInstructions: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                     {/* External Contacts List */}
                     <div className={styles.formGroup}>
                         <label className={styles.label}>

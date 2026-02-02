@@ -12,6 +12,8 @@ interface UserProfile {
     role: UserRole;
     avatar: string;
     address?: string;
+    personalEmergencyCode?: string;
+    personalEmergencyInstructions?: string;
 }
 
 interface UserContextType {

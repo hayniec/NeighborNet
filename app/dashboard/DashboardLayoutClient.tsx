@@ -34,9 +34,9 @@ export default function DashboardLayoutClient({
                     if (res.success && res.data) {
                         const com = res.data.find((c: any) => c.id === user.communityId);
                         if (com && com.emergency?.accessCode) {
-                            message = `Emergency Access Code: ${com.emergency.accessCode}`;
+                            message = `Community Gate Code: ${com.emergency.accessCode}`;
                             if (com.emergency.instructions) {
-                                message += `\nInstructions: ${com.emergency.instructions}`;
+                                message += `\nGate Instructions: ${com.emergency.instructions}`;
                             }
                             hasCode = true;
                         }
@@ -44,6 +44,15 @@ export default function DashboardLayoutClient({
                 } catch (err) {
                     console.error("Failed to fetch emergency info", err);
                 }
+            }
+
+            // Append Personal Emergency Info if available
+            if (user.personalEmergencyCode) {
+                message += `${hasCode ? '\n\n' : ''}My Digital Lock: ${user.personalEmergencyCode}`;
+                if (user.personalEmergencyInstructions) {
+                    message += `\nMy Instructions: ${user.personalEmergencyInstructions}`;
+                }
+                hasCode = true;
             }
 
             if (!hasCode) {
