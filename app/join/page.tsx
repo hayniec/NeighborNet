@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import styles from "./join.module.css";
 import { validateInvitation, markInvitationUsed } from "@/app/actions/invitations";
 import { registerNeighbor } from "@/app/actions/neighbors";
+import { useUser } from "@/contexts/UserContext";
 
 export default function JoinPage() {
     const router = useRouter();
+    const { setUser } = useUser();
     const [step, setStep] = useState(1); // 1: Code, 2: Profile
     const [formData, setFormData] = useState({
         code: "",
@@ -81,16 +83,16 @@ export default function JoinPage() {
                 await markInvitationUsed(formData.code);
             }
 
-            // 3. Simulate Login (Context/LocalStorage)
+            // 3. Update User Context
             const newUserProfile = {
                 id: registerResult.data.id,
                 communityId: registerResult.data.communityId,
                 email: registerResult.data.email,
                 name: registerResult.data.name,
-                role: "resident",
+                role: "resident" as const,
                 avatar: registerResult.data.name.charAt(0).toUpperCase()
             };
-            localStorage.setItem("neighborNet_user", JSON.stringify(newUserProfile));
+            setUser(newUserProfile);
 
             alert(`Welcome, ${formData.firstName}! Account created successfully.`);
             router.push("/dashboard");
