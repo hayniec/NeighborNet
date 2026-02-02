@@ -35,6 +35,13 @@ export default function AdminPage() {
     // User Management State
     const [users, setUsers] = useState<NeighborUser[]>([]);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+    const [userSearchTerm, setUserSearchTerm] = useState("");
+
+    const filteredUsers = users.filter(u =>
+        u.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+        (u.email && u.email.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+        (u.address && u.address.toLowerCase().includes(userSearchTerm.toLowerCase()))
+    );
 
     // User Editing State
     const [editingUser, setEditingUser] = useState<NeighborUser | null>(null);
@@ -46,8 +53,12 @@ export default function AdminPage() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [isLoadingInvites, setIsLoadingInvites] = useState(false);
     const [inviteFilter, setInviteFilter] = useState<'pending' | 'used' | 'expired'>('pending');
+    const [inviteSearchTerm, setInviteSearchTerm] = useState("");
 
-    const filteredInvites = invites.filter(i => i.status === inviteFilter);
+    const filteredInvites = invites.filter(i =>
+        i.status === inviteFilter &&
+        i.email.toLowerCase().includes(inviteSearchTerm.toLowerCase())
+    );
 
     const [communityId, setCommunityId] = useState<string>("");
 
@@ -381,6 +392,17 @@ export default function AdminPage() {
                         <span className={styles.cardTitle}>Manage Residents</span>
                     </div>
                     <div className={styles.cardContent}>
+                        {/* Search Input */}
+                        <div style={{ marginBottom: '1rem' }}>
+                            <input
+                                className={styles.input}
+                                placeholder="Search by name, email, or address..."
+                                value={userSearchTerm}
+                                onChange={(e) => setUserSearchTerm(e.target.value)}
+                                aria-label="Search residents"
+                            />
+                        </div>
+
                         {isLoadingUsers ? (
                             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>Loading residents...</div>
                         ) : (
@@ -394,7 +416,7 @@ export default function AdminPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {users.map((user) => (
+                                    {filteredUsers.map((user) => (
                                         <tr key={user.id} style={{ borderBottom: '1px solid var(--border)' }}>
                                             <td style={{ padding: '0.75rem 0.5rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -503,6 +525,17 @@ export default function AdminPage() {
                                 </button>
                             </div>
 
+                            {/* Search Input */}
+                            <div style={{ marginBottom: '1rem' }}>
+                                <input
+                                    className={styles.input}
+                                    placeholder="Search by email..."
+                                    value={inviteSearchTerm}
+                                    onChange={(e) => setInviteSearchTerm(e.target.value)}
+                                    aria-label="Search invitations"
+                                />
+                            </div>
+
                             {isLoadingInvites ? (
                                 <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>Loading invitations...</div>
                             ) : filteredInvites.length === 0 ? (
@@ -548,242 +581,247 @@ export default function AdminPage() {
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Success Invitation Modal */}
-            {showModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    backdropFilter: 'blur(4px)'
-                }}>
+            {
+                showModal && (
                     <div style={{
-                        backgroundColor: 'var(--card)',
-                        borderRadius: '1rem',
-                        padding: '2rem',
-                        width: '90%',
-                        maxWidth: '500px',
-                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid var(--border)',
-                        position: 'relative'
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        backdropFilter: 'blur(4px)'
                     }}>
-                        <button
-                            onClick={() => setShowModal(false)}
-                            aria-label="Close modal"
-                            style={{
-                                position: 'absolute',
-                                top: '1rem',
-                                right: '1rem',
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--muted-foreground)',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <X size={20} />
-                        </button>
-
-                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                            <div style={{
-                                width: '3rem',
-                                height: '3rem',
-                                backgroundColor: 'var(--accent)',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 1rem auto',
-                                color: 'var(--primary)'
-                            }}>
-                                <CheckCircle size={24} />
-                            </div>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Invitation Created!</h2>
-                            <p style={{ color: 'var(--muted-foreground)' }}>Share this with your neighbor.</p>
-                        </div>
-
                         <div style={{
-                            backgroundColor: 'var(--muted)',
-                            padding: '1rem',
-                            borderRadius: '0.5rem',
-                            fontFamily: 'monospace',
-                            fontSize: '0.9rem',
-                            whiteSpace: 'pre-wrap',
-                            marginBottom: '1.5rem',
+                            backgroundColor: 'var(--card)',
+                            borderRadius: '1rem',
+                            padding: '2rem',
+                            width: '90%',
+                            maxWidth: '500px',
+                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
                             border: '1px solid var(--border)',
-                            color: 'var(--foreground)'
+                            position: 'relative'
                         }}>
-                            {modalData.message}
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '1rem' }}>
                             <button
                                 onClick={() => setShowModal(false)}
+                                aria-label="Close modal"
                                 style={{
-                                    flex: 1,
-                                    padding: '0.75rem',
-                                    borderRadius: 'var(--radius)',
+                                    position: 'absolute',
+                                    top: '1rem',
+                                    right: '1rem',
                                     background: 'transparent',
-                                    border: '1px solid var(--border)',
-                                    color: 'var(--foreground)',
-                                    fontWeight: 600,
+                                    border: 'none',
+                                    color: 'var(--muted-foreground)',
                                     cursor: 'pointer'
                                 }}
                             >
-                                Close
+                                <X size={20} />
                             </button>
-                            <button
-                                onClick={copyToClipboard}
-                                style={{
-                                    flex: 1,
-                                    padding: '0.75rem',
-                                    borderRadius: 'var(--radius)',
-                                    background: 'var(--primary)',
-                                    border: 'none',
-                                    color: 'white',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
+
+                            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                                <div style={{
+                                    width: '3rem',
+                                    height: '3rem',
+                                    backgroundColor: 'var(--accent)',
+                                    borderRadius: '50%',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '0.5rem'
-                                }}
-                            >
-                                <FileText size={18} />
-                                Copy Message
-                            </button>
+                                    margin: '0 auto 1rem auto',
+                                    color: 'var(--primary)'
+                                }}>
+                                    <CheckCircle size={24} />
+                                </div>
+                                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Invitation Created!</h2>
+                                <p style={{ color: 'var(--muted-foreground)' }}>Share this with your neighbor.</p>
+                            </div>
+
+                            <div style={{
+                                backgroundColor: 'var(--muted)',
+                                padding: '1rem',
+                                borderRadius: '0.5rem',
+                                fontFamily: 'monospace',
+                                fontSize: '0.9rem',
+                                whiteSpace: 'pre-wrap',
+                                marginBottom: '1.5rem',
+                                border: '1px solid var(--border)',
+                                color: 'var(--foreground)'
+                            }}>
+                                {modalData.message}
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.75rem',
+                                        borderRadius: 'var(--radius)',
+                                        background: 'transparent',
+                                        border: '1px solid var(--border)',
+                                        color: 'var(--foreground)',
+                                        fontWeight: 600,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    onClick={copyToClipboard}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.75rem',
+                                        borderRadius: 'var(--radius)',
+                                        background: 'var(--primary)',
+                                        border: 'none',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem'
+                                    }}
+                                >
+                                    <FileText size={18} />
+                                    Copy Message
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Edit User Modal */}
-            {editingUser && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    backdropFilter: 'blur(4px)'
-                }}>
+            {
+                editingUser && (
                     <div style={{
-                        backgroundColor: 'var(--card)',
-                        borderRadius: '1rem',
-                        padding: '2rem',
-                        width: '90%',
-                        maxWidth: '500px',
-                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid var(--border)',
-                        position: 'relative'
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        backdropFilter: 'blur(4px)'
                     }}>
-                        <button
-                            onClick={() => setEditingUser(null)}
-                            aria-label="Close modal"
-                            style={{
-                                position: 'absolute',
-                                top: '1rem',
-                                right: '1rem',
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--muted-foreground)',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <X size={20} />
-                        </button>
-
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Edit Resident</h2>
-                            <p style={{ color: 'var(--muted-foreground)' }}>Update details for {editingUser.name}</p>
-                        </div>
-
-                        <div className={styles.formGroup} style={{ marginBottom: '1rem' }}>
-                            <label className={styles.label}>Name</label>
-                            <input
-                                className={styles.input}
-                                value={editingUser.name}
-                                onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
-                                aria-label="Resident Name"
-                            />
-                        </div>
-
-                        <div className={styles.formGroup} style={{ marginBottom: '1rem' }}>
-                            <label className={styles.label}>Address</label>
-                            <input
-                                className={styles.input}
-                                value={editingUser.address || ''}
-                                onChange={(e) => setEditingUser({ ...editingUser, address: e.target.value })}
-                                aria-label="Resident Address"
-                            />
-                        </div>
-
-                        <div className={styles.formGroup} style={{ marginBottom: '1.5rem' }}>
-                            <label className={styles.label}>Role</label>
-                            <select
-                                className={styles.input}
-                                value={editingUser.role}
-                                onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
-                                aria-label="Resident Role"
-                            >
-                                <option value="Resident">Resident</option>
-                                <option value="Board Member">Board Member</option>
-                                <option value="Admin">Admin</option>
-                            </select>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div style={{
+                            backgroundColor: 'var(--card)',
+                            borderRadius: '1rem',
+                            padding: '2rem',
+                            width: '90%',
+                            maxWidth: '500px',
+                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                            border: '1px solid var(--border)',
+                            position: 'relative'
+                        }}>
                             <button
                                 onClick={() => setEditingUser(null)}
+                                aria-label="Close modal"
                                 style={{
-                                    flex: 1,
-                                    padding: '0.75rem',
-                                    borderRadius: 'var(--radius)',
+                                    position: 'absolute',
+                                    top: '1rem',
+                                    right: '1rem',
                                     background: 'transparent',
-                                    border: '1px solid var(--border)',
-                                    color: 'var(--foreground)',
-                                    fontWeight: 600,
+                                    border: 'none',
+                                    color: 'var(--muted-foreground)',
                                     cursor: 'pointer'
                                 }}
                             >
-                                Cancel
+                                <X size={20} />
                             </button>
-                            <button
-                                onClick={handleUpdateUser}
-                                disabled={isUpdatingUser}
-                                style={{
-                                    flex: 1,
-                                    padding: '0.75rem',
-                                    borderRadius: 'var(--radius)',
-                                    background: 'var(--primary)',
-                                    border: 'none',
-                                    color: 'white',
-                                    fontWeight: 600,
-                                    cursor: isUpdatingUser ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem'
-                                }}
-                            >
-                                {isUpdatingUser ? 'Saving...' : 'Save Changes'}
-                            </button>
+
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Edit Resident</h2>
+                                <p style={{ color: 'var(--muted-foreground)' }}>Update details for {editingUser.name}</p>
+                            </div>
+
+                            <div className={styles.formGroup} style={{ marginBottom: '1rem' }}>
+                                <label className={styles.label}>Name</label>
+                                <input
+                                    className={styles.input}
+                                    value={editingUser.name}
+                                    onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                                    aria-label="Resident Name"
+                                />
+                            </div>
+
+                            <div className={styles.formGroup} style={{ marginBottom: '1rem' }}>
+                                <label className={styles.label}>Address</label>
+                                <input
+                                    className={styles.input}
+                                    value={editingUser.address || ''}
+                                    onChange={(e) => setEditingUser({ ...editingUser, address: e.target.value })}
+                                    aria-label="Resident Address"
+                                />
+                            </div>
+
+                            <div className={styles.formGroup} style={{ marginBottom: '1.5rem' }}>
+                                <label className={styles.label}>Role</label>
+                                <select
+                                    className={styles.input}
+                                    value={editingUser.role}
+                                    onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+                                    aria-label="Resident Role"
+                                >
+                                    <option value="Resident">Resident</option>
+                                    <option value="Board Member">Board Member</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button
+                                    onClick={() => setEditingUser(null)}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.75rem',
+                                        borderRadius: 'var(--radius)',
+                                        background: 'transparent',
+                                        border: '1px solid var(--border)',
+                                        color: 'var(--foreground)',
+                                        fontWeight: 600,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleUpdateUser}
+                                    disabled={isUpdatingUser}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.75rem',
+                                        borderRadius: 'var(--radius)',
+                                        background: 'var(--primary)',
+                                        border: 'none',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        cursor: isUpdatingUser ? 'not-allowed' : 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem'
+                                    }}
+                                >
+                                    {isUpdatingUser ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
