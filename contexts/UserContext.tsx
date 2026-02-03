@@ -29,7 +29,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         name: "Eric H.",
         role: "admin", // Default to admin for first-time ease of use
         avatar: "EH",
-        address: "123 Oak St, Unit 4"
+        address: "123 Oak St, Unit 4",
+        communityId: "00000000-0000-0000-0000-000000000000" // Mock Community ID
     });
 
     useEffect(() => {
