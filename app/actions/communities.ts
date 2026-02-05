@@ -83,13 +83,20 @@ export async function createCommunity(data: any) {
         return { success: true, data: mapToUI(inserted) };
     } catch (error: any) {
         console.error("Failed to create community:", error);
-        // Capture Postgres specific error fields if available
-        const detail = error.detail ? ` (Detail: ${error.detail})` : '';
-        const hint = error.hint ? ` (Hint: ${error.hint})` : '';
-        const code = error.code ? ` (Code: ${error.code})` : '';
-        // If the message is the query dump, getting the 'routine' or 'position' might helps, but let's try code/detail first.
+
+        // Handle Unique Constraint Violation (Postgres Code 23505)
+        if (error.code === '23505' || error.message?.includes('unique constraint') || error.message?.includes('duplicate key')) {
+            return { success: false, error: "A tenant with this slug already exists. Please choose a distinct slug." };
+        }
+
+        // Generic error handling
         const msg = error.message || "Failed to create community";
-        return { success: false, error: `${msg}${code}${detail}${hint}` };
+        // Avoid returning the full query dump if it looks like one (starts with insert/select)
+        const safeMsg = msg.length > 200 && (msg.toLowerCase().startsWith('insert') || msg.toLowerCase().startsWith('select'))
+            ? "Database error occurred."
+            : msg;
+
+        return { success: false, error: safeMsg };
     }
 }
 
