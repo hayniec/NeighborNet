@@ -55,9 +55,25 @@ export default function EmergencyPage() {
                 // Simulate sending alerts
                 setTimeout(() => {
                     setStatus('sent');
-                    // In a real app, logic to trigger SMS/Calls via backend would go here.
-                    // For demo, we might try to open tel link for the first contact?
-                    // if (contacts.length > 0) window.location.href = `tel:${contacts[0].phone}`;
+
+                    // Logic for Call initiation based on preferences
+                    const savedProfile = localStorage.getItem('neighborNet_profile');
+                    if (savedProfile) {
+                        const profile = JSON.parse(savedProfile);
+                        const primaryId = profile.primaryContactId;
+                        const contactMethod = localStorage.getItem('neighborNet_notification_method') || 'both'; // We need to sync this from settings too, or checking the state
+
+                        // Actually, SettingsPage saves profile. Let's assume notifications state is saved separately or we just check contacts.
+                        // For this turn, we just check primary ID.
+
+                        if (contacts.length > 0 && (contactMethod === 'call' || contactMethod === 'both')) {
+                            const targetContact = contacts.find(c => c.id === primaryId) || contacts[0];
+                            if (targetContact) {
+                                console.log(`Initiating call to ${targetContact.name} (${targetContact.phone})...`);
+                                window.location.href = `tel:${targetContact.phone}`;
+                            }
+                        }
+                    }
                 }, 2000);
             }
         }
@@ -100,8 +116,30 @@ export default function EmergencyPage() {
                         <span style={{ fontSize: '1rem', fontWeight: 'normal', marginTop: '0.5rem' }}>TAP TO ALERT</span>
                     </button>
 
-                    <div style={{ marginTop: '3rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
-                        <p>This will notify: {contacts.length > 0 ? (
+                    <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '300px' }}>
+                        <a href="tel:911" style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                            backgroundColor: '#ef4444', color: 'white', padding: '1rem', borderRadius: '8px',
+                            fontWeight: 'bold', textDecoration: 'none', fontSize: '1.2rem',
+                            boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.4)'
+                        }}>
+                            <Phone size={24} />
+                            Call 911
+                        </a>
+
+                        <a href="tel:1-800-222-1222" style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                            backgroundColor: '#f59e0b', color: 'white', padding: '1rem', borderRadius: '8px',
+                            fontWeight: 'bold', textDecoration: 'none', fontSize: '1.2rem',
+                            boxShadow: '0 4px 6px -1px rgba(245, 158, 11, 0.4)'
+                        }}>
+                            <AlertTriangle size={24} />
+                            Poison Control
+                        </a>
+                    </div>
+
+                    <div style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+                        <p>SOS Alert will notify: {contacts.length > 0 ? (
                             <span style={{ fontWeight: 'bold' }}>
                                 {contacts.map(c => c.name).join(", ")}
                             </span>

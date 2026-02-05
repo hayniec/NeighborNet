@@ -33,6 +33,7 @@ interface UserProfile {
     externalContacts: ExternalContact[];
     personalEmergencyCode?: string;
     personalEmergencyInstructions?: string;
+    primaryContactId?: string;
 }
 
 export default function SettingsPage() {
@@ -64,7 +65,8 @@ export default function SettingsPage() {
             { id: 'mock2', name: 'Jane Doe', relationship: 'Sister', phone: '555-0123' }
         ],
         personalEmergencyCode: "",
-        personalEmergencyInstructions: ""
+        personalEmergencyInstructions: "",
+        primaryContactId: "mock1" // Default for demo
     });
 
     // Load from LocalStorage on mount
@@ -91,11 +93,15 @@ export default function SettingsPage() {
         }
     }, [user]);
 
-    const [notifications, setNotifications] = useState({
-        emailAlerts: true,
-        pushNotifications: true,
-        neighborAlerts: true,
-        marketing: false
+    const [notifications, setNotifications] = useState(() => {
+        const savedMethod = typeof window !== 'undefined' ? localStorage.getItem('neighborNet_notification_method') : 'both';
+        return {
+            emailAlerts: true,
+            pushNotifications: true,
+            neighborAlerts: true,
+            marketing: false,
+            contactMethod: (savedMethod as 'text' | 'call' | 'both') || 'both'
+        };
     });
 
     const [newSkill, setNewSkill] = useState("");
@@ -166,6 +172,7 @@ export default function SettingsPage() {
     const handleSave = () => {
         // Save to local storage for persistence across reloads
         localStorage.setItem('neighborNet_profile', JSON.stringify(profile));
+        localStorage.setItem('neighborNet_notification_method', notifications.contactMethod);
 
         // Update global user context so Sidebar updates immediately
         const fullName = `${profile.firstName} ${profile.lastName}`.trim();
@@ -391,6 +398,25 @@ export default function SettingsPage() {
                             <span className={styles.slider}></span>
                         </label>
                     </div>
+                    <div className={styles.formGroup} style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '1rem' }}>
+                            Preferred Method for Emergency Alerts
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            {['text', 'call', 'both'].map((method) => (
+                                <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                    <input
+                                        type="radio"
+                                        name="contactMethod"
+                                        checked={notifications.contactMethod === method}
+                                        onChange={() => setNotifications({ ...notifications, contactMethod: method as 'text' | 'call' | 'both' })}
+                                        style={{ accentColor: 'var(--primary)' }}
+                                    />
+                                    <span style={{ textTransform: 'capitalize' }}>{method}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -448,10 +474,25 @@ export default function SettingsPage() {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             {profile.externalContacts.map(contact => (
-                                <div key={contact.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: 'var(--background)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                    <div>
-                                        <div style={{ fontWeight: 500 }}>{contact.name}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>{contact.relationship} • {contact.phone}</div>
+                                <div key={contact.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: 'var(--background)', borderRadius: '8px', border: '1px solid var(--border)', borderColor: profile.primaryContactId === contact.id ? 'var(--primary)' : 'var(--border)' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <input
+                                            type="radio"
+                                            name="primaryContact"
+                                            checked={profile.primaryContactId === contact.id}
+                                            onChange={() => setProfile({ ...profile, primaryContactId: contact.id })}
+                                            style={{ width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                                            title="Set as Primary Call Contact"
+                                        />
+                                        <div>
+                                            <div style={{ fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                {contact.name}
+                                                {profile.primaryContactId === contact.id && (
+                                                    <span style={{ fontSize: '0.7rem', backgroundColor: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '10px' }}>Primary Call</span>
+                                                )}
+                                            </div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>{contact.relationship} • {contact.phone}</div>
+                                        </div>
                                     </div>
                                     <button onClick={() => removeContact(contact.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
                                         <Trash2 size={16} />
@@ -539,6 +580,6 @@ export default function SettingsPage() {
                     Switch to {user.role === 'admin' ? 'Resident' : 'Admin'} Mode
                 </button>
             </div>
-        </div>
+        </div >
     );
 }
