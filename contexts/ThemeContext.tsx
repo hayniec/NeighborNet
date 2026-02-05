@@ -41,6 +41,8 @@ interface ThemeContextType {
         local: boolean; // local guide
     };
     toggleModule: (module: 'marketplace' | 'resources' | 'events' | 'documents' | 'forum' | 'messages' | 'services' | 'local', value: boolean) => void;
+    showEmergencyOnDesktop: boolean;
+    setShowEmergencyOnDesktop: (show: boolean) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -153,6 +155,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         local: true
     });
 
+    const [showEmergencyOnDesktop, setShowEmergencyOnDesktopState] = useState(false);
+
+    useEffect(() => {
+        const savedShowEmergency = localStorage.getItem("neighborNet_showEmergencyOnDesktop");
+        if (savedShowEmergency) {
+            setShowEmergencyOnDesktopState(savedShowEmergency === "true");
+        }
+    }, []);
+
+    const setShowEmergencyOnDesktop = (value: boolean) => {
+        setShowEmergencyOnDesktopState(value);
+        localStorage.setItem("neighborNet_showEmergencyOnDesktop", String(value));
+    };
+
     const toggleModule = (module: 'marketplace' | 'resources' | 'events' | 'documents' | 'forum' | 'messages' | 'services' | 'local', value: boolean) => {
         const newModules = { ...enabledModules, [module]: value };
         setEnabledModules(newModules);
@@ -200,7 +216,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             colorMode, setColorMode,
             communityName, setCommunityName,
             communityLogo, setCommunityLogo,
-            enabledModules, toggleModule
+            enabledModules, toggleModule,
+            showEmergencyOnDesktop, setShowEmergencyOnDesktop
         }}>
             {children}
         </ThemeContext.Provider>

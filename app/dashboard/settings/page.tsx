@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./settings.module.css";
-import { User, Bell, Wrench, X, Save, Stethoscope, Phone, Plus, Trash2, Palette, Key } from "lucide-react";
+import { User, Bell, Wrench, X, Save, Stethoscope, Phone, Plus, Trash2, Palette, Key, Moon, Sun, Monitor, Laptop, Smartphone } from "lucide-react";
 import { MOCK_NEIGHBORS } from "@/lib/data";
 import { useTheme, THEMES } from "@/contexts/ThemeContext";
 import { useUser } from "@/contexts/UserContext";
@@ -36,7 +36,7 @@ interface UserProfile {
 }
 
 export default function SettingsPage() {
-    const { theme, setTheme, communityName, setCommunityName } = useTheme();
+    const { theme, setTheme, communityName, setCommunityName, colorMode, setColorMode, showEmergencyOnDesktop, setShowEmergencyOnDesktop } = useTheme();
     const { user, toggleRole, setUser } = useUser();
     const medicalKeywords = ["Nurse", "Doctor", "EMT", "Paramedic", "First Aid", "CPR", "Medical"];
 
@@ -288,6 +288,67 @@ export default function SettingsPage() {
                                 onKeyDown={handleAddEquipment}
                             />
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Appearance Settings */}
+            <div className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <div className={styles.sectionTitle}>
+                        <Palette size={20} />
+                        Appearance
+                    </div>
+                </div>
+                <div className={styles.sectionContent}>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Theme Preference</label>
+                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '1rem' }}>
+                            Choose how NeighborNet looks on your device.
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button
+                                className={`${styles.outlineButton} ${colorMode === 'light' ? styles.primaryButton : ''}`}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center', border: colorMode === 'light' ? '2px solid var(--primary)' : '1px solid var(--border)' }}
+                                onClick={() => setColorMode('light')}
+                            >
+                                <Sun size={18} /> Light
+                            </button>
+                            <button
+                                className={`${styles.outlineButton} ${colorMode === 'dark' ? styles.primaryButton : ''}`}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center', border: colorMode === 'dark' ? '2px solid var(--primary)' : '1px solid var(--border)' }}
+                                onClick={() => setColorMode('dark')}
+                            >
+                                <Moon size={18} /> Dark
+                            </button>
+                            <button
+                                className={`${styles.outlineButton} ${colorMode === 'system' ? styles.primaryButton : ''}`}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center', border: colorMode === 'system' ? '2px solid var(--primary)' : '1px solid var(--border)' }}
+                                onClick={() => setColorMode('system')}
+                            >
+                                <Monitor size={18} /> System
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className={styles.toggleRow} style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+                        <div className={styles.toggleLabel}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Laptop size={18} />
+                                <span>Show Emergency Tab on Desktop</span>
+                            </div>
+                            <span className={styles.toggleDescription}>
+                                The Emergency tab is always visible on mobile. Enable this to keep it visible on larger screens too.
+                            </span>
+                        </div>
+                        <label className={styles.switch}>
+                            <input
+                                type="checkbox"
+                                checked={showEmergencyOnDesktop}
+                                onChange={e => setShowEmergencyOnDesktop(e.target.checked)}
+                            />
+                            <span className={styles.slider}></span>
+                        </label>
                     </div>
                 </div>
             </div>

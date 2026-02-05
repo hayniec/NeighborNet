@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { LayoutDashboard, Users, Calendar, Settings, Home, LogOut, Siren, BoxSelect, ShoppingBag, MessageCircle, MessageSquare, FileText, Wrench, MapPin, Shield } from "lucide-react";
 import styles from "./dashboard.module.css";
 
@@ -38,14 +39,34 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         localStorage.removeItem('neighborNet_invites');
         router.push('/login');
     };
-    const { communityName, enabledModules } = useTheme();
+    const { communityName, enabledModules, showEmergencyOnDesktop } = useTheme();
     const { user } = useUser();
+
+    // Check mobile status
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Filter navigation based on role and enabled modules
     const filteredNavigation = navigation.filter(item => {
         // Role check
         if (item.name === "Admin Console") {
             return user.role === "admin";
+        }
+
+        // Emergency Visibility
+        if (item.name === "Emergency") {
+            // If mobile, always show. If desktop, check setting.
+            // Note: During hydration (isMobile false), we might hide it if setting is off. 
+            // Ideally we want it accessible, so maybe default to showing if uncertain? 
+            // But for this feature request "selectively visible", adhering to the setting on desktop is key.
+            if (isMobile) return true;
+            return showEmergencyOnDesktop ?? false;
         }
 
         // Module checks
