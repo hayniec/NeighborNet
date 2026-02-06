@@ -157,7 +157,7 @@ export default function MarketplacePage() {
                     <div className={styles.modal}>
                         <div className={styles.modalHeader}>
                             <h2>Post New Item</h2>
-                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                            <button onClick={() => setIsModalOpen(false)} className={styles.closeButton} aria-label="Close">
                                 <X size={24} />
                             </button>
                         </div>
@@ -179,8 +179,8 @@ export default function MarketplacePage() {
                                     placeholder="Condition, details, etc."
                                 />
                             </div>
-                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                <div className={styles.formGroup} style={{ flex: 1 }}>
+                            <div className={styles.flexibleRow}>
+                                <div className={`${styles.formGroup} ${styles.flex1}`}>
                                     <label>Price ($)</label>
                                     <input
                                         type="number"
@@ -190,7 +190,7 @@ export default function MarketplacePage() {
                                         placeholder="0.00"
                                     />
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '1.5rem' }}>
+                                <div className={styles.checkboxGroup}>
                                     <input
                                         type="checkbox"
                                         checked={newItem.isFree}

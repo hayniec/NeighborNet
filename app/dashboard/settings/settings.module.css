@@ -238,3 +238,243 @@ input:checked+.slider:before {
     min-width: 60px;
     color: var(--foreground);
 }
+
+.textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.sectionSubtitle {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.5rem;
+}
+
+.sectionSubtitleLarge {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+    margin-bottom: 1rem;
+}
+
+.tagGreen {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.themeToggleGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.themeButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: center;
+    border: 1px solid var(--border);
+}
+
+.themeButtonActive {
+    border: 2px solid var(--primary);
+}
+
+.inlineIcon {
+    display: inline;
+    margin-right: 6px;
+}
+
+.contactCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background-color: var(--background);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-color: var(--border);
+}
+
+.contactCardActive {
+    border-color: var(--primary);
+}
+
+.radioInput {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.primaryBadge {
+    font-size: 0.7rem;
+    background-color: var(--primary);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.deleteButton {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+}
+
+.contactFormGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.medicalNeighborLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.medicalNeighborActive {
+    background-color: rgba(79, 70, 229, 0.05);
+}
+
+.checkboxInput {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+
+.addButton {
+    background: var(--primary);
+    color: white;
+}
+
+.debugTools {
+    margin-top: 3rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+    text-align: center;
+}
+
+.toggleRowSeparator {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.notificationMethodGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.notificationMethodLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.contactMethodRadio {
+    accent-color: var(--primary);
+}
+
+.sectionTitleContent {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sectionTitleIcon {
+    font-size: 1.2rem;
+}
+
+.contactCardInner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.contactName {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.contactDetails {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+}
+
+.medicalSection {
+    margin-top: 1rem;
+}
+
+.medicalNeighborsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.saveButtonContainer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.saveIcon {
+    margin-right: 8px;
+}
+
+.devRoleButton {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+}
+
+.desktopToggleLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.colFlex2 {
+    flex: 2;
+}
+
+.contactListContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.medicalNameContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.medicalName {
+    font-weight: 500;
+}
+
+.medicalSkills {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+}
+
+.noMedicalText {
+    font-size: 0.9rem;
+    color: var(--muted-foreground);
+    font-style: italic;
+}

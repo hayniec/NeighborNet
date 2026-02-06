@@ -30,6 +30,21 @@
 .subtitle {
     color: var(--muted-foreground);
     font-size: 1.1rem;
+    margin-bottom: 3rem;
+    text-align: center;
+    max-width: 400px;
+}
+
+.boldText {
+    font-weight: bold;
+}
+
+.errorText {
+    color: #ef4444;
+}
+
+.calmText {
+    margin-bottom: 2rem;
 }
 
 .content {
@@ -124,5 +139,170 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+.pageContainer {
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.mainTitle {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.description {
+    margin-bottom: 3rem;
+    text-align: center;
+    max-width: 400px;
+}
+
+.sosButtonBig {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background-color: #ef4444;
+    border: 10px solid #fee2e2;
+    color: white;
+    font-size: 4rem;
+    font-weight: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.4), 0 10px 10px -5px rgba(239, 68, 68, 0.2);
+    transition: transform 0.2s;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.sosButtonText {
+    font-size: 1rem;
+    font-weight: normal;
+    margin-top: 0.5rem;
+}
+
+.quickLinks {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.call911 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: #ef4444;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4);
+}
+
+.callPoison {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: #f59e0b;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.4);
+}
+
+.notifyList {
+    margin-top: 2rem;
+    text-align: center;
+    color: var(--muted-foreground);
+}
+
+.countingSection {
+    text-align: center;
+}
+
+.countingTitle {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.countDownNumber {
+    font-size: 8rem;
+    font-weight: bold;
+    color: #ef4444;
+    margin-bottom: 2rem;
+}
+
+.cancelButton {
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    border: none;
+    background-color: #e5e7eb;
+    cursor: pointer;
+}
+
+.spinnerContainer {
+    text-align: center;
+}
+
+.spinner {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+    border-radius: 50%;
+    border: 4px solid #ef4444;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+.sentSection {
+    text-align: center;
+}
+
+.checkIcon {
+    margin: 0 auto 1.5rem;
+}
+
+.sentTitle {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.sentDescription {
+    margin-bottom: 2rem;
+    max-width: 400px;
+}
+
+.resetButton {
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
     }
 }

@@ -210,8 +210,8 @@ export default function SettingsPage() {
                             {profile.firstName[0]}{profile.lastName[0]}
                         </div>
                         <div className={styles.col}>
-                            <button className={`${styles.button} ${styles.outlineButton}`}>Change Avatar</button>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>JPG, GIF or PNG. 1MB max.</span>
+                            <button className={`${styles.button} ${styles.outlineButton}`} aria-label="Change Avatar">Change Avatar</button>
+                            <span className={styles.sectionSubtitle}>JPG, GIF or PNG. 1MB max.</span>
                         </div>
                     </div>
 
@@ -222,6 +222,7 @@ export default function SettingsPage() {
                                 className={styles.input}
                                 value={profile.firstName}
                                 onChange={e => setProfile({ ...profile, firstName: e.target.value })}
+                                aria-label="First Name"
                             />
                         </div>
                         <div className={styles.col}>
@@ -230,6 +231,7 @@ export default function SettingsPage() {
                                 className={styles.input}
                                 value={profile.lastName}
                                 onChange={e => setProfile({ ...profile, lastName: e.target.value })}
+                                aria-label="Last Name"
                             />
                         </div>
                     </div>
@@ -240,16 +242,17 @@ export default function SettingsPage() {
                             className={styles.input}
                             value={profile.address}
                             onChange={e => setProfile({ ...profile, address: e.target.value })}
+                            aria-label="Address"
                         />
                     </div>
 
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Bio</label>
                         <textarea
-                            className={styles.input}
-                            style={{ minHeight: '80px', resize: 'vertical' }}
+                            className={`${styles.input} ${styles.textarea}`}
                             value={profile.bio}
                             onChange={e => setProfile({ ...profile, bio: e.target.value })}
+                            aria-label="Bio"
                         />
                     </div>
 
@@ -268,21 +271,22 @@ export default function SettingsPage() {
                                 value={newSkill}
                                 onChange={e => setNewSkill(e.target.value)}
                                 onKeyDown={handleAddSkill}
+                                aria-label="Add new skill"
                             />
                         </div>
                     </div>
 
                     <div className={styles.formGroup}>
                         <label className={styles.label}>
-                            <Wrench size={14} style={{ display: 'inline', marginRight: '6px' }} />
+                            <Wrench size={14} className={styles.inlineIcon} />
                             Equipment Inventory (Press Enter to add)
                         </label>
-                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>
+                        <div className={styles.sectionSubtitle}>
                             Items you list here will be available for neighbors to borrow.
                         </div>
                         <div className={styles.tagsInput}>
                             {profile.equipment.map(item => (
-                                <span key={item.id} className={styles.tag} style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#059669', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                                <span key={item.id} className={`${styles.tag} ${styles.tagGreen}`}>
                                     {item.name}
                                     <X size={12} className={styles.removeTag} onClick={() => removeEquipment(item.id)} />
                                 </span>
@@ -293,6 +297,7 @@ export default function SettingsPage() {
                                 value={newEquipment}
                                 onChange={e => setNewEquipment(e.target.value)}
                                 onKeyDown={handleAddEquipment}
+                                aria-label="Add new equipment"
                             />
                         </div>
                     </div>
@@ -310,37 +315,37 @@ export default function SettingsPage() {
                 <div className={styles.sectionContent}>
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Theme Preference</label>
-                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '1rem' }}>
+                        <div className={styles.sectionSubtitleLarge}>
                             Choose how NeighborNet looks on your device.
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div className={styles.themeToggleGroup}>
                             <button
-                                className={`${styles.outlineButton} ${colorMode === 'light' ? styles.primaryButton : ''}`}
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center', border: colorMode === 'light' ? '2px solid var(--primary)' : '1px solid var(--border)' }}
+                                className={`${styles.outlineButton} ${styles.themeButton} ${colorMode === 'light' ? styles.primaryButton + ' ' + styles.themeButtonActive : ''}`}
                                 onClick={() => setColorMode('light')}
+                                aria-label="Set Light Theme"
                             >
                                 <Sun size={18} /> Light
                             </button>
                             <button
-                                className={`${styles.outlineButton} ${colorMode === 'dark' ? styles.primaryButton : ''}`}
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center', border: colorMode === 'dark' ? '2px solid var(--primary)' : '1px solid var(--border)' }}
+                                className={`${styles.outlineButton} ${styles.themeButton} ${colorMode === 'dark' ? styles.primaryButton + ' ' + styles.themeButtonActive : ''}`}
                                 onClick={() => setColorMode('dark')}
+                                aria-label="Set Dark Theme"
                             >
                                 <Moon size={18} /> Dark
                             </button>
                             <button
-                                className={`${styles.outlineButton} ${colorMode === 'system' ? styles.primaryButton : ''}`}
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center', border: colorMode === 'system' ? '2px solid var(--primary)' : '1px solid var(--border)' }}
+                                className={`${styles.outlineButton} ${styles.themeButton} ${colorMode === 'system' ? styles.primaryButton + ' ' + styles.themeButtonActive : ''}`}
                                 onClick={() => setColorMode('system')}
+                                aria-label="Set System Theme"
                             >
                                 <Monitor size={18} /> System
                             </button>
                         </div>
                     </div>
 
-                    <div className={styles.toggleRow} style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+                    <div className={`${styles.toggleRow} ${styles.toggleRowSeparator}`}>
                         <div className={styles.toggleLabel}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div className={styles.desktopToggleLabel}>
                                 <Laptop size={18} />
                                 <span>Show Emergency Tab on Desktop</span>
                             </div>
@@ -353,6 +358,7 @@ export default function SettingsPage() {
                                 type="checkbox"
                                 checked={showEmergencyOnDesktop}
                                 onChange={e => setShowEmergencyOnDesktop(e.target.checked)}
+                                aria-label="Toggle Emergency Tab on Desktop"
                             />
                             <span className={styles.slider}></span>
                         </label>
@@ -379,6 +385,7 @@ export default function SettingsPage() {
                                 type="checkbox"
                                 checked={notifications.emailAlerts}
                                 onChange={e => setNotifications({ ...notifications, emailAlerts: e.target.checked })}
+                                aria-label="Toggle Email Alerts"
                             />
                             <span className={styles.slider}></span>
                         </label>
@@ -394,25 +401,27 @@ export default function SettingsPage() {
                                 type="checkbox"
                                 checked={notifications.pushNotifications}
                                 onChange={e => setNotifications({ ...notifications, pushNotifications: e.target.checked })}
+                                aria-label="Toggle SMS Alerts"
                             />
                             <span className={styles.slider}></span>
                         </label>
                     </div>
                     <div className={styles.formGroup} style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '1rem' }}>
+                        <div className={styles.sectionSubtitleLarge}>
                             Preferred Method for Emergency Alerts
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div className={styles.notificationMethodGroup}>
                             {['text', 'call', 'both'].map((method) => (
-                                <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <label key={method} className={styles.notificationMethodLabel}>
                                     <input
                                         type="radio"
                                         name="contactMethod"
                                         checked={notifications.contactMethod === method}
                                         onChange={() => setNotifications({ ...notifications, contactMethod: method as 'text' | 'call' | 'both' })}
-                                        style={{ accentColor: 'var(--primary)' }}
+                                        className={styles.contactMethodRadio}
+                                        aria-label={`Select ${method} for alerts`}
                                     />
-                                    <span style={{ textTransform: 'capitalize' }}>{method}</span>
+                                    <span className={styles.capitalize}>{method}</span>
                                 </label>
                             ))}
                         </div>
@@ -424,8 +433,8 @@ export default function SettingsPage() {
             <div className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <div className={styles.sectionTitle}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '1.2rem' }}>🚑</span>
+                        <div className={styles.sectionTitleContent}>
+                            <span className={styles.sectionTitleIcon}>🚑</span>
                             Emergency Safety Network
                         </div>
                     </div>
@@ -434,10 +443,10 @@ export default function SettingsPage() {
                     {/* Personal Digital Lock */}
                     <div className={styles.formGroup} style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)' }}>
                         <label className={styles.label}>
-                            <Key size={14} style={{ display: 'inline', marginRight: '6px' }} />
+                            <Key size={14} className={styles.inlineIcon} />
                             My Digital Lock Code (Optional)
                         </label>
-                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>
+                        <div className={styles.sectionSubtitle}>
                             Providing this code allows it to be included in SOS texts sent from your account.
                         </div>
                         <div className={styles.row}>
@@ -448,15 +457,17 @@ export default function SettingsPage() {
                                     placeholder="#1234"
                                     value={profile.personalEmergencyCode || ""}
                                     onChange={e => setProfile({ ...profile, personalEmergencyCode: e.target.value })}
+                                    aria-label="Door or Gate Code"
                                 />
                             </div>
-                            <div className={styles.col} style={{ flex: 2 }}>
+                            <div className={`${styles.col} ${styles.colFlex2}`}>
                                 <label className={styles.label} style={{ fontSize: '0.85rem' }}>Instructions</label>
                                 <input
                                     className={styles.input}
                                     placeholder="e.g. Front door smart lock..."
                                     value={profile.personalEmergencyInstructions || ""}
                                     onChange={e => setProfile({ ...profile, personalEmergencyInstructions: e.target.value })}
+                                    aria-label="Emergency Entry Instructions"
                                 />
                             </div>
                         </div>
@@ -465,95 +476,100 @@ export default function SettingsPage() {
                     {/* External Contacts List */}
                     <div className={styles.formGroup}>
                         <label className={styles.label}>
-                            <Phone size={14} style={{ display: 'inline', marginRight: '6px' }} />
+                            <Phone size={14} className={styles.inlineIcon} />
                             External Emergency Contacts
                         </label>
-                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>
+                        <div className={styles.sectionSubtitle}>
                             Add trusted contacts outside the network (Family, Doctors, etc.)
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <div className={styles.contactListContainer}>
                             {profile.externalContacts.map(contact => (
-                                <div key={contact.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: 'var(--background)', borderRadius: '8px', border: '1px solid var(--border)', borderColor: profile.primaryContactId === contact.id ? 'var(--primary)' : 'var(--border)' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div key={contact.id} className={`${styles.contactCard} ${profile.primaryContactId === contact.id ? styles.contactCardActive : ''}`}>
+                                    <div className={styles.contactCardInner}>
                                         <input
                                             type="radio"
                                             name="primaryContact"
                                             checked={profile.primaryContactId === contact.id}
                                             onChange={() => setProfile({ ...profile, primaryContactId: contact.id })}
-                                            style={{ width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                                            className={styles.radioInput}
                                             title="Set as Primary Call Contact"
+                                            aria-label={`Set ${contact.name} as primary contact`}
                                         />
                                         <div>
-                                            <div style={{ fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <div className={styles.contactName}>
                                                 {contact.name}
                                                 {profile.primaryContactId === contact.id && (
-                                                    <span style={{ fontSize: '0.7rem', backgroundColor: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '10px' }}>Primary Call</span>
+                                                    <span className={styles.primaryBadge}>Primary Call</span>
                                                 )}
                                             </div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>{contact.relationship} • {contact.phone}</div>
+                                            <div className={styles.contactDetails}>{contact.relationship} • {contact.phone}</div>
                                         </div>
                                     </div>
-                                    <button onClick={() => removeContact(contact.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                                    <button onClick={() => removeContact(contact.id)} className={styles.deleteButton} aria-label={`Remove ${contact.name}`}>
                                         <Trash2 size={16} />
                                     </button>
                                 </div>
                             ))}
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.5rem', marginTop: '0.5rem' }}>
+                        <div className={styles.contactFormGrid}>
                             <input
                                 className={styles.input}
                                 placeholder="Name"
                                 value={newContactName}
                                 onChange={e => setNewContactName(e.target.value)}
+                                aria-label="New Contact Name"
                             />
                             <input
                                 className={styles.input}
                                 placeholder="Relationship"
                                 value={newContactRelation}
                                 onChange={e => setNewContactRelation(e.target.value)}
+                                aria-label="New Contact Relationship"
                             />
                             <input
                                 className={styles.input}
                                 placeholder="Phone"
                                 value={newContactPhone}
                                 onChange={e => setNewContactPhone(e.target.value)}
+                                aria-label="New Contact Phone"
                             />
-                            <button className={styles.button} style={{ background: 'var(--primary)', color: 'white' }} onClick={handleAddContact}>
+                            <button className={`${styles.button} ${styles.addButton}`} onClick={handleAddContact} aria-label="Add Contact">
                                 <Plus size={16} />
                             </button>
                         </div>
                     </div>
 
 
-                    <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
+                    <div className={`${styles.formGroup} ${styles.medicalSection}`}>
                         <label className={styles.label}>
-                            <Stethoscope size={14} style={{ display: 'inline', marginRight: '6px' }} />
+                            <Stethoscope size={14} className={styles.inlineIcon} />
                             Medical Response Neighbors
                         </label>
-                        <div className={styles.sectionSubtitle} style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>
+                        <div className={styles.sectionSubtitle}>
                             Select medically trained neighbors to notify in case of an SOS.
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+                        <div className={styles.medicalNeighborsList}>
                             {medicalNeighbors.map(neighbor => (
-                                <label key={neighbor.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', cursor: 'pointer', backgroundColor: profile.selectedMedicalNeighbors.includes(neighbor.id) ? 'rgba(79, 70, 229, 0.05)' : 'transparent' }}>
+                                <label key={neighbor.id} className={`${styles.medicalNeighborLabel} ${profile.selectedMedicalNeighbors.includes(neighbor.id) ? styles.medicalNeighborActive : ''}`}>
                                     <input
                                         type="checkbox"
                                         checked={profile.selectedMedicalNeighbors.includes(neighbor.id)}
                                         onChange={() => toggleMedicalNeighbor(neighbor.id)}
-                                        style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
+                                        className={styles.checkboxInput}
+                                        aria-label={`Select ${neighbor.name}`}
                                     />
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <span style={{ fontWeight: 500 }}>{neighbor.name}</span>
-                                        <span style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                                    <div className={styles.medicalNameContainer}>
+                                        <span className={styles.medicalName}>{neighbor.name}</span>
+                                        <span className={styles.medicalSkills}>
                                             {neighbor.skills.filter(s => medicalKeywords.some(k => s.toLowerCase().includes(k.toLowerCase()))).join(", ")}
                                         </span>
                                     </div>
                                 </label>
                             ))}
                             {medicalNeighbors.length === 0 && (
-                                <p style={{ fontSize: '0.9rem', color: 'var(--muted-foreground)', fontStyle: 'italic' }}>No neighbors with listed medical training found.</p>
+                                <p className={styles.noMedicalText}>No neighbors with listed medical training found.</p>
                             )}
                         </div>
                     </div>
@@ -561,21 +577,20 @@ export default function SettingsPage() {
             </div>
 
             {/* Save Button */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem' }}>
+            <div className={styles.saveButtonContainer}>
                 <button className={`${styles.button} ${styles.outlineButton}`}>Cancel</button>
                 <button className={`${styles.button} ${styles.primaryButton}`} onClick={handleSave}>
-                    <Save size={16} style={{ marginRight: 8 }} />
+                    <Save size={16} className={styles.saveIcon} />
                     Save Changes
                 </button>
             </div>
 
             {/* Debug / Dev Tools */}
-            <div style={{ marginTop: '3rem', borderTop: '1px solid var(--border)', paddingTop: '2rem', textAlign: 'center' }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '1rem' }}>Development Tools</p>
+            <div className={styles.debugTools}>
+                <p className={styles.sectionSubtitleLarge}>Development Tools</p>
                 <button
                     onClick={toggleRole}
-                    className={styles.outlineButton}
-                    style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
+                    className={`${styles.outlineButton} ${styles.devRoleButton}`}
                 >
                     Switch to {user.role === 'admin' ? 'Resident' : 'Admin'} Mode
                 </button>

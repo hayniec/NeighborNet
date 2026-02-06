@@ -132,7 +132,7 @@
 }
 
 /* Modal Styles */
-.overlay {
+.modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -143,13 +143,12 @@
     align-items: center;
     justify-content: center;
     z-index: 50;
-    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 .modal {
     background-color: var(--background);
-    /* Use theme background */
     width: 100%;
     max-width: 500px;
     border-radius: var(--radius);
@@ -157,9 +156,23 @@
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
     animation: modalSlideIn 0.2s ease-out;
     border: 1px solid var(--border);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.modalHeader h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
 }
 
 @keyframes modalSlideIn {
@@ -174,43 +187,122 @@
     }
 }
 
-.field {
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.formGroup {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.label {
+.formGroup label {
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--foreground);
 }
 
-.input,
-.select,
-.textarea {
-    padding: 0.625rem;
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+    padding: 0.75rem;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background-color: var(--background);
     color: var(--foreground);
     font-size: 0.95rem;
+    transition: all 0.2s;
 }
 
-.textarea {
+.formGroup input:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+}
+
+.formGroup textarea {
     min-height: 100px;
     resize: vertical;
 }
 
-.actions {
+.modalActions {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
 }
 
-.secondaryButton {
+.cancelButton {
     background-color: transparent;
-    color: var(--foreground);
+    color: var(--muted-foreground);
     border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancelButton:hover {
+    background-color: var(--muted);
+    color: var(--foreground);
+    border-color: var(--border);
+}
+
+.submitButton {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.submitButton:hover {
+    opacity: 0.9;
+}
+
+.flexibleRow {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.flex1 {
+    flex: 1;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 1.5rem;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted-foreground);
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.closeButton:hover {
+    background-color: var(--muted);
+    color: var(--foreground);
 }

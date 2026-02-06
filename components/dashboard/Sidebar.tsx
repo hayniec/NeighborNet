@@ -94,9 +94,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
                 <div className={styles.logoContainer}>
-                    <div style={{ width: 32, height: 32, background: 'var(--primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                    <div className={styles.logoIconContainer}>
                         {/* Simple logo placeholder if SVG not handy, or use SVG icon */}
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.logoIconSvg}>
                             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
@@ -106,8 +106,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     {/* Close button for mobile inside sidebar */}
                     <button
                         onClick={onClose}
-                        className={styles.iconButton}
-                        style={{ marginLeft: 'auto', display: 'flex' }}
+                        className={`${styles.iconButton} ${styles.closeButtonSidebar}`}
                         aria-label="Close Menu"
                     >
                         {/* We can conditionally render this or handle via CSS. For simplicity let's just use CSS to hide it on desktop if we want, or just rely on overlay click. */}
@@ -136,11 +135,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <div className={styles.avatar}>{user.avatar}</div>
                     <div className={styles.userInfo}>
                         <span className={styles.userName}>{user.name}</span>
-                        <span className={styles.userRole} style={{ textTransform: 'capitalize' }}>{user.role}</span>
+                        <span className={`${styles.userRole} ${styles.userRoleText}`}>{user.role}</span>
                     </div>
                     <button
-                        className={styles.iconButton}
-                        style={{ marginLeft: 'auto' }}
+                        className={`${styles.iconButton} ${styles.logoutButtonSidebar}`}
                         aria-label="Sign out"
                         onClick={handleLogout}
                     >

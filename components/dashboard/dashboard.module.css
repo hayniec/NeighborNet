@@ -197,8 +197,8 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
-    backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
 }
 
 .overlayOpen {
@@ -305,8 +305,8 @@
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     z-index: 100;
     display: flex;
     align-items: center;
@@ -378,4 +378,33 @@
 
 .sosCancelBtn:hover {
     background-color: var(--muted);
+}
+
+.logoIconContainer {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.logoIconSvg {
+    width: 20px;
+    height: 20px;
+}
+
+.closeButtonSidebar {
+    margin-left: auto;
+    display: flex;
+}
+
+.userRoleText {
+    text-transform: capitalize;
+}
+
+.logoutButtonSidebar {
+    margin-left: auto;
 }

@@ -81,92 +81,57 @@ export default function EmergencyPage() {
     }, [status, countdown, contacts]);
 
     return (
-        <div className={styles.container} style={{ height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <div className={`${styles.container} ${styles.pageContainer}`}>
 
             {status === 'idle' && (
                 <>
-                    <h1 className={styles.title} style={{ fontSize: '2.5rem', marginBottom: '1rem', textAlign: 'center' }}>Emergency Assistance</h1>
-                    <p className={styles.subtitle} style={{ marginBottom: '3rem', textAlign: 'center', maxWidth: '400px' }}>
+                    <h1 className={styles.mainTitle}>Emergency Assistance</h1>
+                    <p className={styles.subtitle}>
                         Press the button below to immediately notify your emergency contacts and community responders.
                     </p>
 
                     <button
                         onClick={handleSOSClick}
-                        className={styles.sosButton}
-                        style={{
-                            width: '280px',
-                            height: '280px',
-                            borderRadius: '50%',
-                            backgroundColor: '#ef4444',
-                            border: '10px solid #fee2e2',
-                            color: 'white',
-                            fontSize: '4rem',
-                            fontWeight: '900',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            boxShadow: '0 20px 25px -5px rgba(239, 68, 68, 0.4), 0 10px 10px -5px rgba(239, 68, 68, 0.2)',
-                            transition: 'transform 0.2s',
-                            animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                        }}
+                        className={styles.sosButtonBig}
                     >
                         SOS
-                        <span style={{ fontSize: '1rem', fontWeight: 'normal', marginTop: '0.5rem' }}>TAP TO ALERT</span>
+                        <span className={styles.sosButtonText}>TAP TO ALERT</span>
                     </button>
 
-                    <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '300px' }}>
-                        <a href="tel:911" style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                            backgroundColor: '#ef4444', color: 'white', padding: '1rem', borderRadius: '8px',
-                            fontWeight: 'bold', textDecoration: 'none', fontSize: '1.2rem',
-                            boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.4)'
-                        }}>
+                    <div className={styles.quickLinks}>
+                        <a href="tel:911" className={styles.call911}>
                             <Phone size={24} />
                             Call 911
                         </a>
 
-                        <a href="tel:1-800-222-1222" style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                            backgroundColor: '#f59e0b', color: 'white', padding: '1rem', borderRadius: '8px',
-                            fontWeight: 'bold', textDecoration: 'none', fontSize: '1.2rem',
-                            boxShadow: '0 4px 6px -1px rgba(245, 158, 11, 0.4)'
-                        }}>
+                        <a href="tel:1-800-222-1222" className={styles.callPoison}>
                             <AlertTriangle size={24} />
                             Poison Control
                         </a>
                     </div>
 
-                    <div style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+                    <div className={styles.notifyList}>
                         <p>SOS Alert will notify: {contacts.length > 0 ? (
-                            <span style={{ fontWeight: 'bold' }}>
+                            <span className={styles.boldText}>
                                 {contacts.map(c => c.name).join(", ")}
                             </span>
                         ) : (
-                            <span style={{ color: '#ef4444' }}>No contacts configured! Go to Settings.</span>
+                            <span className={styles.errorText}>No contacts configured! Go to Settings.</span>
                         )}</p>
                     </div>
                 </>
             )}
 
             {status === 'counting' && (
-                <div style={{ textAlign: 'center' }}>
-                    <h2 style={{ fontSize: '2rem', marginBottom: '2rem' }}>Sending Alert in...</h2>
-                    <div style={{ fontSize: '8rem', fontWeight: 'bold', color: '#ef4444', marginBottom: '2rem' }}>
+                <div className={styles.countingSection}>
+                    <h2 className={styles.countingTitle}>Sending Alert in...</h2>
+                    <div className={styles.countDownNumber}>
                         {countdown}
                     </div>
-                    <p style={{ marginBottom: '2rem' }}>Keep calm, help is being notified.</p>
+                    <p className={styles.calmText}>Keep calm, help is being notified.</p>
                     <button
                         onClick={handleCancel}
-                        style={{
-                            padding: '1rem 3rem',
-                            fontSize: '1.2rem',
-                            borderRadius: '50px',
-                            border: 'none',
-                            backgroundColor: '#e5e7eb',
-                            cursor: 'pointer'
-                        }}
+                        className={styles.cancelButton}
                     >
                         Cancel
                     </button>
@@ -174,40 +139,29 @@ export default function EmergencyPage() {
             )}
 
             {status === 'active' && (
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{
-                        width: '120px', height: '120px', margin: '0 auto 2rem',
-                        borderRadius: '50%', border: '4px solid #ef4444', borderTopColor: 'transparent',
-                        animation: 'spin 1s linear infinite'
-                    }} />
+                <div className={styles.spinnerContainer}>
+                    <div className={styles.spinner} />
                     <h2>Contacting Network...</h2>
                 </div>
             )}
 
             {status === 'sent' && (
-                <div style={{ textAlign: 'center' }}>
-                    <CheckCircle2 size={80} color="#10b981" style={{ margin: '0 auto 1.5rem' }} />
-                    <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Alerts Sent</h2>
-                    <p style={{ marginBottom: '2rem', maxWidth: '400px' }}>
+                <div className={styles.sentSection}>
+                    <CheckCircle2 size={80} color="#10b981" className={styles.checkIcon} />
+                    <h2 className={styles.sentTitle}>Alerts Sent</h2>
+                    <p className={styles.sentDescription}>
                         Your emergency contacts and nearby medical responders have been notified of your location.
                     </p>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '300px' }}>
-                        <Link href="tel:911" style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                            backgroundColor: '#ef4444', color: 'white', padding: '1rem', borderRadius: '8px',
-                            fontWeight: 'bold', textDecoration: 'none'
-                        }}>
+                    <div className={styles.quickLinks}>
+                        <Link href="tel:911" className={styles.call911}>
                             <Phone size={20} />
                             Call 911
                         </Link>
 
                         <button
                             onClick={() => setStatus('idle')}
-                            style={{
-                                padding: '1rem', borderRadius: '8px', border: '1px solid #d1d5db',
-                                backgroundColor: 'transparent', cursor: 'pointer'
-                            }}
+                            className={styles.resetButton}
                         >
                             Reset
                         </button>
@@ -215,16 +169,7 @@ export default function EmergencyPage() {
                 </div>
             )}
 
-            <style jsx global>{`
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); opacity: 1; }
-                    50% { transform: scale(1.05); opacity: .9; }
-                }
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-            `}</style>
+
         </div>
     );
 }

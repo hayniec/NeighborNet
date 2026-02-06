@@ -109,7 +109,7 @@ export default function DocumentsPage() {
                 <div className={styles.infoGrid}>
                     <div className={styles.infoCard}>
                         <span className={styles.cardLabel}>Contact</span>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <div className={styles.contactInfo}>
                             <div className={styles.cardValue}>
                                 <Mail size={18} className="text-muted-foreground" />
                                 board@community.com
@@ -121,16 +121,11 @@ export default function DocumentsPage() {
 
             {activeTab === 'documents' && (
                 <div>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                    <div className={styles.flexEndContainer}>
                         {/* Only admins might upload in future, for now allow all or check role */}
                         <button
                             className={styles.uploadButton}
                             onClick={() => setIsUploadModalOpen(true)}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                padding: '0.5rem 1rem', background: 'var(--primary)', color: 'white',
-                                border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer'
-                            }}
                         >
                             <Upload size={16} />
                             Upload Document
@@ -138,9 +133,9 @@ export default function DocumentsPage() {
                     </div>
 
                     {isLoading ? (
-                        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading documents...</div>
+                        <div className={styles.loadingMessage}>Loading documents...</div>
                     ) : documents.length === 0 ? (
-                        <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>No documents found.</div>
+                        <div className={styles.emptyMessage}>No documents found.</div>
                     ) : (
                         <div className={styles.documentList}>
                             {documents.map((doc) => (
@@ -164,7 +159,54 @@ export default function DocumentsPage() {
                 </div>
             )}
 
-            {/* Modal placeholder (UI omitted for brevity but logic present in handleUpload) */}
+            {isUploadModalOpen && (
+                <div className={styles.viewerOverlay}>
+                    <div className={styles.uploadModal}>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.modalTitle}>Upload Document</h2>
+                            <button className={styles.closeButton} onClick={() => setIsUploadModalOpen(false)} aria-label="Close">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <form
+                            className={styles.uploadForm}
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const formData = new FormData(e.currentTarget);
+                                handleUpload({
+                                    name: formData.get('name'),
+                                    category: formData.get('category'),
+                                    url: formData.get('url')
+                                });
+                            }}
+                        >
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Document Title</label>
+                                <input name="name" className={styles.formInput} placeholder="e.g. Annual Budget 2026" required />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Category</label>
+                                <select name="category" className={styles.formInput} aria-label="Document Category">
+                                    <option value="Meeting Minutes">Meeting Minutes</option>
+                                    <option value="Financials">Financials</option>
+                                    <option value="Rules & Bylaws">Rules & Bylaws</option>
+                                    <option value="Notices">Notices</option>
+                                    <option value="Forms">Forms</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Link URL</label>
+                                <input name="url" className={styles.formInput} placeholder="https://..." type="url" required />
+                            </div>
+                            <div className={styles.formActions}>
+                                <button type="button" className={styles.cancelButton} onClick={() => setIsUploadModalOpen(false)}>Cancel</button>
+                                <button type="submit" className={styles.submitButton}>Upload</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
