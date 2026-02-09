@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import styles from "../join/join.module.css";
-import { authenticateUser } from "@/app/actions/auth";
+import { signIn } from "next-auth/react";
+
+// import { authenticateUser } from "@/app/actions/auth"; // Removed in favor of NextAuth
 
 export default function LoginPage() {
     const router = useRouter();
@@ -20,17 +22,17 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            const result = await authenticateUser(email, password);
+            const result = await signIn("credentials", {
+                redirect: false,
+                email,
+                password,
+            });
 
-            if (result.success && result.user) {
-                // @ts-ignore - mismatch between strict casing "resident" vs "Resident"
-                setUser(result.user);
-                // Also persist client side manually if context doesn't (Context does it, but let's be safe per prior patterns)
-                // Actually setUser in context already does localStorage.setItem.
-
-                router.push("/dashboard");
+            if (result?.error) {
+                setError("Invalid email or password");
             } else {
-                setError(result.error || "Login failed");
+                // Successful login
+                router.push("/dashboard");
             }
         } catch (err) {
             console.error(err);
@@ -38,6 +40,11 @@ export default function LoginPage() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleSocialLogin = (provider: string) => {
+        setIsLoading(true);
+        signIn(provider, { callbackUrl: "/dashboard" });
     };
 
     return (
@@ -86,6 +93,42 @@ export default function LoginPage() {
                     </button>
 
                 </form>
+
+                <div style={{ display: "flex", alignItems: "center", margin: "1.5rem 0" }}>
+                    <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }} />
+                    <span style={{ padding: "0 0.5rem", color: "#6b7280", fontSize: "0.875rem" }}>OR</span>
+                    <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }} />
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <button
+                        type="button"
+                        onClick={() => handleSocialLogin("google")}
+                        className={styles.button}
+                        style={{ backgroundColor: "#DB4437", borderColor: "#DB4437" }}
+                        disabled={isLoading}
+                    >
+                        Sign in with Google
+                    </button>
+                    {/* <button
+                        type="button"
+                        onClick={() => handleSocialLogin("facebook")}
+                        className={styles.button}
+                        style={{ backgroundColor: "#4267B2", borderColor: "#4267B2" }}
+                        disabled={isLoading}
+                    >
+                        Sign in with Facebook
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => handleSocialLogin("apple")}
+                        className={styles.button}
+                        style={{ backgroundColor: "#000000", borderColor: "#000000" }}
+                        disabled={isLoading}
+                    >
+                        Sign in with Apple
+                    </button> */}
+                </div>
                 <p className={styles.footerText} style={{ marginTop: '1.5rem' }}>
                     Don't have an account? <a href="/join" className={styles.link}>Join with Code</a>
                 </p>

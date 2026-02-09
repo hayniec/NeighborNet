@@ -61,6 +61,19 @@ export default function AdminPage() {
 
 
 
+    const handleDownloadTemplate = () => {
+        const csvContent = "Email\nresident@example.com\nanother@example.com";
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "resident_import_template.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const handleCsvUpload = async () => {
         if (!csvFile || !communityId || !user.id) return;
         const currentUserId = user.id;
@@ -577,37 +590,7 @@ export default function AdminPage() {
                             </div>
                         </div>
 
-                        <div className={styles.card}>
-                            <div className={styles.cardHeader}>
-                                <Upload size={20} />
-                                <span className={styles.cardTitle}>Batch Import Residents</span>
-                            </div>
-                            <div className={styles.cardContent}>
-                                <div className={styles.formGroup}>
-                                    <label className={styles.label}>Upload CSV (Email in first column)</label>
-                                    <input type="file" accept=".csv" onChange={(e) => setCsvFile(e.target.files?.[0] || null)} style={{ marginTop: '0.5rem' }} />
-                                </div>
-                                <button
-                                    onClick={handleCsvUpload}
-                                    disabled={!csvFile || isImporting}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius)', background: 'var(--secondary)', color: 'white', border: 'none', cursor: 'pointer' }}
-                                >
-                                    {isImporting ? "Importing..." : "Process CSV & Generate Codes"}
-                                </button>
-                                {bulkImportResults.length > 0 && (
-                                    <div style={{ marginTop: '1rem', maxHeight: '150px', overflowY: 'auto', background: 'var(--muted)', padding: '0.5rem' }}>
-                                        <table style={{ width: '100%', fontSize: '0.8rem' }}>
-                                            <thead><tr><th style={{ textAlign: 'left' }}>Email</th><th style={{ textAlign: 'left' }}>Code</th></tr></thead>
-                                            <tbody>
-                                                {bulkImportResults.map((r, i) => (
-                                                    <tr key={i}><td>{r.email}</td><td style={{ fontWeight: 'bold' }}>{r.code}</td></tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+
 
                         <div className={styles.card}>
                             <div className={styles.cardHeader}>
@@ -623,8 +606,22 @@ export default function AdminPage() {
                                         onChange={(e) => setCsvFile(e.target.files ? e.target.files[0] : null)}
                                         style={{ display: 'block', marginTop: '0.5rem' }}
                                     />
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
-                                        CSV Format: First column should be email address. One per line.
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span>CSV Format: First column should be email address. One per line.</span>
+                                        <button
+                                            onClick={handleDownloadTemplate}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                color: 'var(--primary)',
+                                                textDecoration: 'underline',
+                                                cursor: 'pointer',
+                                                fontSize: '0.8rem',
+                                                padding: 0
+                                            }}
+                                        >
+                                            Download Template
+                                        </button>
                                     </div>
                                 </div>
                                 <button

@@ -36,7 +36,7 @@ export const communities = pgTable('communities', {
 
     createdAt: timestamp('created_at').defaultNow(),
 });
-http://thenextweb.com/la/2012/08/11/18-latin-american-tech-hubs-know/
+
 // Invitations table (for new resident sign-ups)
 export const invitations = pgTable('invitations', {
     id: uuid('id').primaryKey().defaultRandom(),
