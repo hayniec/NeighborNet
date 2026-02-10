@@ -96,12 +96,17 @@ export async function bulkCreateInvitations(data: {
             return { success: false, error: "Only admins can perform bulk import." };
         }
 
+        // If createdBy is the mock ID, we must set it to null because "mock-super-admin-id" 
+        // is not a valid UUID in the neighbors table and will cause a foreign key violation.
+        // The invitations table allows created_by to be null (implied by schema absent NOT NULL).
+        const safeCreatedBy = data.createdBy === "mock-super-admin-id" ? null : data.createdBy;
+
         const values = data.invitations.map(inv => ({
             communityId: data.communityId,
             email: inv.email,
             invitedName: inv.name || null,
             code: generateCode(), // Generate unique code for each
-            createdBy: data.createdBy,
+            createdBy: safeCreatedBy,
             status: 'pending' as const
         }));
 
