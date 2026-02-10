@@ -21,6 +21,9 @@ function generateCode(): string {
  */
 async function isAdmin(userId?: string): Promise<boolean> {
     if (!userId) return false;
+    // Allow mock super admin to bypass DB check
+    if (userId === "mock-super-admin-id") return true;
+
     try {
         const [user] = await db
             .select()
