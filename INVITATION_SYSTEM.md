@@ -153,3 +153,26 @@ Deletes an invitation.
 - The current implementation uses a temporary `COMMUNITY_ID` constant
 - In production, this should be replaced with the actual community ID from the user's session/context
 - User account creation is currently simulated - actual user creation logic needs to be implemented
+
+## Email Setup & Configuration
+
+To enable automated email invitations, you must configure the **Resend** service.
+
+### 1. Get API Key
+1.  Sign up for free at [resend.com](https://resend.com).
+2.  Create a new API Key.
+3.  Copy the key (it starts with `re_`).
+
+### 2. Configure Environment
+1.  Open your `.env.local` file.
+2.  Add the following line:
+    ```env
+    RESEND_API_KEY=re_123456789...ZkWAbyk_McMqFinZRHKX8D3q6MSFYFq4
+    ```
+3.  **Restart your development server** (`Ctrl+C` then `npm run dev`) to load the new key.
+
+### 3. Verification
+-   Go to the Admin Console -> Invitations.
+-   Send an invite to your own email address.
+-   Check your inbox (and spam folder) for the invitation code.
+-   **Note**: On the free tier, you can only send emails to the address you signed up with (unless you verify a custom domain).
