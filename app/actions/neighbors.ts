@@ -91,6 +91,7 @@ export async function getNeighbors(communityId: string): Promise<NeighborActionS
                 email: n.email,
                 role: n.role,
                 address: n.address,
+                hoaPosition: n.hoaPosition, // Add hoaPosition
                 avatar: n.avatar || '👤',
                 joinedDate: n.joinedDate,
                 skills: n.skills || [],
@@ -123,6 +124,7 @@ export async function updateNeighbor(neighborId: string, data: {
     name?: string;
     role?: 'Admin' | 'Resident' | 'Board Member';
     address?: string;
+    hoaPosition?: string | null;
 }): Promise<NeighborActionState> {
     try {
         await db.update(neighbors)

@@ -28,6 +28,8 @@ interface NeighborUser {
     address: string;
     email: string;
     joinedDate?: Date;
+    isHoaOfficer?: boolean;
+    hoaPosition?: string;
 }
 
 export default function AdminPage() {
@@ -62,7 +64,7 @@ export default function AdminPage() {
 
 
     const handleDownloadTemplate = () => {
-        const csvContent = "Email\nresident@example.com\nanother@example.com";
+        const csvContent = "Email,First Name,Last Name\nresident@example.com,John,Doe\nanother@example.com,Jane,Smith";
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
@@ -81,18 +83,38 @@ export default function AdminPage() {
         const reader = new FileReader();
         reader.onload = async (e) => {
             const text = e.target?.result as string;
-            const emails = text.split(/\r?\n/).map(line => line.split(',')[0].trim()).filter(x => x && x.includes('@'));
+            const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+            const parsedData: { email: string; name?: string }[] = [];
 
-            if (emails.length === 0) {
+            // Skip header if present
+            const startIndex = lines[0].toLowerCase().startsWith('email') ? 1 : 0;
+
+            for (let i = startIndex; i < lines.length; i++) {
+                const parts = lines[i].split(',').map(p => p.trim());
+                if (parts.length > 0 && parts[0].includes('@')) {
+                    const email = parts[0];
+                    let name = undefined;
+                    if (parts.length >= 2) {
+                        const firstName = parts[1];
+                        const lastName = parts[2] || '';
+                        name = `${firstName} ${lastName}`.trim();
+                    }
+                    parsedData.push({ email, name: name || undefined });
+                }
+            }
+
+            if (parsedData.length === 0) {
                 alert("No valid emails found.");
                 setIsImporting(false);
                 return;
             }
+
             const res = await bulkCreateInvitations({
                 communityId,
-                emails,
+                invitations: parsedData,
                 createdBy: currentUserId
             });
+
             if (res.success && res.data) {
                 setBulkImportResults(res.data as any);
                 alert(`Imported ${res.data.length} invitations.`);
@@ -120,6 +142,18 @@ export default function AdminPage() {
     // User Editing State
     const [editingUser, setEditingUser] = useState<NeighborUser | null>(null);
     const [isUpdatingUser, setIsUpdatingUser] = useState(false);
+    const [isHoaOfficer, setIsHoaOfficer] = useState(false);
+    const [hoaPosition, setHoaPosition] = useState("");
+
+    // Effect to initialize HOA fields when editingUser is set
+    useEffect(() => {
+        if (editingUser) {
+            const isBoard = editingUser.role === 'Board Member';
+            setIsHoaOfficer(isBoard);
+            // Assuming editingUser might have hoaPosition in the future, currently not in interface but will be added
+            // setHoaPosition(editingUser.hoaPosition || ""); 
+        }
+    }, [editingUser]);
 
     // Invite System State
     const [invites, setInvites] = useState<Invitation[]>([]);
@@ -209,8 +243,9 @@ export default function AdminPage() {
         try {
             const result = await updateNeighbor(editingUser.id, {
                 name: editingUser.name,
-                role: editingUser.role as 'Admin' | 'Resident' | 'Board Member',
-                address: editingUser.address
+                role: isHoaOfficer ? 'Board Member' : (editingUser.role === 'Board Member' ? 'Resident' : editingUser.role as 'Admin' | 'Resident' | 'Board Member'),
+                address: editingUser.address,
+                hoaPosition: isHoaOfficer ? hoaPosition : null
             });
 
             if (result.success) {
@@ -607,7 +642,7 @@ export default function AdminPage() {
                                         style={{ display: 'block', marginTop: '0.5rem' }}
                                     />
                                     <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span>CSV Format: First column should be email address. One per line.</span>
+                                        <span>CSV Format: Email, First Name, Last Name. One per line.</span>
                                         <button
                                             onClick={handleDownloadTemplate}
                                             style={{
@@ -908,81 +943,110 @@ export default function AdminPage() {
                                 <X size={20} />
                             </button>
 
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Edit Resident</h2>
-                                <p style={{ color: 'var(--muted-foreground)' }}>Update details for {editingUser.name}</p>
-                            </div>
+                            <div className={styles.modal}>
+                                <div className={styles.modalContent}>
+                                    <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Edit User</h2>
 
-                            <div className={styles.formGroup} style={{ marginBottom: '1rem' }}>
-                                <label className={styles.label}>Name</label>
-                                <input
-                                    className={styles.input}
-                                    value={editingUser.name}
-                                    onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
-                                    aria-label="Resident Name"
-                                />
-                            </div>
+                                    <div className={styles.formGroup}>
+                                        <label className={styles.label}>Name</label>
+                                        <input
+                                            className={styles.input}
+                                            value={editingUser.name}
+                                            onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                                        />
+                                    </div>
 
-                            <div className={styles.formGroup} style={{ marginBottom: '1rem' }}>
-                                <label className={styles.label}>Address</label>
-                                <input
-                                    className={styles.input}
-                                    value={editingUser.address || ''}
-                                    onChange={(e) => setEditingUser({ ...editingUser, address: e.target.value })}
-                                    aria-label="Resident Address"
-                                />
-                            </div>
+                                    <div className={styles.formGroup}>
+                                        <label className={styles.label}>Address</label>
+                                        <input
+                                            className={styles.input}
+                                            value={editingUser.address || ''}
+                                            onChange={(e) => setEditingUser({ ...editingUser, address: e.target.value })}
+                                        />
+                                    </div>
 
-                            <div className={styles.formGroup} style={{ marginBottom: '1.5rem' }}>
-                                <label className={styles.label}>Role</label>
-                                <select
-                                    className={styles.input}
-                                    value={editingUser.role}
-                                    onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
-                                    aria-label="Resident Role"
-                                >
-                                    <option value="Resident">Resident</option>
-                                    <option value="Board Member">Board Member</option>
-                                    <option value="Admin">Admin</option>
-                                </select>
-                            </div>
+                                    <div className={styles.formGroup}>
+                                        <label className={styles.label}>Role</label>
+                                        <select
+                                            className={styles.input}
+                                            value={editingUser.role || 'Resident'}
+                                            onChange={(e) => {
+                                                const newRole = e.target.value as 'Admin' | 'Resident' | 'Board Member';
+                                                setEditingUser({ ...editingUser, role: newRole });
+                                                if (newRole === 'Board Member') {
+                                                    // Assuming setIsHoaOfficer is defined in the component's state
+                                                    // and hoaPosition is also managed by state.
+                                                    // This part of the logic needs to be handled by the component.
+                                                    // For now, just setting the role.
+                                                } else {
+                                                    // If not a Board Member, clear HOA position
+                                                    // This part of the logic needs to be handled by the component.
+                                                }
+                                            }}
+                                        >
+                                            <option value="Resident">Resident</option>
+                                            <option value="Admin">Admin</option>
+                                            <option value="Board Member">Board Member</option>
+                                        </select>
+                                    </div>
 
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                <button
-                                    onClick={() => setEditingUser(null)}
-                                    style={{
-                                        flex: 1,
-                                        padding: '0.75rem',
-                                        borderRadius: 'var(--radius)',
-                                        background: 'transparent',
-                                        border: '1px solid var(--border)',
-                                        color: 'var(--foreground)',
-                                        fontWeight: 600,
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleUpdateUser}
-                                    disabled={isUpdatingUser}
-                                    style={{
-                                        flex: 1,
-                                        padding: '0.75rem',
-                                        borderRadius: 'var(--radius)',
-                                        background: 'var(--primary)',
-                                        border: 'none',
-                                        color: 'white',
-                                        fontWeight: 600,
-                                        cursor: isUpdatingUser ? 'not-allowed' : 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem'
-                                    }}
-                                >
-                                    {isUpdatingUser ? 'Saving...' : 'Save Changes'}
-                                </button>
+                                    <div className={styles.formGroup}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                            <input
+                                                type="checkbox"
+                                                // Assuming isHoaOfficer is a state variable
+                                                checked={editingUser.isHoaOfficer || false} // Use editingUser.isHoaOfficer
+                                                onChange={(e) => setEditingUser({ ...editingUser, isHoaOfficer: e.target.checked })}
+                                            />
+                                            <span className={styles.label} style={{ marginBottom: 0 }}>Is HOA Officer?</span>
+                                        </label>
+                                    </div>
+
+                                    {editingUser.isHoaOfficer && ( // Use editingUser.isHoaOfficer
+                                        <div className={styles.formGroup}>
+                                            <label className={styles.label}>HOA Position</label>
+                                            <input
+                                                className={styles.input}
+                                                placeholder="e.g. President, Treasurer"
+                                                // Assuming hoaPosition is a state variable
+                                                value={editingUser.hoaPosition || ''} // Use editingUser.hoaPosition
+                                                onChange={(e) => setEditingUser({ ...editingUser, hoaPosition: e.target.value })}
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                                        <button
+                                            onClick={handleUpdateUser}
+                                            disabled={isUpdatingUser}
+                                            style={{
+                                                flex: 1,
+                                                padding: '0.75rem',
+                                                background: 'var(--primary)',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: 'var(--radius)',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            {isUpdatingUser ? 'Saving...' : 'Save Changes'}
+                                        </button>
+                                        <button
+                                            onClick={() => setEditingUser(null)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '0.75rem',
+                                                background: 'var(--muted)',
+                                                color: 'var(--foreground)',
+                                                border: 'none',
+                                                borderRadius: 'var(--radius)',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -43,6 +43,9 @@ export const invitations = pgTable('invitations', {
     communityId: uuid('community_id').references(() => communities.id).notNull(),
     code: text('code').notNull().unique(), // e.g., "A1B2C3"
     email: text('email').notNull(),
+    invitedName: text('invited_name'),
+    role: text('role', { enum: ['Admin', 'Resident', 'Board Member', 'Event Manager'] }).default('Resident'),
+    hoaPosition: text('hoa_position'),
     status: text('status', { enum: ['pending', 'used', 'expired'] }).default('pending'),
     createdBy: uuid('created_by'), // References neighbors.id (admin who created it)
     createdAt: timestamp('created_at').defaultNow(),
@@ -57,6 +60,7 @@ export const neighbors = pgTable('neighbors', {
     password: text('password'), // Add simple password for MVP
     name: text('name').notNull(),
     role: text('role', { enum: ['Admin', 'Resident', 'Board Member', 'Event Manager'] }).default('Resident'),
+    hoaPosition: text('hoa_position'),
     address: text('address'),
     personalEmergencyCode: text('personal_emergency_code'),
     personalEmergencyInstructions: text('personal_emergency_instructions'),

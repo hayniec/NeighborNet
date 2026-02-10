@@ -84,7 +84,7 @@ export async function createInvitation(data: {
  */
 export async function bulkCreateInvitations(data: {
     communityId: string;
-    emails: string[];
+    invitations: { email: string; name?: string }[];
     createdBy: string;
 }): Promise<InvitationActionState> {
     try {
@@ -93,9 +93,10 @@ export async function bulkCreateInvitations(data: {
             return { success: false, error: "Only admins can perform bulk import." };
         }
 
-        const values = data.emails.map(email => ({
+        const values = data.invitations.map(inv => ({
             communityId: data.communityId,
-            email: email,
+            email: inv.email,
+            invitedName: inv.name || null,
             code: generateCode(), // Generate unique code for each
             createdBy: data.createdBy,
             status: 'pending' as const
