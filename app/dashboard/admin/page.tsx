@@ -634,8 +634,9 @@ export default function AdminPage() {
                             </div>
                             <div className={styles.cardContent}>
                                 <div className={styles.formGroup}>
-                                    <label className={styles.label}>Upload CSV</label>
+                                    <label htmlFor="csv-upload" className={styles.label}>Upload CSV</label>
                                     <input
+                                        id="csv-upload"
                                         type="file"
                                         accept=".csv"
                                         onChange={(e) => setCsvFile(e.target.files ? e.target.files[0] : null)}
@@ -787,110 +788,41 @@ export default function AdminPage() {
 
             {/* Success Invitation Modal */}
             {
+                {/* Success Invitation Modal */ }
+            {
                 showModal && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000,
-                        backdropFilter: 'blur(4px)'
-                    }}>
-                        <div style={{
-                            backgroundColor: 'var(--card)',
-                            borderRadius: '1rem',
-                            padding: '2rem',
-                            width: '90%',
-                            maxWidth: '500px',
-                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                            border: '1px solid var(--border)',
-                            position: 'relative'
-                        }}>
+                    <div className={styles.modal}>
+                        <div className={styles.modalContent}>
                             <button
                                 onClick={() => setShowModal(false)}
                                 aria-label="Close modal"
-                                style={{
-                                    position: 'absolute',
-                                    top: '1rem',
-                                    right: '1rem',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: 'var(--muted-foreground)',
-                                    cursor: 'pointer'
-                                }}
+                                className={styles.closeButton}
                             >
                                 <X size={20} />
                             </button>
 
                             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                                <div style={{
-                                    width: '3rem',
-                                    height: '3rem',
-                                    backgroundColor: 'var(--accent)',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 1rem auto',
-                                    color: 'var(--primary)'
-                                }}>
+                                <div className={styles.successIcon}>
                                     <CheckCircle size={24} />
                                 </div>
-                                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Invitation Created!</h2>
-                                <p style={{ color: 'var(--muted-foreground)' }}>Share this with your neighbor.</p>
+                                <h2 className={styles.modalTitle}>Invitation Created!</h2>
+                                <p className={styles.modalText}>Share this with your neighbor.</p>
                             </div>
 
-                            <div style={{
-                                backgroundColor: 'var(--muted)',
-                                padding: '1rem',
-                                borderRadius: '0.5rem',
-                                fontFamily: 'monospace',
-                                fontSize: '0.9rem',
-                                whiteSpace: 'pre-wrap',
-                                marginBottom: '1.5rem',
-                                border: '1px solid var(--border)',
-                                color: 'var(--foreground)'
-                            }}>
+                            <div className={styles.codeBlock}>
                                 {modalData.message}
                             </div>
 
-                            <div style={{ display: 'flex', gap: '1rem' }}>
+                            <div className={styles.modalActions}>
                                 <button
                                     onClick={() => setShowModal(false)}
-                                    style={{
-                                        flex: 1,
-                                        padding: '0.75rem',
-                                        borderRadius: 'var(--radius)',
-                                        background: 'transparent',
-                                        border: '1px solid var(--border)',
-                                        color: 'var(--foreground)',
-                                        fontWeight: 600,
-                                        cursor: 'pointer'
-                                    }}
+                                    className={styles.buttonSecondary}
                                 >
                                     Close
                                 </button>
                                 <button
                                     onClick={copyToClipboard}
-                                    style={{
-                                        flex: 1,
-                                        padding: '0.75rem',
-                                        borderRadius: 'var(--radius)',
-                                        background: 'var(--primary)',
-                                        border: 'none',
-                                        color: 'white',
-                                        fontWeight: 600,
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem'
-                                    }}
+                                    className={styles.buttonPrimary}
                                 >
                                     <FileText size={18} />
                                     Copy Message
@@ -904,149 +836,104 @@ export default function AdminPage() {
             {/* Edit User Modal */}
             {
                 editingUser && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000,
-                        backdropFilter: 'blur(4px)'
-                    }}>
-                        <div style={{
-                            backgroundColor: 'var(--card)',
-                            borderRadius: '1rem',
-                            padding: '2rem',
-                            width: '90%',
-                            maxWidth: '500px',
-                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                            border: '1px solid var(--border)',
-                            position: 'relative'
-                        }}>
+                    <div className={styles.modal}>
+                        <div className={styles.modalContent}>
                             <button
                                 onClick={() => setEditingUser(null)}
                                 aria-label="Close modal"
-                                style={{
-                                    position: 'absolute',
-                                    top: '1rem',
-                                    right: '1rem',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: 'var(--muted-foreground)',
-                                    cursor: 'pointer'
-                                }}
+                                className={styles.closeButton}
                             >
                                 <X size={20} />
                             </button>
 
-                            <div className={styles.modal}>
-                                <div className={styles.modalContent}>
-                                    <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Edit User</h2>
+                            <h2 className={styles.modalTitle}>Edit User</h2>
 
-                                    <div className={styles.formGroup}>
-                                        <label className={styles.label}>Name</label>
-                                        <input
-                                            className={styles.input}
-                                            value={editingUser.name}
-                                            onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
-                                        />
-                                    </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="edit-name" className={styles.label}>Name</label>
+                                <input
+                                    id="edit-name"
+                                    className={styles.input}
+                                    value={editingUser.name}
+                                    onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                                />
+                            </div>
 
-                                    <div className={styles.formGroup}>
-                                        <label className={styles.label}>Address</label>
-                                        <input
-                                            className={styles.input}
-                                            value={editingUser.address || ''}
-                                            onChange={(e) => setEditingUser({ ...editingUser, address: e.target.value })}
-                                        />
-                                    </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="edit-address" className={styles.label}>Address</label>
+                                <input
+                                    id="edit-address"
+                                    className={styles.input}
+                                    value={editingUser.address || ''}
+                                    onChange={(e) => setEditingUser({ ...editingUser, address: e.target.value })}
+                                />
+                            </div>
 
-                                    <div className={styles.formGroup}>
-                                        <label className={styles.label}>Role</label>
-                                        <select
-                                            className={styles.input}
-                                            value={editingUser.role || 'Resident'}
-                                            onChange={(e) => {
-                                                const newRole = e.target.value as 'Admin' | 'Resident' | 'Board Member';
-                                                setEditingUser({ ...editingUser, role: newRole });
-                                                if (newRole === 'Board Member') {
-                                                    // Assuming setIsHoaOfficer is defined in the component's state
-                                                    // and hoaPosition is also managed by state.
-                                                    // This part of the logic needs to be handled by the component.
-                                                    // For now, just setting the role.
-                                                } else {
-                                                    // If not a Board Member, clear HOA position
-                                                    // This part of the logic needs to be handled by the component.
-                                                }
-                                            }}
-                                        >
-                                            <option value="Resident">Resident</option>
-                                            <option value="Admin">Admin</option>
-                                            <option value="Board Member">Board Member</option>
-                                        </select>
-                                    </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="edit-role" className={styles.label}>Role</label>
+                                <select
+                                    id="edit-role"
+                                    className={styles.input}
+                                    value={editingUser.role || 'Resident'}
+                                    onChange={(e) => {
+                                        const newRole = e.target.value as 'Admin' | 'Resident' | 'Board Member';
+                                        setEditingUser({ ...editingUser, role: newRole });
+                                        if (newRole === 'Board Member') {
+                                            // Assuming setIsHoaOfficer is defined in the component's state
+                                            // and hoaPosition is also managed by state.
+                                            // This part of the logic needs to be handled by the component.
+                                            // For now, just setting the role.
+                                        } else {
+                                            // If not a Board Member, clear HOA position
+                                            // This part of the logic needs to be handled by the component.
+                                        }
+                                    }}
+                                >
+                                    <option value="Resident">Resident</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="Board Member">Board Member</option>
+                                </select>
+                            </div>
 
-                                    <div className={styles.formGroup}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                                            <input
-                                                type="checkbox"
-                                                // Assuming isHoaOfficer is a state variable
-                                                checked={editingUser.isHoaOfficer || false} // Use editingUser.isHoaOfficer
-                                                onChange={(e) => setEditingUser({ ...editingUser, isHoaOfficer: e.target.checked })}
-                                            />
-                                            <span className={styles.label} style={{ marginBottom: 0 }}>Is HOA Officer?</span>
-                                        </label>
-                                    </div>
+                            <div className={styles.formGroup}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                    <input
+                                        type="checkbox"
+                                        // Assuming isHoaOfficer is a state variable
+                                        checked={editingUser.isHoaOfficer || false} // Use editingUser.isHoaOfficer
+                                        onChange={(e) => setEditingUser({ ...editingUser, isHoaOfficer: e.target.checked })}
+                                    />
+                                    <span className={styles.label} style={{ marginBottom: 0 }}>Is HOA Officer?</span>
+                                </label>
+                            </div>
 
-                                    {editingUser.isHoaOfficer && ( // Use editingUser.isHoaOfficer
-                                        <div className={styles.formGroup}>
-                                            <label className={styles.label}>HOA Position</label>
-                                            <input
-                                                className={styles.input}
-                                                placeholder="e.g. President, Treasurer"
-                                                // Assuming hoaPosition is a state variable
-                                                value={editingUser.hoaPosition || ''} // Use editingUser.hoaPosition
-                                                onChange={(e) => setEditingUser({ ...editingUser, hoaPosition: e.target.value })}
-                                            />
-                                        </div>
-                                    )}
-
-                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                                        <button
-                                            onClick={handleUpdateUser}
-                                            disabled={isUpdatingUser}
-                                            style={{
-                                                flex: 1,
-                                                padding: '0.75rem',
-                                                background: 'var(--primary)',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: 'var(--radius)',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            {isUpdatingUser ? 'Saving...' : 'Save Changes'}
-                                        </button>
-                                        <button
-                                            onClick={() => setEditingUser(null)}
-                                            style={{
-                                                flex: 1,
-                                                padding: '0.75rem',
-                                                background: 'var(--muted)',
-                                                color: 'var(--foreground)',
-                                                border: 'none',
-                                                borderRadius: 'var(--radius)',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
+                            {editingUser.isHoaOfficer && ( // Use editingUser.isHoaOfficer
+                                <div className={styles.formGroup}>
+                                    <label htmlFor="edit-hoa-position" className={styles.label}>HOA Position</label>
+                                    <input
+                                        id="edit-hoa-position"
+                                        className={styles.input}
+                                        placeholder="e.g. President, Treasurer"
+                                        // Assuming hoaPosition is a state variable
+                                        value={editingUser.hoaPosition || ''} // Use editingUser.hoaOfficer
+                                        onChange={(e) => setEditingUser({ ...editingUser, hoaPosition: e.target.value })}
+                                    />
                                 </div>
+                            )}
+
+                            <div className={styles.modalActions}>
+                                <button
+                                    onClick={handleUpdateUser}
+                                    disabled={isUpdatingUser}
+                                    className={styles.buttonPrimary}
+                                >
+                                    {isUpdatingUser ? 'Saving...' : 'Save Changes'}
+                                </button>
+                                <button
+                                    onClick={() => setEditingUser(null)}
+                                    className={styles.buttonSecondary}
+                                >
+                                    Cancel
+                                </button>
                             </div>
                         </div>
                     </div>
