@@ -1,12 +1,10 @@
 
 import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import FacebookProvider from "next-auth/providers/facebook"
-import AppleProvider from "next-auth/providers/apple"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { db } from "@/db"
-import { neighbors } from "@/db/schema"
-import { eq } from "drizzle-orm"
+import { users, members, communities } from "@/db/schema"
+import { eq, and } from "drizzle-orm"
 
 
 export const authOptions: NextAuthOptions = {
@@ -15,14 +13,6 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.GOOGLE_CLIENT_ID || "",
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         }),
-        // FacebookProvider({
-        //     clientId: process.env.FACEBOOK_CLIENT_ID || "",
-        //     clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
-        // }),
-        // AppleProvider({
-        //     clientId: process.env.APPLE_ID || "",
-        //     clientSecret: process.env.APPLE_SECRET || "",
-        // }),
         CredentialsProvider({
             name: "Credentials",
             credentials: {
@@ -33,23 +23,24 @@ export const authOptions: NextAuthOptions = {
                 if (!credentials?.email || !credentials?.password) return null;
 
                 try {
+                    // Check Global User
                     const [user] = await db
                         .select()
-                        .from(neighbors)
-                        .where(eq(neighbors.email, credentials.email));
+                        .from(users)
+                        .where(eq(users.email, credentials.email));
 
                     if (!user) return null;
 
                     // Note: Start using hashed passwords in production!
                     if (user.password !== credentials.password) return null;
 
+                    // We return the global user info here. 
+                    // Community context is resolving in the JWT callback.
                     return {
                         id: user.id,
                         name: user.name,
                         email: user.email,
                         image: user.avatar,
-                        role: user.role || undefined,
-                        communityId: user.communityId || undefined,
                     };
                 } catch (error) {
                     console.error("Authorize error:", error);
@@ -70,20 +61,21 @@ export const authOptions: NextAuthOptions = {
             if (!user.email) return false;
 
             try {
-                // Check if user exists
+                // Check if global user exists
                 const [existingUser] = await db
                     .select()
-                    .from(neighbors)
-                    .where(eq(neighbors.email, user.email));
+                    .from(users)
+                    .where(eq(users.email, user.email));
 
                 if (!existingUser) {
-                    // Create new user for social login
-                    await db.insert(neighbors).values({
+                    // Create new GLOBAL user for social login
+                    // NOTE: This does NOT add them to a community. 
+                    // They will be a 'homeless' user until they are invited or create a community.
+                    // For now, we allow it, but they might get redirected to a 'join' page.
+                    await db.insert(users).values({
                         email: user.email,
                         name: user.name || "Neighbor",
                         avatar: user.image || null,
-                        role: "Resident", // Default role
-                        // communityId is optionally null, handled by DB default or nullable
                     });
                 }
                 return true;
@@ -97,20 +89,59 @@ export const authOptions: NextAuthOptions = {
                 return { ...token, ...session.user };
             }
 
-            // On sign in, user is defined. Or on subsequent requests, check DB to refresh role/communityId
-            // Optimization: checking DB on every session access ensures role updates are live.
+            // 'user' is only available on the first call (sign in)
+            // But we can check DB on every call to ensure validity and switch communities.
+
             if (token.email) {
+                // 1. Fetch Global User
                 const [dbUser] = await db
                     .select()
-                    .from(neighbors)
-                    .where(eq(neighbors.email, token.email));
+                    .from(users)
+                    .where(eq(users.email, token.email));
 
                 if (dbUser) {
                     token.id = dbUser.id;
-                    token.role = dbUser.role || "Resident";
-                    token.communityId = dbUser.communityId;
                     token.name = dbUser.name;
-                    token.picture = dbUser.avatar; // Ensure picture syncs if DB changes
+                    token.picture = dbUser.avatar;
+
+                    // 2. Resolve Community Context
+                    // If the token already has a communityId, try to validate it.
+                    // Otherwise, pick the first one.
+                    let targetCommunityId = token.communityId as string | undefined;
+
+                    // Fetch all memberships for this user
+                    const userMemberships = await db
+                        .select({
+                            communityId: members.communityId,
+                            role: members.role,
+                            memberId: members.id,
+                        })
+                        .from(members)
+                        .where(eq(members.userId, dbUser.id));
+
+                    if (userMemberships.length > 0) {
+                        // Check if current target is valid
+                        const activeMembership = userMemberships.find(m => m.communityId === targetCommunityId);
+
+                        if (activeMembership) {
+                            // Keep existing selection
+                            token.role = activeMembership.role || "Resident";
+                            token.memberId = activeMembership.memberId;
+                            // Ensure token has the communityId (it might be there, but let's be explicit)
+                            token.communityId = activeMembership.communityId;
+                        } else {
+                            // Default to first membership
+                            const defaultMember = userMemberships[0];
+                            token.communityId = defaultMember.communityId;
+                            token.role = defaultMember.role || "Resident";
+                            token.memberId = defaultMember.memberId;
+                        }
+                    } else {
+                        // User has NO communities.
+                        delete token.communityId;
+                        delete token.role;
+                        delete token.memberId;
+                    }
                 }
             }
 
@@ -123,13 +154,15 @@ export const authOptions: NextAuthOptions = {
                 session.user.communityId = token.communityId as string | null | undefined;
                 session.user.name = token.name;
                 session.user.image = token.picture;
+                // @ts-ignore - Valid custom property
+                session.user.memberId = token.memberId as string | undefined;
             }
             return session;
         }
     },
     pages: {
         signIn: '/login',
-        error: '/login', // Redirect to login page on error
+        error: '/login',
     }
 }
 

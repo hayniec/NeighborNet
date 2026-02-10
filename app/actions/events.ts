@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/db";
-import { events, eventRsvps, neighbors } from "@/db/schema";
+import { events, eventRsvps, members } from "@/db/schema";
 import { eq, desc, inArray, and } from "drizzle-orm";
 
 export type EventActionState = {
@@ -10,7 +10,7 @@ export type EventActionState = {
     error?: string;
 };
 
-export async function getCommunityEvents(communityId: string, userId?: string): Promise<EventActionState> {
+export async function getCommunityEvents(communityId: string, memberId?: string): Promise<EventActionState> {
     try {
         const communityEvents = await db
             .select()
@@ -36,8 +36,8 @@ export async function getCommunityEvents(communityId: string, userId?: string): 
             const attendees = eventRsvpsList.reduce((sum, r) => sum + (r.guestCount || 0), 0);
 
             let userRsvp = 0;
-            if (userId) {
-                const myRsvp = eventRsvpsList.find(r => r.neighborId === userId);
+            if (memberId) {
+                const myRsvp = eventRsvpsList.find(r => r.neighborId === memberId);
                 if (myRsvp) userRsvp = myRsvp.guestCount || 0;
             }
 
@@ -48,7 +48,7 @@ export async function getCommunityEvents(communityId: string, userId?: string): 
                 time: event.time,
                 location: event.location,
                 description: event.description,
-                organizer: "Neighbor", // TODO: join
+                organizer: "Neighbor", // TODO: join to return actual organizer name
                 attendees: attendees,
                 category: event.category,
                 userRsvp: userRsvp
@@ -74,8 +74,8 @@ export async function createEvent(data: {
 }): Promise<EventActionState> {
     try {
         // Permission check
-        const [user] = await db.select().from(neighbors).where(eq(neighbors.id, data.organizerId));
-        const role = user?.role?.toLowerCase();
+        const [member] = await db.select().from(members).where(eq(members.id, data.organizerId));
+        const role = member?.role?.toLowerCase();
 
         if (role !== 'admin' && role !== 'event manager') {
             return { success: false, error: 'Unauthorized: Only Admins or Event Managers can create events.' };
@@ -115,10 +115,10 @@ export async function createEvent(data: {
     }
 }
 
-export async function deleteEvent(eventId: string, userId: string): Promise<EventActionState> {
+export async function deleteEvent(eventId: string, memberId: string): Promise<EventActionState> {
     try {
-        const [user] = await db.select().from(neighbors).where(eq(neighbors.id, userId));
-        const role = user?.role?.toLowerCase();
+        const [member] = await db.select().from(members).where(eq(members.id, memberId));
+        const role = member?.role?.toLowerCase();
 
         if (role !== 'admin' && role !== 'event manager') {
             return { success: false, error: 'Unauthorized: Only Admins or Event Managers can delete events.' };
@@ -132,18 +132,18 @@ export async function deleteEvent(eventId: string, userId: string): Promise<Even
     }
 }
 
-export async function updateRsvp(eventId: string, userId: string, guestCount: number): Promise<EventActionState> {
+export async function updateRsvp(eventId: string, memberId: string, guestCount: number): Promise<EventActionState> {
     try {
         if (guestCount <= 0) {
-            await db.delete(eventRsvps).where(and(eq(eventRsvps.eventId, eventId), eq(eventRsvps.neighborId, userId)));
+            await db.delete(eventRsvps).where(and(eq(eventRsvps.eventId, eventId), eq(eventRsvps.neighborId, memberId)));
         } else {
-            const [existing] = await db.select().from(eventRsvps).where(and(eq(eventRsvps.eventId, eventId), eq(eventRsvps.neighborId, userId)));
+            const [existing] = await db.select().from(eventRsvps).where(and(eq(eventRsvps.eventId, eventId), eq(eventRsvps.neighborId, memberId)));
             if (existing) {
                 await db.update(eventRsvps).set({ guestCount: guestCount, status: 'Going' }).where(eq(eventRsvps.id, existing.id));
             } else {
                 await db.insert(eventRsvps).values({
                     eventId,
-                    neighborId: userId,
+                    neighborId: memberId,
                     guestCount,
                     status: 'Going'
                 });

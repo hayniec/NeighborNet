@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/db";
-import { neighbors } from "@/db/schema";
+import { members, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export type NeighborActionState = {
@@ -10,6 +10,7 @@ export type NeighborActionState = {
     data?: any;
     error?: string;
 };
+
 
 /**
  * Register a new neighbor
@@ -25,45 +26,54 @@ export async function registerNeighbor(data: {
     try {
         console.log("[registerNeighbor] Registering neighbor:", data.email);
 
-        // Check if user already exists in this community
-        const existing = await db
+        // 1. Check/Create Global User
+        let [user] = await db.select().from(users).where(eq(users.email, data.email));
+
+        if (!user) {
+            [user] = await db.insert(users).values({
+                email: data.email,
+                name: data.name,
+                password: data.password || 'temp123',
+                // avatar: ...
+            }).returning();
+        }
+
+        // 2. Check Member Existence
+        const [existingMember] = await db
             .select()
-            .from(neighbors)
+            .from(members)
             .where(
                 and(
-                    eq(neighbors.communityId, data.communityId),
-                    eq(neighbors.email, data.email)
+                    eq(members.userId, user.id),
+                    eq(members.communityId, data.communityId)
                 )
             );
 
-        if (existing.length > 0) {
+        if (existingMember) {
             return {
                 success: false,
-                error: "A user with this email already exists in this community."
+                error: "User is already a member of this community."
             };
         }
 
-        const [newNeighbor] = await db.insert(neighbors).values({
+        // 3. Create Member
+        const [newMember] = await db.insert(members).values({
+            userId: user.id,
             communityId: data.communityId,
-            email: data.email,
-            password: data.password || 'temp123', // Default for now if missing
-            name: data.name,
-            address: data.address,
             role: data.role || 'Resident',
+            address: data.address,
             joinedDate: new Date(),
-            isOnline: true // Log them in effectively
+            isOnline: true
         }).returning();
-
-        console.log("[registerNeighbor] Successfully registered:", newNeighbor.id);
 
         return {
             success: true,
             data: {
-                id: newNeighbor.id,
-                name: newNeighbor.name,
-                email: newNeighbor.email,
-                role: newNeighbor.role,
-                communityId: newNeighbor.communityId,
+                id: newMember.id,
+                name: user.name,
+                email: user.email,
+                role: newMember.role,
+                communityId: newMember.communityId,
             },
             message: "Account created successfully"
         };
@@ -79,9 +89,21 @@ export async function registerNeighbor(data: {
 export async function getNeighbors(communityId: string): Promise<NeighborActionState> {
     try {
         const results = await db
-            .select()
-            .from(neighbors)
-            .where(eq(neighbors.communityId, communityId));
+            .select({
+                id: members.id,
+                role: members.role,
+                address: members.address,
+                hoaPosition: members.hoaPosition,
+                joinedDate: members.joinedDate,
+                skills: members.skills,
+                isOnline: members.isOnline,
+                name: users.name,
+                email: users.email,
+                avatar: users.avatar,
+            })
+            .from(members)
+            .innerJoin(users, eq(members.userId, users.id))
+            .where(eq(members.communityId, communityId));
 
         return {
             success: true,
@@ -91,11 +113,11 @@ export async function getNeighbors(communityId: string): Promise<NeighborActionS
                 email: n.email,
                 role: n.role,
                 address: n.address,
-                hoaPosition: n.hoaPosition, // Add hoaPosition
+                hoaPosition: n.hoaPosition,
                 avatar: n.avatar || '👤',
                 joinedDate: n.joinedDate,
                 skills: n.skills || [],
-                equipment: [] // TODO: Add equipment table or field
+                equipment: []
             }))
         };
     } catch (error: any) {
@@ -105,11 +127,11 @@ export async function getNeighbors(communityId: string): Promise<NeighborActionS
 }
 
 /**
- * Delete a neighbor
+ * Delete a neighbor (Remove membership)
  */
-export async function deleteNeighbor(neighborId: string): Promise<NeighborActionState> {
+export async function deleteNeighbor(memberId: string): Promise<NeighborActionState> {
     try {
-        await db.delete(neighbors).where(eq(neighbors.id, neighborId));
+        await db.delete(members).where(eq(members.id, memberId));
         return { success: true, message: "Neighbor removed successfully" };
     } catch (error: any) {
         console.error("Failed to delete neighbor:", error);
@@ -120,16 +142,32 @@ export async function deleteNeighbor(neighborId: string): Promise<NeighborAction
 /**
  * Update a neighbor's details
  */
-export async function updateNeighbor(neighborId: string, data: {
+export async function updateNeighbor(memberId: string, data: {
     name?: string;
     role?: 'Admin' | 'Resident' | 'Board Member';
     address?: string;
     hoaPosition?: string | null;
 }): Promise<NeighborActionState> {
     try {
-        await db.update(neighbors)
-            .set(data)
-            .where(eq(neighbors.id, neighborId));
+        // Update member specific fields
+        await db.update(members)
+            .set({
+                role: data.role,
+                address: data.address,
+                hoaPosition: data.hoaPosition
+            })
+            .where(eq(members.id, memberId));
+
+        // If name changes, we need to update 'users' table, but that affects global profile.
+        // For now, let's assume specific profile updates might be needed or handled separately.
+        // If we MUST update name here (as admin might want to fix a typo), we need the userId.
+
+        if (data.name) {
+            const [member] = await db.select().from(members).where(eq(members.id, memberId));
+            if (member) {
+                await db.update(users).set({ name: data.name }).where(eq(users.id, member.userId));
+            }
+        }
 
         return { success: true, message: "Neighbor updated successfully" };
     } catch (error: any) {
@@ -144,9 +182,21 @@ export async function updateNeighbor(neighborId: string, data: {
 export async function getNeighbor(id: string): Promise<NeighborActionState> {
     try {
         const result = await db
-            .select()
-            .from(neighbors)
-            .where(eq(neighbors.id, id));
+            .select({
+                id: members.id,
+                role: members.role,
+                address: members.address,
+                hoaPosition: members.hoaPosition,
+                joinedDate: members.joinedDate,
+                skills: members.skills,
+                isOnline: members.isOnline,
+                name: users.name,
+                email: users.email,
+                avatar: users.avatar,
+            })
+            .from(members)
+            .innerJoin(users, eq(members.userId, users.id))
+            .where(eq(members.id, id));
 
         if (result.length === 0) {
             return { success: false, error: "Neighbor not found" };
@@ -176,3 +226,4 @@ export async function getNeighbor(id: string): Promise<NeighborActionState> {
         return { success: false, error: error.message };
     }
 }
+

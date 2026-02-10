@@ -1,5 +1,5 @@
 
-import { pgTable, uuid, text, boolean, decimal, timestamp, integer, time, date } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, boolean, decimal, timestamp, integer, time, date, json } from 'drizzle-orm/pg-core';
 
 // 0. Communities (SaaS Tenants)
 export const communities = pgTable('communities', {
@@ -37,7 +37,38 @@ export const communities = pgTable('communities', {
     createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Invitations table (for new resident sign-ups)
+// 1. Users (Global Authentication)
+export const users = pgTable('users', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    email: text('email').notNull().unique(),
+    password: text('password'), // Simple password for now
+    name: text('name').notNull(),
+    avatar: text('avatar'),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+// 2. Members (Community Specific Profile)
+// Formerly 'neighbors'
+export const members = pgTable('members', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id).notNull(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
+
+    role: text('role', { enum: ['Admin', 'Resident', 'Board Member', 'Event Manager'] }).default('Resident'),
+    hoaPosition: text('hoa_position'),
+    address: text('address'),
+
+    // Emergency Info (Specific to this home/community context)
+    personalEmergencyCode: text('personal_emergency_code'),
+    personalEmergencyInstructions: text('personal_emergency_instructions'),
+
+    skills: text('skills').array(),
+    equipment: json('equipment').default([]),
+    joinedDate: timestamp('joined_date', { withTimezone: true }).defaultNow(),
+    isOnline: boolean('is_online').default(false),
+});
+
+// 3. Invitations
 export const invitations = pgTable('invitations', {
     id: uuid('id').primaryKey().defaultRandom(),
     communityId: uuid('community_id').references(() => communities.id).notNull(),
@@ -47,35 +78,12 @@ export const invitations = pgTable('invitations', {
     role: text('role', { enum: ['Admin', 'Resident', 'Board Member', 'Event Manager'] }).default('Resident'),
     hoaPosition: text('hoa_position'),
     status: text('status', { enum: ['pending', 'used', 'expired'] }).default('pending'),
-    createdBy: uuid('created_by'), // References neighbors.id (admin who created it)
+    createdBy: uuid('created_by').references(() => members.id), // Reference to the admin member
     createdAt: timestamp('created_at').defaultNow(),
-    expiresAt: timestamp('expires_at'), // Optional expiration
+    expiresAt: timestamp('expires_at'),
 });
 
-// 1. Neighbors (Users)
-export const neighbors = pgTable('neighbors', {
-    id: uuid('id').primaryKey().defaultRandom(),
-    communityId: uuid('community_id').references(() => communities.id), // Link to the tenant
-    email: text('email').notNull().unique(), // Add email for auth, unique to ensure 1 community per user
-    password: text('password'), // Add simple password for MVP
-    name: text('name').notNull(),
-    role: text('role', { enum: ['Admin', 'Resident', 'Board Member', 'Event Manager'] }).default('Resident'),
-    hoaPosition: text('hoa_position'),
-    address: text('address'),
-    personalEmergencyCode: text('personal_emergency_code'),
-    personalEmergencyInstructions: text('personal_emergency_instructions'),
-    avatar: text('avatar'),
-    // Note: Array support in Drizzle requires specific setup or json handling if strict arrays aren't needed. 
-    // For simplicity using simple arrays if supported by driver, or jsonb.
-    // Neon supports arrays, but Drizzle pg-core doesn't always have a direct .array() helper depending on version.
-    // We'll use text[] if possible, otherwise we might standardise on a separate table or comma-separated string for simplicity in basic MVP.
-    // Update: Drizzle supports arrays in recent versions.
-    skills: text('skills').array(),
-    joinedDate: timestamp('joined_date', { withTimezone: true }).defaultNow(),
-    isOnline: boolean('is_online').default(false),
-});
-
-// 2. Events
+// 4. Events
 export const events = pgTable('events', {
     id: uuid('id').primaryKey().defaultRandom(),
     communityId: uuid('community_id').references(() => communities.id).notNull(),
@@ -85,11 +93,11 @@ export const events = pgTable('events', {
     time: time('time').notNull(),
     location: text('location'),
     category: text('category', { enum: ['Social', 'HOA', 'Maintenance', 'Security'] }),
-    organizerId: uuid('organizer_id').references(() => neighbors.id),
+    organizerId: uuid('organizer_id').references(() => members.id),
     attendeesCount: integer('attendees_count').default(0),
 });
 
-// 3. Marketplace Items
+// 5. Marketplace Items
 export const marketplaceItems = pgTable('marketplace_items', {
     id: uuid('id').primaryKey().defaultRandom(),
     communityId: uuid('community_id').references(() => communities.id).notNull(),
@@ -102,10 +110,10 @@ export const marketplaceItems = pgTable('marketplace_items', {
     status: text('status', { enum: ['Active', 'Sold', 'Expired'] }).default('Active'),
     postedDate: timestamp('posted_date', { withTimezone: true }).defaultNow(),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
-    sellerId: uuid('seller_id').references(() => neighbors.id),
+    sellerId: uuid('seller_id').references(() => members.id),
 });
 
-// 4. Community Resources
+// 6. Community Resources
 export const resources = pgTable('resources', {
     id: uuid('id').primaryKey().defaultRandom(),
     communityId: uuid('community_id').references(() => communities.id).notNull(),
@@ -117,7 +125,7 @@ export const resources = pgTable('resources', {
     imageUrl: text('image_url'),
 });
 
-// 5. HOA Documents
+// 7. HOA Documents
 export const documents = pgTable('documents', {
     id: uuid('id').primaryKey().defaultRandom(),
     communityId: uuid('community_id').references(() => communities.id).notNull(),
@@ -126,14 +134,14 @@ export const documents = pgTable('documents', {
     uploadDate: timestamp('upload_date', { withTimezone: true }).defaultNow(),
     size: text('size'),
     url: text('url'),
-    uploaderId: uuid('uploader_id').references(() => neighbors.id),
+    uploaderId: uuid('uploader_id').references(() => members.id),
 });
 
-// 6. Event RSVPs
+// 8. Event RSVPs
 export const eventRsvps = pgTable('event_rsvps', {
     id: uuid('id').primaryKey().defaultRandom(),
     eventId: uuid('event_id').references(() => events.id, { onDelete: 'cascade' }).notNull(),
-    neighborId: uuid('neighbor_id').references(() => neighbors.id).notNull(),
+    neighborId: uuid('neighbor_id').references(() => members.id).notNull(),
     guestCount: integer('guest_count').default(1),
     status: text('status', { enum: ['Going', 'Maybe', 'Not Going'] }).default('Going'),
     rsvpDate: timestamp('rsvp_date', { withTimezone: true }).defaultNow(),

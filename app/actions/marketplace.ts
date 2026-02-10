@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/db";
-import { marketplaceItems, neighbors } from "@/db/schema";
+import { marketplaceItems, members, users } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 export type MarketplaceActionState = {
@@ -15,16 +15,18 @@ export async function getCommunityMarketplaceItems(communityId: string): Promise
         const results = await db
             .select({
                 item: marketplaceItems,
-                seller: neighbors
+                sellerMember: members,
+                sellerUser: users
             })
             .from(marketplaceItems)
-            .leftJoin(neighbors, eq(marketplaceItems.sellerId, neighbors.id))
+            .leftJoin(members, eq(marketplaceItems.sellerId, members.id))
+            .leftJoin(users, eq(members.userId, users.id))
             .where(eq(marketplaceItems.communityId, communityId))
             .orderBy(desc(marketplaceItems.postedDate));
 
         return {
             success: true,
-            data: results.map(({ item, seller }) => ({
+            data: results.map(({ item, sellerMember, sellerUser }) => ({
                 id: item.id,
                 title: item.title,
                 description: item.description,
@@ -36,8 +38,8 @@ export async function getCommunityMarketplaceItems(communityId: string): Promise
                 postedDate: item.postedDate?.toISOString(),
                 expiresAt: item.expiresAt?.toISOString(),
                 sellerId: item.sellerId,
-                sellerName: seller?.name || "Unknown Neighbor",
-                sellerEmail: seller?.email // Optional: Exposed for contact link if straightforward
+                sellerName: sellerUser?.name || "Unknown Neighbor",
+                sellerEmail: sellerUser?.email // Optional
             }))
         };
     } catch (error: any) {

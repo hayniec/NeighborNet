@@ -1,7 +1,6 @@
-'use server'
 
 import { db } from "@/db";
-import { neighbors } from "@/db/schema";
+import { users, members } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function authenticateUser(email: string, password: string) {
@@ -10,19 +9,22 @@ export async function authenticateUser(email: string, password: string) {
     }
 
     try {
+        // 1. Check Global User
         const [user] = await db
             .select()
-            .from(neighbors)
-            .where(
-                and(
-                    eq(neighbors.email, email),
-                    eq(neighbors.password, password)
-                )
-            );
+            .from(users)
+            .where(eq(users.email, email));
 
-        if (!user) {
+        if (!user || user.password !== password) {
             return { success: false, error: "Invalid email or password" };
         }
+
+        // 2. Get Default Community Context (First membership found)
+        const [membership] = await db
+            .select()
+            .from(members)
+            .where(eq(members.userId, user.id))
+            .limit(1);
 
         return {
             success: true,
@@ -30,9 +32,9 @@ export async function authenticateUser(email: string, password: string) {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role ? user.role.toLowerCase() : "resident",
+                role: membership?.role ? membership.role.toLowerCase() : "resident",
                 avatar: user.avatar || user.name.charAt(0).toUpperCase(),
-                communityId: user.communityId
+                communityId: membership?.communityId
             }
         };
 

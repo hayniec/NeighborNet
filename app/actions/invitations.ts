@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/db";
-import { invitations, neighbors } from "@/db/schema";
+import { invitations, members } from "@/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 
 export type InvitationActionState = {
@@ -19,17 +19,17 @@ function generateCode(): string {
 /**
  * Helper to verify admin status
  */
-async function isAdmin(userId?: string): Promise<boolean> {
-    if (!userId) return false;
+async function isAdmin(memberId?: string): Promise<boolean> {
+    if (!memberId) return false;
     // Allow mock super admin to bypass DB check
-    if (userId === "mock-super-admin-id") return true;
+    if (memberId === "mock-super-admin-id") return true;
 
     try {
-        const [user] = await db
+        const [member] = await db
             .select()
-            .from(neighbors)
-            .where(eq(neighbors.id, userId));
-        return user && user.role === 'Admin';
+            .from(members)
+            .where(eq(members.id, memberId));
+        return member && member.role === 'Admin';
     } catch {
         return false;
     }
@@ -51,7 +51,6 @@ export async function createInvitation(data: {
                 return { success: false, error: "Only admins can send invitations." };
             }
         }
-        // Note: If createdBy is null (system action?), we might allow it, strictly enforcing user id for now.
 
         const code = generateCode();
 
@@ -59,7 +58,7 @@ export async function createInvitation(data: {
             communityId: data.communityId,
             email: data.email,
             code,
-            createdBy: data.createdBy,
+            createdBy: (data.createdBy && data.createdBy !== "mock-super-admin-id") ? data.createdBy : null,
             status: 'pending',
         }).returning();
 
@@ -96,9 +95,6 @@ export async function bulkCreateInvitations(data: {
             return { success: false, error: "Only admins can perform bulk import." };
         }
 
-        // If createdBy is the mock ID, we must set it to null because "mock-super-admin-id" 
-        // is not a valid UUID in the neighbors table and will cause a foreign key violation.
-        // The invitations table allows created_by to be null (implied by schema absent NOT NULL).
         const safeCreatedBy = data.createdBy === "mock-super-admin-id" ? null : data.createdBy;
 
         const values = data.invitations.map(inv => ({
@@ -239,9 +235,6 @@ export async function markInvitationUsed(code: string): Promise<InvitationAction
  */
 export async function deleteInvitation(id: string): Promise<InvitationActionState> {
     try {
-        // Ideally checking permissions here too, but for speed relying on UI hiding for now
-        // or assumes the caller is authorized. 
-        // Given complexity, I will leave logic as is but note it.
         await db.delete(invitations).where(eq(invitations.id, id));
 
         return {
