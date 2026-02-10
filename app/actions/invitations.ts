@@ -125,8 +125,34 @@ export async function bulkCreateInvitations(data: {
 /**
  * Get all invitations for a community
  */
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
+
+/**
+ * Get all invitations for a community
+ */
 export async function getInvitations(communityId: string): Promise<InvitationActionState> {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        // Verify requestor has admin/board access
+        const [membership] = await db
+            .select()
+            .from(members)
+            .where(
+                and(
+                    eq(members.userId, session.user.id),
+                    eq(members.communityId, communityId)
+                )
+            );
+
+        if (!membership || !['Admin', 'Board Member'].includes(membership.role || '')) {
+            return { success: false, error: "Insufficient permissions" };
+        }
+
         const results = await db
             .select()
             .from(invitations)

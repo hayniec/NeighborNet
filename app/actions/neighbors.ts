@@ -86,8 +86,34 @@ export async function registerNeighbor(data: {
 /**
  * Get all neighbors for a community (for Admin Panel)
  */
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
+
+/**
+ * Get all neighbors for a community (for Admin Panel)
+ */
 export async function getNeighbors(communityId: string): Promise<NeighborActionState> {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        // Verify requestor has admin/board access to this community
+        const [membership] = await db
+            .select()
+            .from(members)
+            .where(
+                and(
+                    eq(members.userId, session.user.id),
+                    eq(members.communityId, communityId)
+                )
+            );
+
+        if (!membership || !['Admin', 'Board Member'].includes(membership.role || '')) {
+            return { success: false, error: "Insufficient permissions" };
+        }
+
         const results = await db
             .select({
                 id: members.id,

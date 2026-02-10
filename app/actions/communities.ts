@@ -41,20 +41,51 @@ const mapToUI = (row: any) => ({
     }
 });
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
+import { members } from "@/db/schema";
+
 export async function getCommunities() {
     try {
-        console.log("[getCommunities] Starting query...");
-        const rows = await db.select().from(communities);
-        console.log(`[getCommunities] Successfully fetched ${rows.length} communities`);
-        return { success: true, data: rows.map(mapToUI) };
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        console.log("[getCommunities] Fetching communities for user:", session.user.id);
+
+        // Fetch user's communities via membership
+        const userCommunities = await db
+            .select({
+                id: communities.id,
+                name: communities.name,
+                slug: communities.slug,
+                planTuple: communities.planTuple,
+                hasMarketplace: communities.hasMarketplace,
+                hasResources: communities.hasResources,
+                hasEvents: communities.hasEvents,
+                hasDocuments: communities.hasDocuments,
+                hasForum: communities.hasForum,
+                hasMessages: communities.hasMessages,
+                hasServicePros: communities.hasServicePros,
+                hasLocalGuide: communities.hasLocalGuide,
+                isActive: communities.isActive,
+                logoUrl: communities.logoUrl,
+                primaryColor: communities.primaryColor,
+                secondaryColor: communities.secondaryColor,
+                accentColor: communities.accentColor,
+                emergencyAccessCode: communities.emergencyAccessCode,
+                emergencyInstructions: communities.emergencyInstructions,
+            })
+            .from(communities)
+            .innerJoin(members, eq(communities.id, members.communityId))
+            .where(eq(members.userId, session.user.id));
+
+        console.log(`[getCommunities] Found ${userCommunities.length} communities.`);
+        return { success: true, data: userCommunities.map(mapToUI) };
     } catch (error: any) {
         console.error("Failed to fetch communities:", error);
-        console.error("Error stack:", error.stack);
-        console.error("Error name:", error.name);
-        const detail = error.detail ? ` (Detail: ${error.detail})` : '';
-        const code = error.code ? ` (Code: ${error.code})` : '';
-        const msg = error.message || "Failed to fetch communities";
-        return { success: false, error: `${msg}${code}${detail}` };
+        return { success: false, error: "Failed to fetch communities" };
     }
 }
 
