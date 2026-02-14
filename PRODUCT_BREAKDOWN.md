@@ -1,7 +1,7 @@
-# NeighborNet Product Breakdown
+# KithGrid Product Breakdown
 
 ## Product Summary
-**NeighborNet** is a hyper-local community management platform designed to connect neighbors, enhance safety, and streamline HOA communications. It acts as a central digital hub where residents can organize events, share resources, trade items, and access critical community information in a cohesive, secure environment.
+**KithGrid** is a hyper-local community management platform designed to connect neighbors, enhance safety, and streamline HOA communications. It acts as a central digital hub where residents can organize events, share resources, trade items, and access critical community information in a cohesive, secure environment.
 
 ## Navigation Breakdown
 

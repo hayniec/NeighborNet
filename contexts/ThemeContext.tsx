@@ -50,7 +50,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [theme, setThemeState] = useState<ThemeColor>(THEMES[0]);
     const [colorMode, setColorModeState] = useState<ColorMode>('system');
-    const [communityName, setCommunityNameState] = useState("HOA NeighborNet");
+    const [communityName, setCommunityNameState] = useState("KithGrid Community");
     const [communityLogo, setCommunityLogoState] = useState("");
 
     // Helper to determine text color (black or white) based on background hex
@@ -65,10 +65,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // Load initial state
     useEffect(() => {
-        const savedThemeName = localStorage.getItem("neighborNet_themeName");
-        const savedColorMode = localStorage.getItem("neighborNet_colorMode") as ColorMode;
-        const savedCommunityName = localStorage.getItem("neighborNet_communityName");
-        const savedCommunityLogo = localStorage.getItem("neighborNet_communityLogo");
+        const savedThemeName = localStorage.getItem("kithGrid_themeName");
+        const savedColorMode = localStorage.getItem("kithGrid_colorMode") as ColorMode;
+        const savedCommunityName = localStorage.getItem("kithGrid_communityName");
+        const savedCommunityLogo = localStorage.getItem("kithGrid_communityLogo");
 
         // Environment defaults
         const envTheme = process.env.NEXT_PUBLIC_DEFAULT_THEME;
@@ -97,15 +97,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Load modules
-        const savedModules = localStorage.getItem("neighborNet_modules");
+        const savedModules = localStorage.getItem("kithGrid_modules");
         if (savedModules) {
             setEnabledModules(JSON.parse(savedModules));
         }
 
         // Check for Custom Branding (Simulation)
-        const customPrimary = localStorage.getItem('neighborNet_customPrimary');
-        const customSecondary = localStorage.getItem('neighborNet_customSecondary');
-        const customAccent = localStorage.getItem('neighborNet_customAccent');
+        const customPrimary = localStorage.getItem('kithGrid_customPrimary');
+        const customSecondary = localStorage.getItem('kithGrid_customSecondary');
+        const customAccent = localStorage.getItem('kithGrid_customAccent');
 
         if (customPrimary) {
             document.documentElement.style.setProperty("--primary", customPrimary);
@@ -158,7 +158,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [showEmergencyOnDesktop, setShowEmergencyOnDesktopState] = useState(false);
 
     useEffect(() => {
-        const savedShowEmergency = localStorage.getItem("neighborNet_showEmergencyOnDesktop");
+        const savedShowEmergency = localStorage.getItem("kithGrid_showEmergencyOnDesktop");
         if (savedShowEmergency) {
             setShowEmergencyOnDesktopState(savedShowEmergency === "true");
         }
@@ -166,18 +166,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const setShowEmergencyOnDesktop = (value: boolean) => {
         setShowEmergencyOnDesktopState(value);
-        localStorage.setItem("neighborNet_showEmergencyOnDesktop", String(value));
+        localStorage.setItem("kithGrid_showEmergencyOnDesktop", String(value));
     };
 
     const toggleModule = (module: 'marketplace' | 'resources' | 'events' | 'documents' | 'forum' | 'messages' | 'services' | 'local', value: boolean) => {
         const newModules = { ...enabledModules, [module]: value };
         setEnabledModules(newModules);
-        localStorage.setItem("neighborNet_modules", JSON.stringify(newModules));
+        localStorage.setItem("kithGrid_modules", JSON.stringify(newModules));
     };
 
     const setTheme = (newTheme: ThemeColor) => {
         setThemeState(newTheme);
-        localStorage.setItem("neighborNet_themeName", newTheme.name);
+        localStorage.setItem("kithGrid_themeName", newTheme.name);
         // Apply CSS variables
         document.documentElement.style.setProperty("--primary", newTheme.primary);
         document.documentElement.style.setProperty("--ring", newTheme.ring);
@@ -185,17 +185,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const setColorMode = (mode: ColorMode) => {
         setColorModeState(mode);
-        localStorage.setItem("neighborNet_colorMode", mode);
+        localStorage.setItem("kithGrid_colorMode", mode);
     };
 
     const setCommunityName = (name: string) => {
         setCommunityNameState(name);
-        localStorage.setItem("neighborNet_communityName", name);
+        localStorage.setItem("kithGrid_communityName", name);
     };
 
     const setCommunityLogo = (url: string) => {
         setCommunityLogoState(url);
-        localStorage.setItem("neighborNet_communityLogo", url);
+        localStorage.setItem("kithGrid_communityLogo", url);
     };
 
     // Apply theme on initial load as well to prevent flash
@@ -203,7 +203,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         // Only apply the "theme" state if there are NO custom overrides in local storage.
         // Otherwise, the custom override logic (in the other useEffect) handles it.
         // This prevents the default 'Indigo' theme from clobbering our custom colors on reload.
-        const customPrimary = localStorage.getItem('neighborNet_customPrimary');
+        const customPrimary = localStorage.getItem('kithGrid_customPrimary');
         if (!customPrimary) {
             document.documentElement.style.setProperty("--primary", theme.primary);
             document.documentElement.style.setProperty("--ring", theme.ring);

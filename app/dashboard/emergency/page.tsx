@@ -20,7 +20,7 @@ export default function EmergencyPage() {
 
     useEffect(() => {
         // Load contacts from settings
-        const savedProfile = localStorage.getItem('neighborNet_profile');
+        const savedProfile = localStorage.getItem('kithGrid_profile');
         if (savedProfile) {
             try {
                 const profile = JSON.parse(savedProfile);
@@ -57,11 +57,11 @@ export default function EmergencyPage() {
                     setStatus('sent');
 
                     // Logic for Call initiation based on preferences
-                    const savedProfile = localStorage.getItem('neighborNet_profile');
+                    const savedProfile = localStorage.getItem('kithGrid_profile');
                     if (savedProfile) {
                         const profile = JSON.parse(savedProfile);
                         const primaryId = profile.primaryContactId;
-                        const contactMethod = localStorage.getItem('neighborNet_notification_method') || 'both'; // We need to sync this from settings too, or checking the state
+                        const contactMethod = localStorage.getItem('kithGrid_notification_method') || 'both'; // We need to sync this from settings too, or checking the state
 
                         // Actually, SettingsPage saves profile. Let's assume notifications state is saved separately or we just check contacts.
                         // For this turn, we just check primary ID.

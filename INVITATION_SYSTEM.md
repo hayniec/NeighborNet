@@ -2,7 +2,7 @@
 
 ## Overview
 
-The NeighborNet invitation system allows HOA administrators to invite new residents to join their community. The system is database-backed and includes code generation, validation, and usage tracking.
+The KithGrid invitation system allows HOA administrators to invite new residents to join their community. The system is database-backed and includes code generation, validation, and usage tracking.
 
 ## How It Works
 

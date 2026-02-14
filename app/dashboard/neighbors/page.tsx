@@ -99,7 +99,7 @@ export default function NeighborsPage() {
                 <p style={{ marginTop: '1rem' }}>
                     Please <a href="/login" onClick={(e) => {
                         e.preventDefault();
-                        localStorage.removeItem('neighborNet_user');
+                        localStorage.removeItem('kithGrid_user');
                         window.location.href = '/login';
                     }} style={{ color: 'var(--primary)', textDecoration: 'underline', cursor: 'pointer' }}>
                         Sign Out

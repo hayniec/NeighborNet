@@ -144,7 +144,7 @@ export default function SuperAdminPage() {
                         <Shield size={32} color="#4f46e5" />
                         Super Admin Console <span className={styles.version}>v2.1</span>
                     </h1>
-                    <p className={styles.subtitle}>Master control for all NeighborNet tenants.</p>
+                    <p className={styles.subtitle}>Master control for all KithGrid tenants.</p>
                 </div>
                 <button
                     onClick={() => setShowAddModal(true)}
@@ -268,12 +268,12 @@ export default function SuperAdminPage() {
                                 <div className={styles.manageButtons}>
                                     <button
                                         onClick={() => {
-                                            localStorage.setItem('neighborNet_communityName', comm.name);
-                                            localStorage.setItem('neighborNet_modules', JSON.stringify(comm.features));
-                                            localStorage.setItem('neighborNet_customPrimary', comm.branding.primaryColor);
-                                            localStorage.setItem('neighborNet_customSecondary', comm.branding.secondaryColor);
-                                            localStorage.setItem('neighborNet_customAccent', comm.branding.accentColor);
-                                            localStorage.setItem('neighborNet_communityLogo', comm.branding.logoUrl);
+                                            localStorage.setItem('kithGrid_communityName', comm.name);
+                                            localStorage.setItem('kithGrid_modules', JSON.stringify(comm.features));
+                                            localStorage.setItem('kithGrid_customPrimary', comm.branding.primaryColor);
+                                            localStorage.setItem('kithGrid_customSecondary', comm.branding.secondaryColor);
+                                            localStorage.setItem('kithGrid_customAccent', comm.branding.accentColor);
+                                            localStorage.setItem('kithGrid_communityLogo', comm.branding.logoUrl);
 
                                             alert(`Simulating login for ${comm.name}!`);
                                             window.location.href = '/dashboard';

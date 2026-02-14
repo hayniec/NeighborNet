@@ -6,7 +6,7 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <div className={styles.intro}>
-          <h1>NeighborNet</h1>
+          <h1>KithGrid</h1>
           <p>
             Connect with your community. Manage your HOA, organize events, and get to know your neighbors.
           </p>

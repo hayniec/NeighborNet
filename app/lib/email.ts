@@ -16,12 +16,12 @@ export async function sendInvitationEmail(
 
     try {
         const { data, error } = await resend.emails.send({
-            from: 'NeighborNet <onboarding@resend.dev>', // Use this for testing/free tier
+            from: 'KithGrid <onboarding@resend.dev>', // Use this for testing/free tier
             to: [toEmail],
-            subject: `You've been invited to join ${communityName} on NeighborNet!`,
+            subject: `You've been invited to join ${communityName} on KithGrid!`,
             html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h1>Welcome to NeighborNet!</h1>
+                    <h1>Welcome to KithGrid!</h1>
                     <p>You have been invited to join the <strong>${communityName}</strong> community${senderName ? ' by ' + senderName : ''}.</p>
                     
                     <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
@@ -31,7 +31,7 @@ export async function sendInvitationEmail(
 
                     <p>To accept this invitation:</p>
                     <ol>
-                        <li>Visit <a href="https://neighborhoodnet.netlify.app/join">NeighborNet</a></li>
+                        <li>Visit <a href="https://kithgrid.netlify.app/join">KithGrid</a></li>
                         <li>Enter your email (${toEmail}) and the code above.</li>
                     </ol>
                     

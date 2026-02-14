@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.neighbornet.app',
-  appName: 'NeighborNet',
+  appId: 'com.kithgrid.app',
+  appName: 'KithGrid',
   webDir: 'out',
   server: {
     // 1. For Local Development on Android Emulator, uncomment the line below:
@@ -10,7 +10,7 @@ const config: CapacitorConfig = {
     // cleartext: true,
 
     // 2. For Production/Phone, uncomment and set your Netlify URL:
-    url: "https://neighborhoodnet.netlify.app",
+    url: "https://kithgrid.netlify.app",
 
     androidScheme: 'https'
   }

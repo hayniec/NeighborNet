@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">NeighborNet</string>
-    <string name="title_activity_main">NeighborNet</string>
-    <string name="package_name">com.neighbornet.app</string>
-    <string name="custom_url_scheme">com.neighbornet.app</string>
+    <string name="app_name">KithGrid</string>
+    <string name="title_activity_main">KithGrid</string>
+    <string name="package_name">com.kithgrid.app</string>
+    <string name="custom_url_scheme">com.kithgrid.app</string>
 </resources>

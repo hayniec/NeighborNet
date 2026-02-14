@@ -72,7 +72,7 @@ export default function SettingsPage() {
     // Load from LocalStorage on mount
     useEffect(() => {
         // 1. Try to load detailed profile settings
-        const savedProfile = localStorage.getItem('neighborNet_profile');
+        const savedProfile = localStorage.getItem('kithGrid_profile');
         if (savedProfile) {
             try {
                 setProfile(prev => ({ ...prev, ...JSON.parse(savedProfile) }));
@@ -94,7 +94,7 @@ export default function SettingsPage() {
     }, [user]);
 
     const [notifications, setNotifications] = useState(() => {
-        const savedMethod = typeof window !== 'undefined' ? localStorage.getItem('neighborNet_notification_method') : 'both';
+        const savedMethod = typeof window !== 'undefined' ? localStorage.getItem('kithGrid_notification_method') : 'both';
         return {
             emailAlerts: true,
             pushNotifications: true,
@@ -171,8 +171,8 @@ export default function SettingsPage() {
 
     const handleSave = () => {
         // Save to local storage for persistence across reloads
-        localStorage.setItem('neighborNet_profile', JSON.stringify(profile));
-        localStorage.setItem('neighborNet_notification_method', notifications.contactMethod);
+        localStorage.setItem('kithGrid_profile', JSON.stringify(profile));
+        localStorage.setItem('kithGrid_notification_method', notifications.contactMethod);
 
         // Update global user context so Sidebar updates immediately
         const fullName = `${profile.firstName} ${profile.lastName}`.trim();
@@ -316,7 +316,7 @@ export default function SettingsPage() {
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Theme Preference</label>
                         <div className={styles.sectionSubtitleLarge}>
-                            Choose how NeighborNet looks on your device.
+                            Choose how KithGrid looks on your device.
                         </div>
                         <div className={styles.themeToggleGroup}>
                             <button

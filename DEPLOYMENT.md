@@ -1,6 +1,6 @@
-# Deployment Guide for NeighborNet
+# Deployment Guide for KithGrid
 
-NeighborNet is designed to be easily self-hosted or deployed to cloud providers. This guide covers the two most common methods: Docker (recommended) and manual Node.js deployment.
+KithGrid is designed to be easily self-hosted or deployed to cloud providers. This guide covers the two most common methods: Docker (recommended) and manual Node.js deployment.
 
 ## Option 1: Docker (Recommended)
 
@@ -34,7 +34,7 @@ Environment variables in `docker-compose.yml` serve as the **default** for new u
 
 ## Option 2: Cloud Platform Deployment (Automated)
 
-The easiest way to host NeighborNet is to connect your GitHub repository to a modern cloud provider.
+The easiest way to host KithGrid is to connect your GitHub repository to a modern cloud provider.
 
 ### Step 1: Push to GitHub
 1.  Initialize git: `git init`
@@ -43,7 +43,7 @@ The easiest way to host NeighborNet is to connect your GitHub repository to a mo
 4.  Create a new repository on GitHub.
 5.  Link and push:
     ```bash
-    git remote add origin https://github.com/YOUR_USERNAME/neighbor-net.git
+    git remote add origin https://github.com/YOUR_USERNAME/kith-grid.git
     git push -u origin main
     ```
 
@@ -53,7 +53,7 @@ Choose one of the following providers. They all offer excellent free tiers for p
 #### **Vercel (Recommended for Next.js)**
 1.  Go to [vercel.com](https://vercel.com) and sign up with GitHub.
 2.  Click **"Add New Project"**.
-3.  Select your `neighbor-net` repository.
+3.  Select your `kith-grid` repository.
 4.  **Framework Preset**: It should auto-detect "Next.js".
 5.  **Environment Variables**: Add the following (optional but recommended):
     *   `NEXT_PUBLIC_COMMUNITY_NAME`: Your HOA Name

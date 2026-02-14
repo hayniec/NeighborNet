@@ -410,7 +410,7 @@ export default function AdminPage() {
                                     className={styles.input}
                                     value={communityName}
                                     onChange={(e) => setCommunityName(e.target.value)}
-                                    placeholder="e.g. HOA NeighborNet"
+                                    placeholder="e.g. KithGrid Community"
                                     aria-label="Community Name"
                                 />
                                 <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>

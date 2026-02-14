@@ -58,7 +58,7 @@ export default function LoginPage() {
             <div className={styles.card}>
                 <div className={styles.header}>
                     <h1 className={styles.title}>Welcome Back</h1>
-                    <p className={styles.subtitle}>Sign in to NeighborNet</p>
+                    <p className={styles.subtitle}>Sign in to KithGrid</p>
                 </div>
 
                 <form onSubmit={handleLogin} className={styles.formCol}>

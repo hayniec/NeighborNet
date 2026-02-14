@@ -1,6 +1,6 @@
 {
-  "name": "NeighborNet",
-  "short_name": "NeighborNet",
+  "name": "KithGrid",
+  "short_name": "KithGrid",
   "description": "Neighborhood connection app for HOAs and communities.",
   "start_url": "/",
   "display": "standalone",

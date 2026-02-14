@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NeighborNet",
+  title: "KithGrid",
   description: "Neighborhood connection app for HOAs and communities.",
   manifest: "/manifest.json",
 };

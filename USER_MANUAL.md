@@ -1,6 +1,6 @@
-# NeighborNet User Manual
+# KithGrid User Manual
 
-Welcome to **NeighborNet**, your private, secure, and modern community platform. This guide explains how to navigate the application and make the most of its features.
+Welcome to **KithGrid**, your private, secure, and modern community platform. This guide explains how to navigate the application and make the most of its features.
 
 ## Table of Contents
 1.  [Getting Started](#getting-started)
@@ -108,6 +108,6 @@ To access:
 ---
 
 ## Mobile Usage
-NeighborNet is fully responsive.
+KithGrid is fully responsive.
 *   **Sidebar**: On mobile, the sidebar collapses into a Menu button (top left).
 *   **Navigation**: All features are accessible via touch on your phone or tablet.
