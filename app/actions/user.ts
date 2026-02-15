@@ -5,6 +5,11 @@ import { users, members, communities } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function getUserProfile(userId: string) {
+    // DEBUG: Test mode to isolate crash
+    // Logic commented out to verify connectivity
+    return { success: false, error: "DEBUG: CONNECTION SUCCESSFUL - DB LOGIC BYPASSED" };
+
+    /*
     try {
         console.log("[getUserProfile] Fetching for userId:", userId);
 
@@ -27,9 +32,9 @@ export async function getUserProfile(userId: string) {
             // Check for both spellings (Eric/Erich) and admin
             if (email.includes('eric.haynie') || email.includes('erich.haynie') || email.includes('admin')) {
                 console.log(`[AutoFix] Creating admin membership for ${email}...`);
-
+                
                 let [comm] = await db.select().from(communities).limit(1);
-
+                
                 // Fallback: Create default community if DB is empty
                 if (!comm) {
                     console.log("[AutoFix] No communities found! Creating 'Demo Community'...");
@@ -49,7 +54,7 @@ export async function getUserProfile(userId: string) {
                         role: 'Admin', // Capitalized 'Admin' per schema enum
                         joinedDate: new Date()
                     }).returning();
-
+                    
                     membership = newMember;
                     console.log("[AutoFix] Membership created!", membership);
                 }
@@ -57,9 +62,9 @@ export async function getUserProfile(userId: string) {
 
 
             if (!membership) {
-                console.error("[getUserProfile] Auto-Fix FAILED. No membership found after create attempt.");
-                return {
-                    success: false,
+                 console.error("[getUserProfile] Auto-Fix FAILED. No membership found after create attempt.");
+                 return { 
+                    success: false, 
                     error: `Auto-Fix failed: Could not create membership. Email: ${email}. Community limit: ${await db.select({ count: communities.id }).from(communities).limit(1).then(r => r.length)}`
                 };
             }
@@ -84,4 +89,5 @@ export async function getUserProfile(userId: string) {
         console.error("Failed to get user profile", e);
         return { success: false, error: `Server Error: ${e.message || String(e)}` };
     }
+    */
 }
