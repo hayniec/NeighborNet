@@ -37,6 +37,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
 
     useEffect(() => {
+        console.log("UserContext Effect - Status:", status);
+        console.log("UserContext Effect - Session:", session);
         if (status === "authenticated" && session?.user) {
             setUserState({
                 id: session.user.id,

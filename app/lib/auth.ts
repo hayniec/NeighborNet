@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
                     const [user] = await db
                         .select()
                         .from(users)
-                        .where(eq(users.email, credentials.email));
+                        .where(eq(users.email, credentials.email.toLowerCase()));
 
                     if (!user) return null;
 
@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
                 const [existingUser] = await db
                     .select()
                     .from(users)
-                    .where(eq(users.email, user.email));
+                    .where(eq(users.email, user.email.toLowerCase()));
 
                 if (!existingUser) {
                     // Create new GLOBAL user for social login
@@ -96,7 +96,7 @@ export const authOptions: NextAuthOptions = {
                 const [dbUser] = await db
                     .select()
                     .from(users)
-                    .where(eq(users.email, token.email));
+                    .where(eq(users.email, token.email.toLowerCase()));
 
                 if (dbUser) {
                     token.id = dbUser.id;
