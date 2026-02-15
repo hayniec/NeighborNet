@@ -207,3 +207,14 @@ export const forumLikes = pgTable('forum_likes', {
     memberId: uuid('member_id').references(() => members.id).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
+
+// 15. Announcements
+export const announcements = pgTable('announcements', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    authorId: uuid('author_id').references(() => members.id),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+});
