@@ -1,22 +1,43 @@
 'use server'
 
 import { db } from "@/db";
-import { users, members, communities } from "@/db/schema";
+import {
+    users, members, communities,
+    invitations, events, marketplaceItems, documents,
+    eventRsvps, forumPosts, forumComments, forumLikes,
+    announcements, directMessages
+} from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function resetAndSeed() {
     try {
         console.log("[SEED] Starting Database Reset...");
 
-        // 1. DELETE Members (Constraint: Members depend on Users, so delete members first)
+        // 1. DELETE Dependent Tables (Level 3 - Grandchildren)
+        await db.delete(forumLikes);
+        await db.delete(forumComments);
+        await db.delete(eventRsvps);
+        await db.delete(directMessages);
+        console.log("[SEED] Level 3 deleted.");
+
+        // 2. DELETE Dependent Tables (Level 2 - Children)
+        await db.delete(forumPosts);
+        await db.delete(invitations);
+        await db.delete(events);
+        await db.delete(marketplaceItems);
+        await db.delete(documents);
+        await db.delete(announcements);
+        console.log("[SEED] Level 2 deleted.");
+
+        // 3. DELETE Members (Level 1)
         await db.delete(members);
         console.log("[SEED] Members deleted.");
 
-        // 2. DELETE Users
+        // 4. DELETE Users (Level 0)
         await db.delete(users);
         console.log("[SEED] Users deleted.");
 
-        // 3. Ensure Communities Exist
+        // 5. Ensure Communities Exist
         // We need 'Sunset Heights', 'River Valley', 'NeighborNet' (or whatever names you prefer)
         // I will search for them or create them.
 
@@ -47,7 +68,7 @@ export async function resetAndSeed() {
             commsMap[t.name] = existing.id;
         }
 
-        // 4. Create Test Users
+        // 6. Create Test Users
         const testUsers = [
             {
                 name: "Test User Sunset",
@@ -97,7 +118,7 @@ export async function resetAndSeed() {
             results.push({ user: u.email, community: u.community, status: "Created" });
         }
 
-        // Also re-create YOUR user specifically if you want? 
+        // Also re-create YOUR user specifically if you want?
         // User asked to "Remove ALL users", so I will respect that.
         // But you might want 'erich.haynie@gmail.com' back eventually.
         // I'll stick to the requested 3 test users.
@@ -106,6 +127,6 @@ export async function resetAndSeed() {
 
     } catch (e: any) {
         console.error("[SEED] Failed:", e);
-        return { success: false, error: e.message };
+        return { success: false, error: "Failed query: " + e.message };
     }
 }
