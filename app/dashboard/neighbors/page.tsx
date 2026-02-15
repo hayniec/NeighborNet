@@ -184,7 +184,8 @@ export default function NeighborsPage() {
                                         alert('Switched! Reloading...');
                                         window.location.reload();
                                     } else {
-                                        alert('Failed: ' + res.error);
+                                        // @ts-ignore - Handle dynamic response types during debug
+                                        alert('Failed: ' + (res.error || res.message || 'Unknown error'));
                                     }
                                 } catch (err: any) {
                                     alert('Error: ' + err.message);
