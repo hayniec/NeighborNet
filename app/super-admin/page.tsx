@@ -278,7 +278,7 @@ export default function SuperAdminPage() {
                             <div className={styles.footer}>
                                 <div className={styles.manageButtons}>
                                     <button
-                                        onClick={() => {
+                                        onClick={async () => {
                                             localStorage.setItem('kithGrid_communityName', comm.name);
                                             localStorage.setItem('kithGrid_modules', JSON.stringify(comm.features));
                                             localStorage.setItem('kithGrid_customPrimary', comm.branding.primaryColor);
