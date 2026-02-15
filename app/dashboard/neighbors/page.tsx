@@ -92,6 +92,8 @@ export default function NeighborsPage() {
         }
     };
 
+    const [isFixing, setIsFixing] = useState(false);
+
     if (!isLoading && !user.communityId) {
         return (
             <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
@@ -108,9 +110,19 @@ export default function NeighborsPage() {
 
                 <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                     <button
+                        disabled={isFixing}
                         onClick={async () => {
-                            if (user?.id) {
+                            if (!user?.id) {
+                                alert("No User ID to verify with.");
+                                return;
+                            }
+
+                            try {
+                                setIsFixing(true);
+                                console.log("Starting Auto-Fix for User ID:", user.id);
                                 const res = await getUserProfile(user.id);
+                                console.log("Auto-Fix Response:", res);
+
                                 if (res.success && res.data && res.data.communityId) {
                                     alert(`Found Community: ${res.data.communityId}. Updating...`);
                                     setUser({ ...user, communityId: res.data.communityId, role: res.data.role as any });
@@ -118,13 +130,24 @@ export default function NeighborsPage() {
                                 } else {
                                     alert(`Server verify failed: ${res.error || "No community found for this user."}`);
                                 }
-                            } else {
-                                alert("No User ID to verify with.");
+                            } catch (err: any) {
+                                console.error("Auto-Fix Crashed:", err);
+                                alert(`Auto-Fix Error: ${err?.message || "Unknown system error"}`);
+                            } finally {
+                                setIsFixing(false);
                             }
                         }}
-                        style={{ padding: '0.5rem 1rem', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: isFixing ? '#666' : 'var(--primary)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: isFixing ? 'not-allowed' : 'pointer',
+                            opacity: isFixing ? 0.7 : 1
+                        }}
                     >
-                        Try Auto-Fix
+                        {isFixing ? "Fixing..." : "Try Auto-Fix"}
                     </button>
 
                     <a href="/login" onClick={(e) => {
