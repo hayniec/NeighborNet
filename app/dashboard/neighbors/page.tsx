@@ -116,7 +116,7 @@ export default function NeighborsPage() {
                                     setUser({ ...user, communityId: res.data.communityId, role: res.data.role as any });
                                     window.location.reload();
                                 } else {
-                                    alert("Server verify failed: No community found for this user.");
+                                    alert(`Server verify failed: ${res.error || "No community found for this user."}`);
                                 }
                             } else {
                                 alert("No User ID to verify with.");

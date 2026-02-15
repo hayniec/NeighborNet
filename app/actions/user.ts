@@ -55,14 +55,12 @@ export async function getUserProfile(userId: string) {
                 }
             }
 
+
             if (!membership) {
+                console.error("[getUserProfile] Auto-Fix FAILED. No membership found after create attempt.");
                 return {
-                    success: true,
-                    data: {
-                        ...dbUser,
-                        communityId: null,
-                        role: 'Resident'
-                    }
+                    success: false,
+                    error: `Auto-Fix failed: Could not create membership. Email: ${email}. Community limit: ${await db.select({ count: communities.id }).from(communities).limit(1).then(r => r.length)}`
                 };
             }
         }
