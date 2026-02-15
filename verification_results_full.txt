@@ -1,0 +1,14 @@
+[dotenv@17.2.3] injecting env (10) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+🚀 Starting Backend Verification...
+Context: Member=cd48f9df-4096-4f8d-b76c-9a6dca90ceab, Community=2bf6bc8a-899c-4e29-8ee7-f2038c804260
+
+---------------------------------------------------
+1. Testing Event Creation...
+✅ Event Created Successfully: 3a3bd9bf-96b5-4225-819d-8e1cd728a2cf
+
+---------------------------------------------------
+2. Testing Marketplace Item Creation...
+✅ Marketplace Item Created Successfully: a9e66faa-e3fc-4382-908e-b6ad630b15f6
+
+---------------------------------------------------
+🏁 Verification Complete.

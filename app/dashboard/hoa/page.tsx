@@ -2,13 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/UserContext";
-import { MOCK_DOCUMENTS } from "@/lib/data";
-import { HoaDocument } from "@/types/hoa";
 import styles from "./hoa.module.css";
 import { FileText, Download, Mail, Phone, MapPin, Upload } from "lucide-react";
 import { UploadDocumentModal } from "@/components/dashboard/UploadDocumentModal";
-import { getNeighbors, NeighborActionState } from "@/app/actions/neighbors";
+import { getNeighbors, getCommunityOfficers } from "@/app/actions/neighbors";
 import { ContactOfficerModal } from "@/components/dashboard/ContactOfficerModal";
+import { getCommunityDocuments, createDocument } from "@/app/actions/documents";
+
+interface HoaDocument {
+    id: string;
+    name: string;
+    category: string;
+    uploadDate: string;
+    size: string;
+    url: string;
+    uploaderName: string;
+}
 
 interface Officer {
     id: string;
@@ -20,63 +29,85 @@ interface Officer {
 }
 
 export default function HoaPage() {
-    const [documents, setDocuments] = useState<HoaDocument[]>(MOCK_DOCUMENTS);
+    const { user } = useUser();
+    const [documents, setDocuments] = useState<HoaDocument[]>([]);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-
-    // Contact Modal State
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
+    const [officers, setOfficers] = useState<Officer[]>([]);
+    const [isLoadingOfficers, setIsLoadingOfficers] = useState(true);
+    const [isLoadingDocs, setIsLoadingDocs] = useState(true);
 
-    const { user } = useUser();
     const role = user?.role?.toLowerCase();
     const canUpload = role === 'admin' || role === 'board member';
 
-    const [officers, setOfficers] = useState<Officer[]>([]);
-    const [isLoadingOfficers, setIsLoadingOfficers] = useState(true);
-
     useEffect(() => {
-        async function fetchOfficers() {
-            if (!user?.communityId) return;
-
-            try {
-                const result = await getNeighbors(user.communityId);
-                if (result.success && result.data) {
-                    const foundOfficers = result.data.filter((n: any) =>
-                        n.hoaPosition && n.hoaPosition.trim() !== ""
-                    ).map((n: any) => ({
-                        id: n.id,
-                        name: n.name,
-                        role: n.role,
-                        hoaPosition: n.hoaPosition,
-                        email: n.email,
-                        avatar: n.avatar
-                    }));
-                    setOfficers(foundOfficers);
-                }
-            } catch (err) {
-                console.error("Failed to load officers", err);
-            } finally {
-                setIsLoadingOfficers(false);
-            }
+        if (user?.communityId) {
+            fetchOfficers();
+            fetchDocuments();
         }
-
-        fetchOfficers();
     }, [user?.communityId]);
 
+    const fetchOfficers = async () => {
+        if (!user?.communityId) return;
+        setIsLoadingOfficers(true);
+        try {
+            const result = await getCommunityOfficers(user.communityId);
+            if (result.success && result.data) {
+                const foundOfficers = result.data.map((n: any) => ({
+                    id: n.id,
+                    name: n.name,
+                    role: n.role,
+                    hoaPosition: n.hoaPosition,
+                    email: n.email || "",
+                    avatar: n.avatar
+                }));
+                setOfficers(foundOfficers);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        setIsLoadingOfficers(false);
+    };
 
-    const handleUpload = (docData: any) => {
-        // Mock upload
-        const newDoc: HoaDocument = {
-            id: Math.random().toString(36).substr(2, 9),
+    const fetchDocuments = async () => {
+        if (!user?.communityId) return;
+        setIsLoadingDocs(true);
+        const res = await getCommunityDocuments(user.communityId);
+        if (res.success && res.data) {
+            const adapted = res.data.map((d: any) => ({
+                id: d.id,
+                name: d.title,
+                category: d.category,
+                uploadDate: d.date,
+                size: d.size,
+                url: d.url,
+                uploaderName: d.uploaderName || "Unknown"
+            }));
+            setDocuments(adapted);
+        }
+        setIsLoadingDocs(false);
+    };
+
+    const handleUpload = async (docData: any) => {
+        if (!user) return;
+
+        const path = docData.source === 'external' ? docData.url : "#";
+
+        const res = await createDocument({
+            communityId: user.communityId,
             name: docData.name,
             category: docData.category,
-            uploadDate: new Date().toISOString().split('T')[0],
-            size: docData.file ? "1.5 MB" : "Link",
-            url: docData.source === 'external' ? docData.url : "#",
-            uploaderName: user?.name || "Neighbor"
-        };
-        setDocuments([newDoc, ...documents]);
-        setIsUploadModalOpen(false);
+            filePath: path,
+            uploadedBy: user.id
+        });
+
+        if (res.success) {
+            fetchDocuments();
+            setIsUploadModalOpen(false);
+        } else {
+            alert("Failed to upload: " + res.error);
+        }
     };
 
     const handleEmailClick = (officer: Officer) => {
@@ -86,7 +117,6 @@ export default function HoaPage() {
 
     return (
         <div className={styles.container}>
-
             <div className={styles.intro}>
                 <h1>Maple Grove HOA</h1>
                 <p>
@@ -190,26 +220,35 @@ export default function HoaPage() {
                     )}
                 </div>
 
-                <div className={styles.docsList}>
-                    {documents.map(doc => (
-                        <div key={doc.id} className={styles.docItem}>
-                            <div className={styles.docInfo}>
-                                <div className={styles.docIcon}>
-                                    <FileText size={24} />
+                {isLoadingDocs ? (
+                    <div style={{ padding: '2rem', textAlign: 'center' }}>Loading documents...</div>
+                ) : (
+                    <div className={styles.docsList}>
+                        {documents.map(doc => (
+                            <div key={doc.id} className={styles.docItem}>
+                                <div className={styles.docInfo}>
+                                    <div className={styles.docIcon}>
+                                        <FileText size={24} />
+                                    </div>
+                                    <div className={styles.docMeta}>
+                                        <span className={styles.docName}>{doc.name}</span>
+                                        <span className={styles.docDetails}>
+                                            {doc.category} • {doc.size} • Uploaded {doc.uploadDate}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className={styles.docMeta}>
-                                    <span className={styles.docName}>{doc.name}</span>
-                                    <span className={styles.docDetails}>
-                                        {doc.category} • {doc.size} • Uploaded {doc.uploadDate}
-                                    </span>
-                                </div>
+                                <button className={styles.downloadButton} title="Download">
+                                    <Download size={20} />
+                                </button>
                             </div>
-                            <button className={styles.downloadButton} title="Download">
-                                <Download size={20} />
-                            </button>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                        {documents.length === 0 && (
+                            <div style={{ padding: '1rem', color: 'var(--muted-foreground)', fontStyle: 'italic' }}>
+                                No documents found.
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <UploadDocumentModal

@@ -1,43 +1,117 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import styles from "./messages.module.css";
-import { Send, User } from "lucide-react";
-import { DirectMessage } from "@/types/forum";
+import { Send, User, MessageCircle } from "lucide-react";
+import { getConversations, getThread, sendMessage } from "@/app/actions/messages";
+import { useUser } from "@/contexts/UserContext";
+import { useSearchParams } from "next/navigation";
 
-export default function MessagesPage() {
-    const [activeChat, setActiveChat] = useState("Sarah Jenkins");
+// Local types matching what we expect from actions
+interface Conversation {
+    otherId: string;
+    otherName: string;
+    lastMessage: string;
+    timestamp: Date;
+    unreadCount: number;
+}
+
+interface DirectMessage {
+    id: string;
+    senderId: string;
+    recipientId: string;
+    content: string;
+    createdAt: Date;
+    isRead: boolean;
+}
+
+function MessagesContent() {
+    const { user } = useUser();
+    const searchParams = useSearchParams();
+    const toId = searchParams.get("to");
+
+    const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [activeChatId, setActiveChatId] = useState<string | null>(null);
+    const [messages, setMessages] = useState<DirectMessage[]>([]);
     const [newMessage, setNewMessage] = useState("");
+    const [loading, setLoading] = useState(true);
 
-    // Mock conversations
-    const [conversations, setConversations] = useState([
-        { id: "1", name: "Sarah Jenkins", lastMessage: "Thanks for borrowing the ladder!", unread: 2 },
-        { id: "2", name: "Mike Chen", lastMessage: "Can you help me with the fence?", unread: 0 },
-        { id: "3", name: "Emily Rodriguez", lastMessage: "See you at the meeting.", unread: 0 },
-    ]);
+    // Initial load
+    useEffect(() => {
+        if (user) {
+            loadConversations();
+        }
+    }, [user]);
 
-    // Mock messages for the active chat
-    const [messages, setMessages] = useState<DirectMessage[]>([
-        { id: "m1", senderId: "2", senderName: "Sarah Jenkins", recipientId: "me", content: "Hey Eric! Do you still have that power drill?", timestamp: "10:30 AM", read: true },
-        { id: "m2", senderId: "me", senderName: "Eric H.", recipientId: "2", content: "Yes I do! You can swing by anytime to grab it.", timestamp: "10:32 AM", read: true },
-        { id: "m3", senderId: "2", senderName: "Sarah Jenkins", recipientId: "me", content: "Awesome, thanks! I'll be there in 30 mins.", timestamp: "10:35 AM", read: true },
-    ]);
+    // Handle "to" param
+    useEffect(() => {
+        if (toId && user && toId !== user.id) {
+            setActiveChatId(toId);
+        }
+    }, [toId, user]);
 
-    const handleSendMessage = () => {
-        if (!newMessage.trim()) return;
+    // Load thread when activeChatId changes
+    useEffect(() => {
+        if (activeChatId && user) {
+            loadThread(activeChatId);
+        }
+    }, [activeChatId, user]);
 
-        const msg: DirectMessage = {
-            id: Math.random().toString(36),
-            senderId: "me",
-            senderName: "Eric H.",
-            recipientId: "active",
+    const loadConversations = async () => {
+        if (!user) return;
+        setLoading(true);
+        const res = await getConversations(user.id);
+        if (res.success && res.data) {
+            setConversations(res.data);
+            // Default select first if none selected and not directed by URL
+            if (!activeChatId && !toId && res.data.length > 0) {
+                setActiveChatId(res.data[0].otherId);
+            }
+        }
+        setLoading(false);
+    };
+
+    const loadThread = async (otherId: string) => {
+        if (!user) return;
+        const res = await getThread(user.id, otherId);
+        if (res.success && res.data) {
+            setMessages(res.data);
+        }
+    };
+
+    const handleSendMessage = async () => {
+        if (!newMessage.trim() || !user || !activeChatId) return;
+
+        // Optimistic append
+        const tempMsg: DirectMessage = {
+            id: 'temp-' + Date.now(),
+            senderId: user.id,
+            recipientId: activeChatId,
             content: newMessage,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            read: true
+            createdAt: new Date(),
+            isRead: false
         };
-
-        setMessages([...messages, msg]);
+        setMessages([...messages, tempMsg]);
         setNewMessage("");
+
+        const res = await sendMessage(user.id, activeChatId, tempMsg.content);
+        if (res.success && res.data) {
+            // Refresh conversation list to update last message snippet
+            loadConversations();
+            // Replace temp with real (or re-fetch thread completely to be safe)
+            const realMsg = res.data as DirectMessage;
+            setMessages(prev => prev.map(m => m.id === tempMsg.id ? realMsg : m));
+        } else {
+            alert("Failed to send: " + res.error);
+        }
+    };
+
+    const getActiveChatName = () => {
+        const conv = conversations.find(c => c.otherId === activeChatId);
+        // If not in conversations list (new chat), we might need to fetch name or just show ID/Loading
+        // But for now, returning "Chat" or ID is fallback. 
+        // Improvement: fetch name if not in list.
+        return conv ? conv.otherName : "Chat";
     };
 
     return (
@@ -46,14 +120,18 @@ export default function MessagesPage() {
             <div className={styles.sidebar}>
                 <div className={styles.sidebarHeader}>Messages</div>
                 <div className={styles.conversationList}>
+                    {loading && conversations.length === 0 && <div style={{ padding: '1rem' }}>Loading...</div>}
+                    {!loading && conversations.length === 0 && <div style={{ padding: '1rem', color: '#666' }}>No conversations yet.</div>}
+
                     {conversations.map(conv => (
                         <div
-                            key={conv.id}
-                            className={`${styles.conversationItem} ${activeChat === conv.name ? styles.activeConversation : ''}`}
-                            onClick={() => setActiveChat(conv.name)}
+                            key={conv.otherId}
+                            className={`${styles.conversationItem} ${activeChatId === conv.otherId ? styles.activeConversation : ''}`}
+                            onClick={() => setActiveChatId(conv.otherId)}
                         >
-                            <div className={styles.conversationName}>{conv.name}</div>
+                            <div className={styles.conversationName}>{conv.otherName}</div>
                             <div className={styles.lastMessage}>{conv.lastMessage}</div>
+                            {conv.unreadCount > 0 && <span className={styles.unreadBadge}>{conv.unreadCount}</span>}
                         </div>
                     ))}
                 </div>
@@ -61,32 +139,54 @@ export default function MessagesPage() {
 
             {/* Chat Area */}
             <div className={styles.chatArea}>
-                <div className={styles.chatHeader}>
-                    <User size={20} />
-                    {activeChat}
-                </div>
-
-                <div className={styles.messagesList}>
-                    {messages.map(msg => (
-                        <div key={msg.id} className={`${styles.messageBubble} ${msg.senderId === 'me' ? styles.sent : styles.received}`}>
-                            {msg.content}
+                {activeChatId ? (
+                    <>
+                        <div className={styles.chatHeader}>
+                            <User size={20} />
+                            {getActiveChatName()}
                         </div>
-                    ))}
-                </div>
 
-                <div className={styles.inputArea}>
-                    <input
-                        className={styles.input}
-                        placeholder="Type a message..."
-                        value={newMessage}
-                        onChange={e => setNewMessage(e.target.value)}
-                        onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
-                    />
-                    <button className={styles.sendButton} onClick={handleSendMessage}>
-                        <Send size={18} />
-                    </button>
-                </div>
+                        <div className={styles.messagesList}>
+                            {messages.map(msg => (
+                                <div key={msg.id} className={`${styles.messageBubble} ${msg.senderId === user?.id ? styles.sent : styles.received}`}>
+                                    {msg.content}
+                                </div>
+                            ))}
+                            {messages.length === 0 && (
+                                <div style={{ textAlign: 'center', padding: '2rem', color: '#999' }}>
+                                    Start the conversation!
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles.inputArea}>
+                            <input
+                                className={styles.input}
+                                placeholder="Type a message..."
+                                value={newMessage}
+                                onChange={e => setNewMessage(e.target.value)}
+                                onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
+                            />
+                            <button className={styles.sendButton} onClick={handleSendMessage}>
+                                <Send size={18} />
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <div className={styles.emptyState}>
+                        <MessageCircle size={48} color="#ccc" />
+                        <p>Select a conversation or start a new one from the Forum.</p>
+                    </div>
+                )}
             </div>
         </div>
+    );
+}
+
+export default function MessagesPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <MessagesContent />
+        </Suspense>
     );
 }

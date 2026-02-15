@@ -1,99 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./forum.module.css";
 import { MessageSquare, Heart, Share2, Send, MessageCircle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ForumPost, ForumCategory, ForumComment } from "@/types/forum";
+import { getCommunityPosts, createPost, createComment, toggleLike, ForumPost } from "@/app/actions/forum";
+import { useUser } from "@/contexts/UserContext";
 
 export default function ForumPage() {
     const router = useRouter();
+    const { user } = useUser();
     const [newPost, setNewPost] = useState("");
-    const [activeCategory, setActiveCategory] = useState<ForumCategory | "All">("All");
-    const [newPostCategory, setNewPostCategory] = useState<ForumCategory>("General");
+    const [activeCategory, setActiveCategory] = useState<string>("All");
+    const [newPostCategory, setNewPostCategory] = useState<string>("General");
     const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
     const [newComment, setNewComment] = useState("");
 
-    const [posts, setPosts] = useState<ForumPost[]>([
-        {
-            id: 1,
-            author: "Sarah Jenkins",
-            initials: "SJ",
-            content: "Has anyone else noticed the streetlights on Maple Drive flickering lately? Just wanted to check before I report it.",
-            timestamp: "2 hours ago",
-            likes: 5,
-            comments: [
-                { id: "c1", authorId: "mc", authorName: "Mike Chen", content: "Yes! The one in front of my house has been doing it for days.", timestamp: "1 hour ago" },
-                { id: "c2", authorId: "er", authorName: "Emily R.", content: "I called the city yesterday, they said they'd check it out.", timestamp: "30 mins ago" }
-            ],
-            category: "Safety"
-        },
-        {
-            id: 2,
-            author: "Mike Chen",
-            initials: "MC",
-            content: "Just a reminder that the annual block party planning meeting is this Saturday at the community center! We need volunteers for the grill station.",
-            timestamp: "5 hours ago",
-            likes: 12,
-            comments: [],
-            category: "Events"
-        },
-        {
-            id: 3,
-            author: "Emily Rodriguez",
-            initials: "ER",
-            content: "Found a set of keys near the park entrance. Describe them and I'll drop them off!",
-            timestamp: "1 day ago",
-            likes: 8,
-            comments: [],
-            category: "Lost & Found"
+    const [posts, setPosts] = useState<ForumPost[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (user?.communityId) {
+            loadPosts();
         }
-    ]);
+    }, [user?.communityId]);
 
-    const handlePost = () => {
-        if (!newPost.trim()) return;
+    const loadPosts = async () => {
+        if (!user) return;
+        setIsLoading(true);
+        const res = await getCommunityPosts(user.communityId, user.id);
+        if (res.success && res.data) {
+            setPosts(res.data);
 
-        const post: ForumPost = {
-            id: Date.now(),
-            author: "Eric H.",
-            initials: "EH",
+            // If a post is selected, refresh its data too
+            if (selectedPost) {
+                const refreshedPost = res.data.find((p: ForumPost) => p.id === selectedPost.id);
+                if (refreshedPost) setSelectedPost(refreshedPost);
+            }
+        }
+        setIsLoading(false);
+    };
+
+    const handlePost = async () => {
+        if (!newPost.trim() || !user) return;
+
+        const res = await createPost({
+            communityId: user.communityId,
+            authorId: user.id,
             content: newPost,
-            timestamp: "Just now",
-            likes: 0,
-            comments: [],
             category: newPostCategory
-        };
+        });
 
-        setPosts([post, ...posts]);
-        setNewPost("");
-        setNewPostCategory("General");
+        if (res.success) {
+            setNewPost("");
+            setNewPostCategory("General");
+            loadPosts();
+        } else {
+            alert("Failed to create post: " + res.error);
+        }
     };
 
-    const handleComment = () => {
-        if (!selectedPost || !newComment.trim()) return;
+    const handleComment = async () => {
+        if (!selectedPost || !newComment.trim() || !user) return;
 
-        const comment: ForumComment = {
-            id: Date.now().toString(),
-            authorId: "me",
-            authorName: "Eric H.",
-            content: newComment,
-            timestamp: "Just now"
-        };
+        const res = await createComment({
+            postId: selectedPost.id,
+            authorId: user.id,
+            content: newComment
+        });
 
-        const updatedPost = {
-            ...selectedPost,
-            comments: Array.isArray(selectedPost.comments) ? [...selectedPost.comments, comment] : [comment]
-        };
-
-        setPosts(posts.map(p => p.id === selectedPost.id ? updatedPost : p));
-        setSelectedPost(updatedPost);
-        setNewComment("");
+        if (res.success) {
+            setNewComment("");
+            loadPosts(); // Refresh to update comments list
+        } else {
+            alert("Failed to add comment: " + res.error);
+        }
     };
 
-    const handleLike = (e: React.MouseEvent, postId: string | number) => {
+    const handleLike = async (e: React.MouseEvent, postId: string) => {
         e.stopPropagation();
+        if (!user) return;
 
-        const updateLike = (post: ForumPost) => {
+        // Optimistic update
+        const updateLikeLocal = (post: ForumPost) => {
             if (post.id !== postId) return post;
             const isLiked = !!post.likedByMe;
             return {
@@ -103,25 +92,29 @@ export default function ForumPage() {
             };
         };
 
-        const newPosts = posts.map(updateLike);
-        setPosts(newPosts);
-
+        setPosts(posts.map(updateLikeLocal));
         if (selectedPost && selectedPost.id === postId) {
-            setSelectedPost(updateLike(selectedPost));
+            setSelectedPost(updateLikeLocal(selectedPost));
         }
+
+        await toggleLike(postId, user.id);
     };
 
-    const handleMessageUser = (e: React.MouseEvent, userName: string) => {
+    const handleMessageUser = (e: React.MouseEvent, userId: string) => {
         e.stopPropagation();
-        router.push(`/dashboard/messages?to=${encodeURIComponent(userName)}`);
+        // Assuming we navigate to messages with the userId ?
+        // Or handle looking up name. The previous code used userName.
+        // My routing probably relies on user ID or needs lookup.
+        // Let's pass ID for now.
+        router.push(`/dashboard/messages?to=${userId}`);
     };
 
     const filteredPosts = activeCategory === "All"
         ? posts
         : posts.filter(post => post.category === activeCategory);
 
-    const categories: (ForumCategory | "All")[] = ["All", "General", "Safety", "Events", "Lost & Found", "Recommendations"];
-    const postCategories: ForumCategory[] = ["General", "Safety", "Events", "Lost & Found", "Recommendations"];
+    const categories = ["All", "General", "Safety", "Events", "Lost & Found", "Recommendations"];
+    const postCategories = ["General", "Safety", "Events", "Lost & Found", "Recommendations"];
 
     return (
         <div style={{ paddingBottom: '3rem' }}>
@@ -149,9 +142,9 @@ export default function ForumPage() {
                             <div className={styles.postContent} style={{ fontSize: '1.05rem' }}>{selectedPost.content}</div>
 
                             <div className={styles.commentSection}>
-                                <h3 style={{ fontSize: '0.95rem', fontWeight: 600 }}>Comments ({Array.isArray(selectedPost.comments) ? selectedPost.comments.length : 0})</h3>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: 600 }}>Comments ({selectedPost.comments?.length || 0})</h3>
                                 <div className={styles.commentsList}>
-                                    {Array.isArray(selectedPost.comments) && selectedPost.comments.map(comment => (
+                                    {selectedPost.comments?.map(comment => (
                                         <div key={comment.id} className={styles.comment}>
                                             <div className={styles.commentAvatar}>{comment.authorName.charAt(0)}</div>
                                             <div className={styles.commentContent}>
@@ -163,7 +156,7 @@ export default function ForumPage() {
                                             </div>
                                         </div>
                                     ))}
-                                    {(!Array.isArray(selectedPost.comments) || selectedPost.comments.length === 0) && (
+                                    {(!selectedPost.comments || selectedPost.comments.length === 0) && (
                                         <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem', fontStyle: 'italic' }}>No comments yet. Be the first!</p>
                                     )}
                                 </div>
@@ -208,29 +201,33 @@ export default function ForumPage() {
                 </div>
 
                 {/* Create Post Widget */}
-                <div className={styles.createPost}>
-                    <textarea
-                        className={styles.postInput}
-                        placeholder="What's on your mind, Eric?"
-                        value={newPost}
-                        onChange={e => setNewPost(e.target.value)}
-                    />
-                    <div className={styles.postActions}>
-                        <select
-                            className={styles.selectCategory}
-                            value={newPostCategory}
-                            onChange={(e) => setNewPostCategory(e.target.value as ForumCategory)}
-                        >
-                            {postCategories.map(cat => (
-                                <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                        </select>
-                        <button className={styles.button} onClick={handlePost}>Post Update</button>
+                {user && (
+                    <div className={styles.createPost}>
+                        <textarea
+                            className={styles.postInput}
+                            placeholder={`What's on your mind, ${user.name.split(' ')[0]}?`}
+                            value={newPost}
+                            onChange={e => setNewPost(e.target.value)}
+                        />
+                        <div className={styles.postActions}>
+                            <select
+                                className={styles.selectCategory}
+                                value={newPostCategory}
+                                onChange={(e) => setNewPostCategory(e.target.value)}
+                            >
+                                {postCategories.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                            <button className={styles.button} onClick={handlePost}>Post Update</button>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Feed */}
-                {filteredPosts.map(post => (
+                {isLoading ? (
+                    <div style={{ padding: '2rem', textAlign: 'center' }}>Loading posts...</div>
+                ) : filteredPosts.map(post => (
                     <div
                         key={post.id}
                         className={styles.post}
@@ -244,10 +241,10 @@ export default function ForumPage() {
                                     <div className={styles.timestamp}>{post.timestamp}</div>
                                 </div>
                             </div>
-                            {post.author !== "Eric H." && (
+                            {post.authorId !== user?.id && (
                                 <button
                                     className={styles.messageButton}
-                                    onClick={(e) => handleMessageUser(e, post.author)}
+                                    onClick={(e) => handleMessageUser(e, post.authorId)}
                                 >
                                     <MessageCircle size={14} />
                                     Message
@@ -273,7 +270,7 @@ export default function ForumPage() {
                             </button>
                             <button className={styles.actionButton}>
                                 <MessageSquare size={18} />
-                                {Array.isArray(post.comments) ? post.comments.length : post.comments} Comments
+                                {post.comments?.length || 0} Comments
                             </button>
                             <button className={styles.actionButton}>
                                 <Share2 size={18} />

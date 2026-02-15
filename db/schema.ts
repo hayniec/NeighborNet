@@ -146,3 +146,64 @@ export const eventRsvps = pgTable('event_rsvps', {
     status: text('status', { enum: ['Going', 'Maybe', 'Not Going'] }).default('Going'),
     rsvpDate: timestamp('rsvp_date', { withTimezone: true }).defaultNow(),
 });
+
+// 9. Forum Posts
+export const forumPosts = pgTable('forum_posts', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
+    authorId: uuid('author_id').references(() => members.id).notNull(),
+    content: text('content').notNull(),
+    category: text('category').notNull(),
+    likes: integer('likes').default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// 10. Forum Comments
+export const forumComments = pgTable('forum_comments', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    postId: uuid('post_id').references(() => forumPosts.id, { onDelete: 'cascade' }).notNull(),
+    authorId: uuid('author_id').references(() => members.id).notNull(),
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// 11. Service Providers
+export const serviceProviders = pgTable('service_providers', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
+    name: text('name').notNull(),
+    category: text('category').notNull(),
+    phone: text('phone'),
+    rating: decimal('rating', { precision: 2, scale: 1 }).default('5.0'),
+    description: text('description'),
+    recommendedBy: text('recommended_by'), // Could be a name or reference to a member
+});
+
+// 12. Local Guide Places
+export const localPlaces = pgTable('local_places', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id').references(() => communities.id).notNull(),
+    name: text('name').notNull(),
+    category: text('category').notNull(),
+    address: text('address'),
+    description: text('description'),
+    rating: decimal('rating', { precision: 2, scale: 1 }),
+});
+
+// 13. Direct Messages
+export const directMessages = pgTable('direct_messages', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    senderId: uuid('sender_id').references(() => members.id).notNull(),
+    recipientId: uuid('recipient_id').references(() => members.id).notNull(),
+    content: text('content').notNull(),
+    isRead: boolean('is_read').default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// 14. Forum Likes
+export const forumLikes = pgTable('forum_likes', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    postId: uuid('post_id').references(() => forumPosts.id, { onDelete: 'cascade' }).notNull(),
+    memberId: uuid('member_id').references(() => members.id).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});

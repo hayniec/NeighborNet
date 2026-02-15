@@ -1,0 +1,10 @@
+[dotenv@17.2.3] injecting env (10) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+🛠️ Setting up Development Environment...
+
+✅ Community ID: 2bf6bc8a-899c-4e29-8ee7-f2038c804260
+✅ User ID: 7f60485b-c241-47e6-a9b6-6081322f8e37
+✅ Member ID (for context): cd48f9df-4096-4f8d-b76c-9a6dca90ceab
+
+Update contexts/UserContext.tsx with these values:
+id: "cd48f9df-4096-4f8d-b76c-9a6dca90ceab"
+communityId: "2bf6bc8a-899c-4e29-8ee7-f2038c804260"

@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { members, users } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNotNull, ne } from "drizzle-orm";
 
 export type NeighborActionState = {
     success: boolean;
@@ -249,6 +249,54 @@ export async function getNeighbor(id: string): Promise<NeighborActionState> {
         };
     } catch (error: any) {
         console.error("Failed to fetch neighbor:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function getCommunityOfficers(communityId: string): Promise<NeighborActionState> {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        // Verify basic membership
+        const [membership] = await db
+            .select()
+            .from(members)
+            .where(
+                and(
+                    eq(members.userId, session.user.id),
+                    eq(members.communityId, communityId)
+                )
+            );
+
+        if (!membership) {
+            return { success: false, error: "Not a member" };
+        }
+
+        const results = await db
+            .select({
+                id: members.id,
+                role: members.role,
+                hoaPosition: members.hoaPosition,
+                name: users.name,
+                email: users.email,
+                avatar: users.avatar,
+            })
+            .from(members)
+            .innerJoin(users, eq(members.userId, users.id))
+            .where(
+                and(
+                    eq(members.communityId, communityId),
+                    isNotNull(members.hoaPosition),
+                    ne(members.hoaPosition, '')
+                )
+            );
+
+        return { success: true, data: results };
+    } catch (error: any) {
+        console.error("Failed to fetch officers:", error);
         return { success: false, error: error.message };
     }
 }
