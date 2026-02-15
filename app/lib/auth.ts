@@ -54,32 +54,42 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         async signIn({ user, account }) {
-            // Allow credentials login without checks (already checked in authorize)
-            if (account?.provider === "credentials") return true;
+            console.log(`[AUTH] SignIn initiated for ${user.email} via ${account?.provider}`);
 
-            if (!user.email) return false;
+            // Allow credentials login without checks (already checked in authorize)
+            if (account?.provider === "credentials") {
+                console.log("[AUTH] Credentials login - allowing");
+                return true;
+            }
+
+            if (!user.email) {
+                console.error("[AUTH] No email provided by provider");
+                return false;
+            }
 
             try {
+                const normalizedEmail = user.email.toLowerCase();
                 // Check if global user exists
                 const [existingUser] = await db
                     .select()
                     .from(users)
-                    .where(eq(users.email, user.email.toLowerCase()));
+                    .where(eq(users.email, normalizedEmail));
 
                 if (!existingUser) {
+                    console.log(`[AUTH] Creating new user for ${normalizedEmail}`);
                     // Create new GLOBAL user for social login
-                    // NOTE: This does NOT add them to a community. 
-                    // They will be a 'homeless' user until they are invited or create a community.
-                    // For now, we allow it, but they might get redirected to a 'join' page.
                     await db.insert(users).values({
-                        email: user.email,
+                        email: normalizedEmail,
                         name: user.name || "Neighbor",
                         avatar: user.image || null,
                     });
+                    console.log(`[AUTH] User created successfully`);
+                } else {
+                    console.log(`[AUTH] User ${normalizedEmail} already exists`);
                 }
                 return true;
             } catch (error) {
-                console.error("Error in signIn callback:", error);
+                console.error("[AUTH] Error in signIn callback:", error);
                 return false;
             }
         },
