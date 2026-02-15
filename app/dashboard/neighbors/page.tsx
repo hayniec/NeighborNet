@@ -111,7 +111,7 @@ export default function NeighborsPage() {
                         onClick={async () => {
                             if (user?.id) {
                                 const res = await getUserProfile(user.id);
-                                if (res.success && res.data.communityId) {
+                                if (res.success && res.data && res.data.communityId) {
                                     alert(`Found Community: ${res.data.communityId}. Updating...`);
                                     setUser({ ...user, communityId: res.data.communityId, role: res.data.role as any });
                                     window.location.reload();
