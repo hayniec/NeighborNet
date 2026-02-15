@@ -7,16 +7,18 @@ import { authOptions } from "@/app/lib/auth";
 import { eq } from "drizzle-orm";
 
 // Hardcoded Super Admins for now - typically this would be in the DB or env
+// Hardcoded Super Admins for now - typically this would be in the DB or env
 const SUPER_ADMINS = [
     "sally.johnson@example.com",
-    "erich.haynie@gmail.com" // Assuming user's email might be this based on paths, adding just in case or sticking to plan
-];
+    "erich.haynie@gmail.com",
+    process.env.SUPER_ADMIN_EMAIL
+].filter((email): email is string => !!email).map(email => email.toLowerCase());
 
 // Helper to check Super Admin capabilities
 async function isSuperAdmin() {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) return false;
-    return SUPER_ADMINS.includes(session.user.email);
+    return SUPER_ADMINS.includes(session.user.email.toLowerCase());
 }
 
 // Map DB row to UI Community type (Shared logic, duplicated slightly to avoid importing from client-heavy files if any)
