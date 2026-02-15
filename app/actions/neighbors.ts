@@ -110,7 +110,7 @@ export async function getNeighbors(communityId: string): Promise<NeighborActionS
                 )
             );
 
-        if (!membership || !['Admin', 'Board Member'].includes(membership.role || '')) {
+        if (!membership || !['Admin', 'Board Member', 'Resident', 'Event Manager'].includes(membership.role || '')) {
             return { success: false, error: "Insufficient permissions" };
         }
 
