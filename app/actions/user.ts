@@ -85,3 +85,25 @@ export async function getUserProfile(userId: string) {
         return { success: false, error: `Server Error: ${e.message || String(e)}` };
     }
 }
+
+export async function switchCommunity(userId: string, newCommunityId: string) {
+    try {
+        console.log(`[switchCommunity] Moving user ${userId} to ${newCommunityId}...`);
+
+        // delete existing membership
+        await db.delete(members).where(eq(members.userId, userId));
+
+        // create new admin membership
+        const [newMember] = await db.insert(members).values({
+            userId: userId,
+            communityId: newCommunityId,
+            role: 'Admin',
+            joinedDate: new Date()
+        }).returning();
+
+        return { success: true, message: "Switched successfully!", memberId: newMember.id };
+    } catch (e: any) {
+        console.error("Failed to switch community", e);
+        return { success: false, error: e.message };
+    }
+}

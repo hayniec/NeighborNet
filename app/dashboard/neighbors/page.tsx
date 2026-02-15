@@ -6,7 +6,7 @@ import styles from "./neighbors.module.css";
 import { Search, Filter, Mail, X } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { getNeighbors } from "@/app/actions/neighbors";
-import { getUserProfile } from "@/app/actions/user";
+import { getUserProfile, switchCommunity } from "@/app/actions/user";
 import { createInvitation } from "@/app/actions/invitations";
 import { Neighbor } from "@/types/neighbor";
 
@@ -18,6 +18,10 @@ export default function NeighborsPage() {
     const [inviteEmail, setInviteEmail] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [isSendingInvite, setIsSendingInvite] = useState(false);
+
+    // Debug Switch Community
+    const [switchId, setSwitchId] = useState("");
+    const [isSwitching, setIsSwitching] = useState(false);
 
     // Fetch neighbors on mount
     useEffect(() => {
@@ -323,6 +327,43 @@ export default function NeighborsPage() {
                     </div>
                 </div>
             )}
+
+            {/* DEBUG: Force Switch Community */}
+            <div style={{ marginTop: '3rem', padding: '1rem', borderTop: '1px solid var(--border)', opacity: 0.7 }}>
+                <p style={{ fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Debug: Switch Community</p>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                        type="text"
+                        placeholder="Paste Community ID here..."
+                        value={switchId}
+                        onChange={(e) => setSwitchId(e.target.value)}
+                        style={{ padding: '0.5rem', background: 'var(--background)', border: '1px solid var(--border)', borderRadius: '4px', flex: 1 }}
+                    />
+                    <button
+                        onClick={async () => {
+                            if (!switchId || !user?.id) return;
+                            setIsSwitching(true);
+                            try {
+                                const res = await switchCommunity(user.id, switchId);
+                                if (res.success) {
+                                    alert('Switched! Reloading...');
+                                    window.location.reload();
+                                } else {
+                                    alert('Switch failed: ' + res.error);
+                                }
+                            } catch (err: any) {
+                                alert('Switch error: ' + err.message);
+                            } finally {
+                                setIsSwitching(false);
+                            }
+                        }}
+                        disabled={isSwitching}
+                        style={{ padding: '0.5rem 1rem', background: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        {isSwitching ? 'Switching...' : 'Force Switch'}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
