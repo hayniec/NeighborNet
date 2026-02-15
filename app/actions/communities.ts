@@ -111,6 +111,18 @@ export async function createCommunity(data: any) {
             logoUrl: data.branding?.logoUrl
         }).returning();
 
+        // Auto-add creator as Admin
+        const session = await getServerSession(authOptions);
+        if (session?.user?.id) {
+            await db.insert(members).values({
+                userId: session.user.id,
+                communityId: inserted.id,
+                role: 'Admin',
+                address: 'Admin Address', // Optional default
+                joinedDate: new Date()
+            });
+        }
+
         return { success: true, data: mapToUI(inserted) };
     } catch (error: any) {
         console.error("Failed to create community:", error);

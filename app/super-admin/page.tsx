@@ -9,7 +9,7 @@ import { createCommunity, toggleCommunityStatus, deleteCommunity, toggleCommunit
 import type { Community } from "@/types/community";
 
 export default function SuperAdminPage() {
-    const { data: session, status } = useSession();
+    const { data: session, status, update } = useSession();
     const [communities, setCommunities] = useState<Community[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCreating, setIsCreating] = useState(false);
@@ -285,6 +285,9 @@ export default function SuperAdminPage() {
                                             localStorage.setItem('kithGrid_customSecondary', comm.branding.secondaryColor);
                                             localStorage.setItem('kithGrid_customAccent', comm.branding.accentColor);
                                             localStorage.setItem('kithGrid_communityLogo', comm.branding.logoUrl);
+
+                                            // Update NextAuth Session to switch context
+                                            await update({ user: { communityId: comm.id } });
 
                                             alert(`Simulating login for ${comm.name}!`);
                                             window.location.href = '/dashboard';
