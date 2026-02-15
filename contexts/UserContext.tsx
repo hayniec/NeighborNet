@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 
-export type UserRole = "admin" | "resident" | "event manager";
+export type UserRole = "admin" | "resident" | "event manager" | "board member";
 
 interface UserProfile {
     id?: string;
