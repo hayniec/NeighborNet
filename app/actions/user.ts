@@ -90,13 +90,17 @@ export async function switchCommunity(userId: string, newCommunityId: string) {
     try {
         console.log(`[switchCommunity] Request: User ${userId} -> Comm ${newCommunityId}`);
 
-        // 1. Check if user exists
+        // 1. Check if user exists (READ TEST)
         const [user] = await db.select().from(users).where(eq(users.id, userId));
         if (!user) {
             console.error("[switchCommunity] User not found");
             return { success: false, error: "User ID invalid" };
         }
 
+        // DEBUG: Return early to test if READ works
+        return { success: true, message: `READ OK: Found ${user.email}` };
+
+        /* 
         // 2. Clear old membership
         console.log("[switchCommunity] Deleting old membership...");
         await db.delete(members).where(eq(members.userId, userId));
@@ -113,6 +117,7 @@ export async function switchCommunity(userId: string, newCommunityId: string) {
 
         console.log("[switchCommunity] Success!");
         return { success: true, message: "Switched" };
+        */
 
     } catch (e: any) {
         console.error("[switchCommunity] CRITICAL FAIL:", e);
