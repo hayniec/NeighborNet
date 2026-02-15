@@ -87,41 +87,7 @@ export async function getUserProfile(userId: string) {
 }
 
 export async function switchCommunity(userId: string, newCommunityId: string) {
-    try {
-        console.log(`[switchCommunity] Request: User ${userId} -> Comm ${newCommunityId}`);
-
-        // 1. Check if user exists (READ TEST)
-        const [user] = await db.select().from(users).where(eq(users.id, userId));
-        if (!user) {
-            console.error("[switchCommunity] User not found");
-            return { success: false, error: "User ID invalid" };
-        }
-
-        // DEBUG: Return early to test if READ works
-        return { success: true, message: `READ OK: Found ${user.email}` };
-
-        /* 
-        // 2. Clear old membership
-        console.log("[switchCommunity] Deleting old membership...");
-        await db.delete(members).where(eq(members.userId, userId));
-
-        // 3. Create new membership
-        console.log("[switchCommunity] Creating new membership...");
-        await db.insert(members).values({
-            userId: userId,
-            communityId: newCommunityId,
-            role: 'Admin',
-            joinedDate: new Date()
-        });
-        // Note: Not using .returning() to avoid any object return issues
-
-        console.log("[switchCommunity] Success!");
-        return { success: true, message: "Switched" };
-        */
-
-    } catch (e: any) {
-        console.error("[switchCommunity] CRITICAL FAIL:", e);
-        // Ensure error is a simple string
-        return { success: false, error: String(e.message || e) };
-    }
+    console.log("[switchCommunity] HELLO WORLD TEST");
+    // NO DB CALLS
+    return { success: true, message: "HELLO WORLD - Server Action is ALIVE" };
 }
