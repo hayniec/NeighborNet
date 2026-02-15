@@ -29,8 +29,11 @@ export async function getCommunityAnnouncements(communityId: string, userId?: st
 
         if (!isAdmin) {
             // Residents only see active announcements
-            baseConditions.push(or(isNull(announcements.activateAt), lte(announcements.activateAt, now)));
-            baseConditions.push(or(isNull(announcements.expiresAt), gt(announcements.expiresAt, now)));
+            const activeCondition = or(isNull(announcements.activateAt), lte(announcements.activateAt, now));
+            if (activeCondition) baseConditions.push(activeCondition);
+
+            const notExpiredCondition = or(isNull(announcements.expiresAt), gt(announcements.expiresAt, now));
+            if (notExpiredCondition) baseConditions.push(notExpiredCondition);
         }
 
         const results = await db
