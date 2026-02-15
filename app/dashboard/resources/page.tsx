@@ -33,7 +33,7 @@ export default function ResourcesPage() {
     }, [user?.communityId]);
 
     const loadResources = async () => {
-        if (!user) return;
+        if (!user?.communityId) return;
         setIsLoading(true);
         const res = await getCommunityResources(user.communityId);
         if (res.success && res.data) {
@@ -60,7 +60,7 @@ export default function ResourcesPage() {
     };
 
     const handleCreate = async (data: any) => {
-        if (!user) return;
+        if (!user?.communityId) return;
 
         const res = await createResource({
             communityId: user.communityId,

@@ -58,7 +58,7 @@ function MessagesContent() {
     }, [activeChatId, user]);
 
     const loadConversations = async () => {
-        if (!user) return;
+        if (!user?.id) return;
         setLoading(true);
         const res = await getConversations(user.id);
         if (res.success && res.data) {
@@ -72,7 +72,7 @@ function MessagesContent() {
     };
 
     const loadThread = async (otherId: string) => {
-        if (!user) return;
+        if (!user?.id) return;
         const res = await getThread(user.id, otherId);
         if (res.success && res.data) {
             setMessages(res.data);
@@ -80,7 +80,7 @@ function MessagesContent() {
     };
 
     const handleSendMessage = async () => {
-        if (!newMessage.trim() || !user || !activeChatId) return;
+        if (!newMessage.trim() || !user?.id || !activeChatId) return;
 
         // Optimistic append
         const tempMsg: DirectMessage = {

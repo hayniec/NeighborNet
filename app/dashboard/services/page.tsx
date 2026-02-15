@@ -28,7 +28,7 @@ export default function ServicesPage() {
     }, [user?.communityId]);
 
     const loadServices = async () => {
-        if (!user) return;
+        if (!user?.communityId) return;
         setIsLoading(true);
         const res = await getServiceProviders(user.communityId);
         if (res.success && res.data) {

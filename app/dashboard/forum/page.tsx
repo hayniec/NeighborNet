@@ -26,7 +26,7 @@ export default function ForumPage() {
     }, [user?.communityId]);
 
     const loadPosts = async () => {
-        if (!user) return;
+        if (!user?.communityId) return;
         setIsLoading(true);
         const res = await getCommunityPosts(user.communityId, user.id);
         if (res.success && res.data) {
@@ -42,7 +42,7 @@ export default function ForumPage() {
     };
 
     const handlePost = async () => {
-        if (!newPost.trim() || !user) return;
+        if (!newPost.trim() || !user?.communityId || !user?.id) return;
 
         const res = await createPost({
             communityId: user.communityId,
@@ -61,7 +61,7 @@ export default function ForumPage() {
     };
 
     const handleComment = async () => {
-        if (!selectedPost || !newComment.trim() || !user) return;
+        if (!selectedPost || !newComment.trim() || !user?.id) return;
 
         const res = await createComment({
             postId: selectedPost.id,
@@ -79,7 +79,7 @@ export default function ForumPage() {
 
     const handleLike = async (e: React.MouseEvent, postId: string) => {
         e.stopPropagation();
-        if (!user) return;
+        if (!user?.id) return;
 
         // Optimistic update
         const updateLikeLocal = (post: ForumPost) => {

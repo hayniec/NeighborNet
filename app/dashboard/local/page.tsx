@@ -27,7 +27,7 @@ export default function LocalGuidePage() {
     }, [user?.communityId]);
 
     const loadSpots = async () => {
-        if (!user) return;
+        if (!user?.communityId) return;
         setIsLoading(true);
         const res = await getLocalPlaces(user.communityId);
         if (res.success && res.data) {
