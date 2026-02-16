@@ -1,10 +1,9 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import styles from "./services.module.css";
-import { Wrench, Phone, Star, User, Hammer, Trees, ShieldCheck } from "lucide-react";
-import { getServiceProviders } from "@/app/actions/services";
+import { Wrench, Phone, Star, User, Hammer, Trees, ShieldCheck, Plus } from "lucide-react";
+import { getServiceProviders, createServiceProvider } from "@/app/actions/services";
 import { useUser } from "@/contexts/UserContext";
+import { CreateServiceModal } from "@/components/dashboard/CreateServiceModal";
 
 interface ServiceProvider {
     id: string;
@@ -20,10 +19,14 @@ export default function ServicesPage() {
     const { user } = useUser();
     const [providers, setProviders] = useState<ServiceProvider[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     useEffect(() => {
         if (user?.communityId) {
             loadServices();
+        } else if (user) {
+            // User loaded but no community? Stop loading.
+            setIsLoading(false);
         }
     }, [user?.communityId]);
 
@@ -37,11 +40,48 @@ export default function ServicesPage() {
         setIsLoading(false);
     };
 
+    const handleCreateService = async (data: any) => {
+        if (!user?.communityId) return;
+        try {
+            const res = await createServiceProvider({
+                communityId: user.communityId,
+                name: data.name,
+                category: data.category,
+                phone: data.phone,
+                description: data.description,
+                recommendedBy: user.name || "Neighbor", // Default name if missing
+            });
+
+            if (res.success && res.data) {
+                setProviders(prev => [res.data, ...prev]);
+                setIsCreateModalOpen(false);
+            } else {
+                alert("Failed to add recommendation: " + res.error);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("An error occurred.");
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <h1 className={styles.pageTitle}>Service Recommendations</h1>
-                <p className={styles.pageSubtitle}>Trusted professionals recommended by your neighbors.</p>
+                <div>
+                    <h1 className={styles.pageTitle}>Service Recommendations</h1>
+                    <p className={styles.pageSubtitle}>Trusted professionals recommended by your neighbors.</p>
+                </div>
+                <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        padding: '0.75rem 1rem', background: 'var(--primary)', color: 'white',
+                        border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600
+                    }}
+                >
+                    <Plus size={18} />
+                    Recommend a Pro
+                </button>
             </div>
 
             {isLoading ? (
@@ -92,6 +132,12 @@ export default function ServicesPage() {
                     )}
                 </div>
             )}
+
+            <CreateServiceModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onCreate={handleCreateService}
+            />
         </div>
     );
 }
