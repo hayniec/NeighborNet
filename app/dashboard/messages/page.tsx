@@ -214,16 +214,6 @@ function MessagesContent() {
                     <div className={styles.emptyState}>
                         <MessageCircle size={48} color="#ccc" />
                         <p>Select a conversation or start a new one.</p>
-                        <button
-                            onClick={() => setIsNewMessageModalOpen(true)}
-                            style={{
-                                marginTop: '1rem', padding: '0.5rem 1rem',
-                                background: 'var(--primary)', color: 'white',
-                                border: 'none', borderRadius: '4px', cursor: 'pointer'
-                            }}
-                        >
-                            Start New Message
-                        </button>
                     </div>
                 )}
             </div>
