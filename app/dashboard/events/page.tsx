@@ -125,7 +125,19 @@ export default function EventsPage() {
         }
     };
 
-    const canManageEvents = ['admin', 'event manager'].includes(user.role?.toLowerCase());
+    // Check for any leadership role
+    const userRole = user.role?.toLowerCase() || '';
+    const canManageEvents = [
+        'admin',
+        'super admin',
+        'event manager',
+        'board member',
+        'hoa officer',
+        'president',
+        'vice president',
+        'secretary',
+        'treasurer'
+    ].includes(userRole);
 
     return (
         <div className={styles.container}>
