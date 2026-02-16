@@ -40,6 +40,10 @@ const mapToUI = (row: any) => ({
     emergency: {
         accessCode: row.emergencyAccessCode || '',
         instructions: row.emergencyInstructions || ''
+    },
+    hoaSettings: {
+        duesAmount: row.hoaDuesAmount || null,
+        duesFrequency: row.hoaDuesFrequency || 'Monthly'
     }
 });
 
@@ -80,6 +84,8 @@ export async function getCommunities() {
                 accentColor: communities.accentColor,
                 emergencyAccessCode: communities.emergencyAccessCode,
                 emergencyInstructions: communities.emergencyInstructions,
+                hoaDuesAmount: communities.hoaDuesAmount,
+                hoaDuesFrequency: communities.hoaDuesFrequency,
             })
             .from(communities)
             .innerJoin(members, eq(communities.id, members.communityId))
@@ -218,6 +224,22 @@ export async function updateEmergencySettings(id: string, data: { accessCode: st
     } catch (e) {
         console.error("Failed to update emergency settings", e);
         return { success: false, error: "Failed to update emergency settings" };
+    }
+}
+
+export async function updateCommunityHoaSettings(id: string, data: { duesAmount: string; duesFrequency: string }) {
+    try {
+        // Parse duesAmount as a string for decimal field, ensure it's valid
+        const amount = parseFloat(data.duesAmount).toFixed(2);
+
+        await db.update(communities).set({
+            hoaDuesAmount: amount,
+            hoaDuesFrequency: data.duesFrequency
+        }).where(eq(communities.id, id));
+        return { success: true };
+    } catch (e) {
+        console.error("Failed to update HOA settings", e);
+        return { success: false, error: "Failed to update HOA settings" };
     }
 }
 

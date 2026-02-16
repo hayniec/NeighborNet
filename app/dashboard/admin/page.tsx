@@ -5,7 +5,7 @@ import { useTheme, THEMES } from "@/contexts/ThemeContext";
 import styles from "./admin.module.css";
 import { Palette, Shield, Users, FileText, Trash2, CheckCircle, UserPlus, Mail, X, Edit2, Wrench } from "lucide-react";
 import { createInvitation, getInvitations, deleteInvitation, bulkCreateInvitations, InvitationActionState } from "@/app/actions/invitations";
-import { getCommunities } from "@/app/actions/communities";
+import { getCommunities, updateCommunityHoaSettings } from "@/app/actions/communities";
 import { getNeighbors, deleteNeighbor, updateNeighbor } from "@/app/actions/neighbors";
 import { getCommunityResources, createResource, deleteResource } from "@/app/actions/resources";
 import { CreateResourceModal } from "@/components/dashboard/CreateResourceModal";
@@ -40,20 +40,48 @@ export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<Tab>('general');
     const [communityId, setCommunityId] = useState<string>("");
 
-    // Fetch real Community ID
+    // HOA Settings State
+    const [hoaDuesAmount, setHoaDuesAmount] = useState("");
+    const [hoaDuesFrequency, setHoaDuesFrequency] = useState("Monthly");
+    const [isSavingHoa, setIsSavingHoa] = useState(false);
+
+    // Fetch real Community ID and Settings
     useEffect(() => {
-        const fetchCommunityId = async () => {
+        const fetchCommunityDetails = async () => {
             try {
                 const res = await getCommunities();
                 if (res.success && res.data && res.data.length > 0) {
-                    setCommunityId(res.data[0].id);
+                    const current = res.data[0];
+                    setCommunityId(current.id);
+                    // Update theme context branding if needed, but it might handle itself.
+                    // Set HOA Settings locally
+                    if (current.hoaSettings) {
+                        setHoaDuesAmount(current.hoaSettings.duesAmount || "");
+                        setHoaDuesFrequency(current.hoaSettings.duesFrequency || "Monthly");
+                    }
                 }
             } catch (error) {
-                console.error("Failed to fetch community ID", error);
+                console.error("Failed to fetch community details", error);
             }
         };
-        fetchCommunityId();
+        fetchCommunityDetails();
     }, []);
+
+    const handleSaveHoaSettings = async () => {
+        if (!communityId) return;
+        setIsSavingHoa(true);
+        const res = await updateCommunityHoaSettings(communityId, {
+            duesAmount: hoaDuesAmount,
+            duesFrequency: hoaDuesFrequency
+        });
+        setIsSavingHoa(false);
+        if (res.success) {
+            alert("HOA settings saved.");
+        } else {
+            alert("Failed to save: " + res.error);
+        }
+    };
+
 
 
     // CSV Import
@@ -577,6 +605,56 @@ export default function AdminPage() {
                                     Allow residents to generate guest passes
                                 </label>
                             </div>
+                        </div>
+                    </div>
+
+                    <div className={styles.card}>
+                        <div className={styles.cardHeader}>
+                            <FileText size={20} />
+                            <span className={styles.cardTitle}>HOA Settings</span>
+                        </div>
+                        <div className={styles.cardContent}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Dues Amount ($)</label>
+                                <input
+                                    type="number"
+                                    className={styles.input}
+                                    value={hoaDuesAmount}
+                                    onChange={(e) => setHoaDuesAmount(e.target.value)}
+                                    placeholder="e.g. 150.00"
+                                    aria-label="Dues Amount"
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Payment Frequency</label>
+                                <select
+                                    className={styles.input}
+                                    value={hoaDuesFrequency}
+                                    onChange={(e) => setHoaDuesFrequency(e.target.value)}
+                                    aria-label="Payment Frequency"
+                                >
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Quarterly">Quarterly</option>
+                                    <option value="Annually">Annually</option>
+                                </select>
+                            </div>
+                            <button
+                                onClick={handleSaveHoaSettings}
+                                disabled={isSavingHoa}
+                                style={{
+                                    padding: '0.75rem',
+                                    borderRadius: 'var(--radius)',
+                                    background: 'var(--primary)',
+                                    color: 'white',
+                                    border: 'none',
+                                    fontWeight: 600,
+                                    cursor: isSavingHoa ? 'not-allowed' : 'pointer',
+                                    marginTop: '1rem',
+                                    width: '100%'
+                                }}
+                            >
+                                {isSavingHoa ? 'Saving...' : 'Save HOA Settings'}
+                            </button>
                         </div>
                     </div>
 

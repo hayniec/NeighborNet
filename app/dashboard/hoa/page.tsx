@@ -8,6 +8,7 @@ import { UploadDocumentModal } from "@/components/dashboard/UploadDocumentModal"
 import { getNeighbors, getCommunityOfficers } from "@/app/actions/neighbors";
 import { ContactOfficerModal } from "@/components/dashboard/ContactOfficerModal";
 import { getCommunityDocuments, createDocument } from "@/app/actions/documents";
+import { getCommunities } from "@/app/actions/communities";
 
 interface HoaDocument {
     id: string;
@@ -37,6 +38,7 @@ export default function HoaPage() {
     const [officers, setOfficers] = useState<Officer[]>([]);
     const [isLoadingOfficers, setIsLoadingOfficers] = useState(true);
     const [isLoadingDocs, setIsLoadingDocs] = useState(true);
+    const [hoaSettings, setHoaSettings] = useState<{ duesAmount: string | null; duesFrequency: string | null } | null>(null);
 
     const role = user?.role?.toLowerCase();
     const canUpload = role === 'admin' || role === 'board member';
@@ -45,8 +47,24 @@ export default function HoaPage() {
         if (user?.communityId) {
             fetchOfficers();
             fetchDocuments();
+            fetchCommunitySettings();
         }
     }, [user?.communityId]);
+
+    const fetchCommunitySettings = async () => {
+        if (!user?.communityId) return;
+        try {
+            const res = await getCommunities();
+            if (res.success && res.data) {
+                const current = res.data.find((c: any) => c.id === user.communityId);
+                if (current && current.hoaSettings) {
+                    setHoaSettings(current.hoaSettings);
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const fetchOfficers = async () => {
         if (!user?.communityId) return;
@@ -165,7 +183,7 @@ export default function HoaPage() {
                                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <span style={{ fontWeight: 600, fontSize: '0.95rem' }}>{officer.name}</span>
                                                 <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', fontWeight: 500 }}>
-                                                    {officer.hoaPosition}
+                                                    {officer.hoaPosition || "Board Member"}
                                                 </span>
                                             </div>
                                         </div>
@@ -187,8 +205,15 @@ export default function HoaPage() {
                     <div className={styles.infoCard}>
                         <span className={styles.cardLabel}>Dues & Fees</span>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                            <span style={{ fontSize: '2rem', fontWeight: 700 }}>$150<span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--muted-foreground)' }}>/month</span></span>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>Next payment due: Feb 1st, 2024</p>
+                            <span style={{ fontSize: '2rem', fontWeight: 700 }}>
+                                {hoaSettings?.duesAmount ? `$${hoaSettings.duesAmount}` : 'Not set'}
+                                <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--muted-foreground)' }}>
+                                    {hoaSettings?.duesFrequency ? `/${hoaSettings.duesFrequency.toLowerCase()}` : ''}
+                                </span>
+                            </span>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>
+                                {hoaSettings?.duesAmount ? 'Current period' : 'Contact board for details'}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -270,6 +295,6 @@ export default function HoaPage() {
                     email: user?.email || ""
                 }}
             />
-        </div>
+        </div >
     );
 }

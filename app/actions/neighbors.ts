@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { members, users } from "@/db/schema";
-import { eq, and, isNotNull, ne } from "drizzle-orm";
+import { eq, and, isNotNull, ne, or } from "drizzle-orm";
 
 export type NeighborActionState = {
     success: boolean;
@@ -289,8 +289,13 @@ export async function getCommunityOfficers(communityId: string): Promise<Neighbo
             .where(
                 and(
                     eq(members.communityId, communityId),
-                    isNotNull(members.hoaPosition),
-                    ne(members.hoaPosition, '')
+                    or(
+                        eq(members.role, 'Board Member'),
+                        and(
+                            isNotNull(members.hoaPosition),
+                            ne(members.hoaPosition, '')
+                        )
+                    )
                 )
             );
 

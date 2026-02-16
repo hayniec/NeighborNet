@@ -35,6 +35,10 @@ export const communities = pgTable('communities', {
     emergencyAccessCode: text('emergency_access_code'),
     emergencyInstructions: text('emergency_instructions'),
 
+    // HOA Settings
+    hoaDuesAmount: decimal('hoa_dues_amount', { precision: 10, scale: 2 }),
+    hoaDuesFrequency: text('hoa_dues_frequency').default('Monthly'),
+
     createdAt: timestamp('created_at').defaultNow(),
 });
 
