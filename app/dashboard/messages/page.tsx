@@ -2,7 +2,8 @@
 
 import { useState, useEffect, Suspense } from "react";
 import styles from "./messages.module.css";
-import { Send, User, MessageCircle } from "lucide-react";
+import { Send, User, MessageCircle, Plus } from "lucide-react";
+import { MessageUserModal } from "@/components/dashboard/MessageUserModal";
 import { getConversations, getThread, sendMessage } from "@/app/actions/messages";
 import { useUser } from "@/contexts/UserContext";
 import { useSearchParams } from "next/navigation";
@@ -36,6 +37,10 @@ function MessagesContent() {
     const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(true);
 
+    // New Message Modal State
+    const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
+    const [tempChatName, setTempChatName] = useState("");
+
     // Initial load
     useEffect(() => {
         if (user) {
@@ -64,7 +69,8 @@ function MessagesContent() {
         if (res.success && res.data) {
             setConversations(res.data);
             // Default select first if none selected and not directed by URL
-            if (!activeChatId && !toId && res.data.length > 0) {
+            // Only if we haven't manually selected one via modal (tempChatName check?)
+            if (!activeChatId && !toId && res.data.length > 0 && !tempChatName) {
                 setActiveChatId(res.data[0].otherId);
             }
         }
@@ -108,17 +114,35 @@ function MessagesContent() {
 
     const getActiveChatName = () => {
         const conv = conversations.find(c => c.otherId === activeChatId);
-        // If not in conversations list (new chat), we might need to fetch name or just show ID/Loading
-        // But for now, returning "Chat" or ID is fallback. 
-        // Improvement: fetch name if not in list.
-        return conv ? conv.otherName : "Chat";
+        return conv ? conv.otherName : (tempChatName || "Chat");
+    };
+
+    const handleSelectUser = (userId: string, userName: string) => {
+        setActiveChatId(userId);
+        setTempChatName(userName);
+        setIsNewMessageModalOpen(false);
+        // If this user is NOT in the list, we treat it as a fresh start.
+        // The messages will likely be empty (or loaded if history exists but wasn't in list?)
+        // If history exists, loadThread will find it.
     };
 
     return (
         <div className={styles.container}>
             {/* Sidebar List */}
             <div className={styles.sidebar}>
-                <div className={styles.sidebarHeader}>Messages</div>
+                <div className={styles.sidebarHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Messages</span>
+                    <button
+                        onClick={() => setIsNewMessageModalOpen(true)}
+                        style={{
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            color: 'var(--primary)', display: 'flex', alignItems: 'center'
+                        }}
+                        title="New Message"
+                    >
+                        <Plus size={20} />
+                    </button>
+                </div>
                 <div className={styles.conversationList}>
                     {loading && conversations.length === 0 && <div style={{ padding: '1rem' }}>Loading...</div>}
                     {!loading && conversations.length === 0 && <div style={{ padding: '1rem', color: '#666' }}>No conversations yet.</div>}
@@ -127,7 +151,7 @@ function MessagesContent() {
                         <div
                             key={conv.otherId}
                             className={`${styles.conversationItem} ${activeChatId === conv.otherId ? styles.activeConversation : ''}`}
-                            onClick={() => setActiveChatId(conv.otherId)}
+                            onClick={() => { setActiveChatId(conv.otherId); setTempChatName(""); }}
                         >
                             <div className={styles.conversationName}>{conv.otherName}</div>
                             <div className={styles.lastMessage}>{conv.lastMessage}</div>
@@ -175,10 +199,26 @@ function MessagesContent() {
                 ) : (
                     <div className={styles.emptyState}>
                         <MessageCircle size={48} color="#ccc" />
-                        <p>Select a conversation or start a new one from the Forum.</p>
+                        <p>Select a conversation or start a new one.</p>
+                        <button
+                            onClick={() => setIsNewMessageModalOpen(true)}
+                            style={{
+                                marginTop: '1rem', padding: '0.5rem 1rem',
+                                background: 'var(--primary)', color: 'white',
+                                border: 'none', borderRadius: '4px', cursor: 'pointer'
+                            }}
+                        >
+                            Start New Message
+                        </button>
                     </div>
                 )}
             </div>
+
+            <MessageUserModal
+                isOpen={isNewMessageModalOpen}
+                onClose={() => setIsNewMessageModalOpen(false)}
+                onSelectUser={handleSelectUser}
+            />
         </div>
     );
 }
