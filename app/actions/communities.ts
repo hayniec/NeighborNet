@@ -103,7 +103,11 @@ export async function getCommunities() {
     }
 }
 
-export async function createCommunity(data: any) {
+export type CommunityActionState =
+    | { success: true; data: any }
+    | { success: false; error: string };
+
+export async function createCommunity(data: any): Promise<CommunityActionState> {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
