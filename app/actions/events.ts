@@ -73,8 +73,13 @@ export async function createEvent(data: {
     organizerId: string;
 }): Promise<EventActionState> {
     try {
-        // Permission check
-        const [member] = await db.select().from(members).where(eq(members.id, data.organizerId));
+        // Permission check - organizerId is actually the user ID from auth
+        const [member] = await db.select().from(members).where(eq(members.userId, data.organizerId));
+
+        if (!member) {
+            return { success: false, error: 'Member not found for this user.' };
+        }
+
         const role = member?.role?.toLowerCase();
         const roles = member?.roles?.map(r => r.toLowerCase()) || [];
 
@@ -121,7 +126,13 @@ export async function createEvent(data: {
 
 export async function deleteEvent(eventId: string, memberId: string): Promise<EventActionState> {
     try {
-        const [member] = await db.select().from(members).where(eq(members.id, memberId));
+        // memberId is actually the user ID from auth
+        const [member] = await db.select().from(members).where(eq(members.userId, memberId));
+
+        if (!member) {
+            return { success: false, error: 'Member not found for this user.' };
+        }
+
         const role = member?.role?.toLowerCase();
         const roles = member?.roles?.map(r => r.toLowerCase()) || [];
 

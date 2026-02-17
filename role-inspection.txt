@@ -1,0 +1,39 @@
+﻿[dotenv@17.2.3] injecting env (10) from .env.local -- tip: ≡ƒôí add observability to secrets: https://dotenvx.com/ops
+Checking member roles in production database...
+
+Members in database:
+====================================================================================================
+Name: Football Fan
+Email: footballfan1997@protonmail.com
+Legacy Role: Admin
+Roles Array: ["Admin"]
+Roles Count: 1
+----------------------------------------------------------------------------------------------------
+Name: Legacy Box
+Email: legacybox.com.liqueur152@passmail.net
+Legacy Role: Resident
+Roles Array: ["Resident","Board Member","Event Manager"]
+Roles Count: 3
+----------------------------------------------------------------------------------------------------
+Name: Recovered User
+Email: eric.haynie@gmail.com
+Legacy Role: Admin
+Roles Array: ["Admin"]
+Roles Count: 1
+----------------------------------------------------------------------------------------------------
+
+
+Users with Admin or Event Manager permissions:
+====================================================================================================
+Name: Football Fan, Email: footballfan1997@protonmail.com
+  Legacy Role: Admin
+  Roles Array: ["Admin"]
+----------------------------------------------------------------------------------------------------
+Name: Recovered User, Email: eric.haynie@gmail.com
+  Legacy Role: Admin
+  Roles Array: ["Admin"]
+----------------------------------------------------------------------------------------------------
+Name: Legacy Box, Email: legacybox.com.liqueur152@passmail.net
+  Legacy Role: Resident
+  Roles Array: ["Resident","Board Member","Event Manager"]
+----------------------------------------------------------------------------------------------------
