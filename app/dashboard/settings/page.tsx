@@ -366,6 +366,101 @@ export default function SettingsPage() {
                 </div>
             </div>
 
+            {/* Emergency Button Settings */}
+            <div className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <div className={styles.sectionTitle}>
+                        <span className={styles.sectionTitleIcon}>🚨</span>
+                        Emergency Button
+                    </div>
+                </div>
+                <div className={styles.sectionContent}>
+                    <div className={styles.toggleRow}>
+                        <div className={styles.toggleLabel}>
+                            <span>Show Emergency Button</span>
+                            <span className={styles.toggleDescription}>Display the floating emergency button on all pages.</span>
+                        </div>
+                        <label className={styles.switch}>
+                            <input
+                                type="checkbox"
+                                checked={user.emergencyButtonSettings?.visible ?? true}
+                                onChange={e => setUser({
+                                    ...user,
+                                    emergencyButtonSettings: {
+                                        ...user.emergencyButtonSettings,
+                                        visible: e.target.checked,
+                                        position: user.emergencyButtonSettings?.position || 'bottom-left'
+                                    }
+                                })}
+                                aria-label="Toggle Emergency Button Visibility"
+                            />
+                            <span className={styles.slider}></span>
+                        </label>
+                    </div>
+
+                    <div className={styles.formGroup} style={{ marginTop: '1.5rem' }}>
+                        <label className={styles.label}>Button Position</label>
+                        <div className={styles.sectionSubtitleLarge}>
+                            Choose where the emergency button appears on your screen.
+                        </div>
+                        <div className={styles.themeToggleGroup} style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                            <button
+                                className={`${styles.outlineButton} ${styles.themeButton} ${user.emergencyButtonSettings?.position === 'bottom-left' ? styles.primaryButton + ' ' + styles.themeButtonActive : ''}`}
+                                onClick={() => setUser({
+                                    ...user,
+                                    emergencyButtonSettings: {
+                                        visible: user.emergencyButtonSettings?.visible ?? true,
+                                        position: 'bottom-left'
+                                    }
+                                })}
+                                aria-label="Set Bottom Left Position"
+                            >
+                                ↙️ Bottom Left
+                            </button>
+                            <button
+                                className={`${styles.outlineButton} ${styles.themeButton} ${user.emergencyButtonSettings?.position === 'bottom-right' ? styles.primaryButton + ' ' + styles.themeButtonActive : ''}`}
+                                onClick={() => setUser({
+                                    ...user,
+                                    emergencyButtonSettings: {
+                                        visible: user.emergencyButtonSettings?.visible ?? true,
+                                        position: 'bottom-right'
+                                    }
+                                })}
+                                aria-label="Set Bottom Right Position"
+                            >
+                                ↘️ Bottom Right
+                            </button>
+                            <button
+                                className={`${styles.outlineButton} ${styles.themeButton} ${user.emergencyButtonSettings?.position === 'top-left' ? styles.primaryButton + ' ' + styles.themeButtonActive : ''}`}
+                                onClick={() => setUser({
+                                    ...user,
+                                    emergencyButtonSettings: {
+                                        visible: user.emergencyButtonSettings?.visible ?? true,
+                                        position: 'top-left'
+                                    }
+                                })}
+                                aria-label="Set Top Left Position"
+                            >
+                                ↖️ Top Left
+                            </button>
+                            <button
+                                className={`${styles.outlineButton} ${styles.themeButton} ${user.emergencyButtonSettings?.position === 'top-right' ? styles.primaryButton + ' ' + styles.themeButtonActive : ''}`}
+                                onClick={() => setUser({
+                                    ...user,
+                                    emergencyButtonSettings: {
+                                        visible: user.emergencyButtonSettings?.visible ?? true,
+                                        position: 'top-right'
+                                    }
+                                })}
+                                aria-label="Set Top Right Position"
+                            >
+                                ↗️ Top Right
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Notifications */}
             <div className={styles.section}>
                 <div className={styles.sectionHeader}>

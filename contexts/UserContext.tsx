@@ -16,6 +16,10 @@ interface UserProfile {
     address?: string;
     personalEmergencyCode?: string;
     personalEmergencyInstructions?: string;
+    emergencyButtonSettings?: {
+        visible: boolean;
+        position: 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right';
+    };
 }
 
 interface UserContextType {
@@ -33,7 +37,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         roles: ["admin"],
         avatar: "EH",
         address: "123 Oak St, Unit 4",
-        communityId: "00000000-0000-0000-0000-000000000000"
+        communityId: "00000000-0000-0000-0000-000000000000",
+        emergencyButtonSettings: {
+            visible: true,
+            position: 'bottom-left'
+        }
     });
 
     const { data: session, status } = useSession();

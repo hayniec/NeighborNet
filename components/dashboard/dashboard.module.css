@@ -255,8 +255,7 @@
 /* SOS Button Styles */
 .sosButton {
     position: fixed;
-    bottom: 2rem;
-    right: 2rem;
+    /* Position set by variant classes below */
     width: 64px;
     height: 64px;
     border-radius: 50%;
@@ -272,6 +271,27 @@
     z-index: 50;
     transition: transform 0.2s, box-shadow 0.2s;
     animation: pulse 2s infinite;
+}
+
+/* Position Variants */
+.sosButton.bottomLeft {
+    bottom: 1.5rem;
+    left: 1.5rem;
+}
+
+.sosButton.bottomRight {
+    bottom: 1.5rem;
+    right: 1.5rem;
+}
+
+.sosButton.topLeft {
+    top: 1.5rem;
+    left: 1.5rem;
+}
+
+.sosButton.topRight {
+    top: 1.5rem;
+    right: 1.5rem;
 }
 
 .sosButton:hover {

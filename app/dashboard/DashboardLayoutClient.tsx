@@ -91,9 +91,14 @@ export default function DashboardLayoutClient({
             </div>
 
             {/* SOS Floating Button */}
-            {showSOSButton && (
+            {showSOSButton && (user.emergencyButtonSettings?.visible ?? true) && (
                 <button
-                    className={styles.sosButton}
+                    className={`${styles.sosButton} ${styles[
+                        user.emergencyButtonSettings?.position === 'bottom-right' ? 'bottomRight' :
+                            user.emergencyButtonSettings?.position === 'top-left' ? 'topLeft' :
+                                user.emergencyButtonSettings?.position === 'top-right' ? 'topRight' :
+                                    'bottomLeft' // default
+                    ]}`}
                     onClick={() => setShowSOSModal(true)}
                     title="Emergency Access"
                 >
