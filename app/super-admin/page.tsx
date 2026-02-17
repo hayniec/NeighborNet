@@ -115,7 +115,7 @@ export default function SuperAdminPage() {
                 }
             });
 
-            if (res.success && 'data' in res && res.data) {
+            if (res.success) {
                 setCommunities([...communities, res.data]);
                 setShowAddModal(false);
                 setNewCommunity({
