@@ -122,7 +122,7 @@ export default function DocumentsPage() {
             {activeTab === 'documents' && (
                 <div>
                     <div className={styles.flexEndContainer}>
-                        {(user.roles?.some(r => ['admin', 'board member'].includes(r.toLowerCase())) || user.role === 'admin' || user.role === 'Board Member') && (
+                        {(user.roles?.some(r => r === 'admin' || r === 'board member') || user.role === 'admin' || user.role === 'board member') && (
                             <button
                                 className={styles.uploadButton}
                                 onClick={() => setIsUploadModalOpen(true)}

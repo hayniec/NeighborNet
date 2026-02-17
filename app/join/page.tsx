@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import styles from "./join.module.css";
 import { validateInvitation, markInvitationUsed } from "@/app/actions/invitations";
 import { registerNeighbor } from "@/app/actions/neighbors";
-import { useUser } from "@/contexts/UserContext";
+import { useUser, type UserRole } from "@/contexts/UserContext";
 
 export default function JoinPage() {
     const router = useRouter();
@@ -90,6 +90,7 @@ export default function JoinPage() {
                 email: registerResult.data.email,
                 name: registerResult.data.name,
                 role: "resident" as const,
+                roles: ["resident"] as UserRole[],
                 avatar: registerResult.data.name.charAt(0).toUpperCase()
             };
             setUser(newUserProfile);
