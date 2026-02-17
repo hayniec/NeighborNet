@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTheme, THEMES } from "@/contexts/ThemeContext";
 import styles from "./admin.module.css";
-import { Palette, Shield, Users, FileText, Trash2, CheckCircle, UserPlus, Mail, X, Edit2, Wrench } from "lucide-react";
+import { Palette, Shield, Users, FileText, Trash2, CheckCircle, UserPlus, Mail, X, Edit2, Wrench, RefreshCw } from "lucide-react";
 import { createInvitation, getInvitations, deleteInvitation, bulkCreateInvitations, InvitationActionState } from "@/app/actions/invitations";
 import { getCommunityById, updateCommunityHoaSettings } from "@/app/actions/communities";
 import { getNeighbors, deleteNeighbor, updateNeighbor } from "@/app/actions/neighbors";
@@ -48,12 +48,14 @@ export default function AdminPage() {
     const [hoaContactEmail, setHoaContactEmail] = useState("");
     const [isSavingHoa, setIsSavingHoa] = useState(false);
 
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+
     // Fetch real Community ID and Settings
     useEffect(() => {
         const fetchCommunityDetails = async () => {
             try {
-                // Use user's communityId directly if available
-                if (user.communityId) {
+                // Ignore dummy/initial community ID
+                if (user.communityId && user.communityId !== "00000000-0000-0000-0000-000000000000") {
                     console.log("[Admin] Using user.communityId:", user.communityId);
                     setCommunityId(user.communityId);
 
@@ -76,14 +78,18 @@ export default function AdminPage() {
                         console.warn("[Admin] Failed to load community:", res.error);
                     }
                 } else {
-                    console.warn("[Admin] No user.communityId available");
+                    console.warn("[Admin] Waiting for valid communityId (current: " + user.communityId + ")");
                 }
             } catch (error) {
                 console.error("Failed to fetch community details", error);
             }
         };
         fetchCommunityDetails();
-    }, [user.communityId]);
+    }, [user.communityId, refreshTrigger]);
+
+    const refreshHoaSettings = () => {
+        setRefreshTrigger(prev => prev + 1);
+    };
 
     const handleSaveHoaSettings = async () => {
         console.log("[Admin] Attempting to save HOA settings. CommunityId:", communityId);
@@ -114,6 +120,7 @@ export default function AdminPage() {
 
         if (res.success) {
             alert("HOA settings saved successfully!");
+            refreshHoaSettings();
         } else {
             alert("Failed to save: " + res.error);
         }
@@ -624,9 +631,26 @@ export default function AdminPage() {
 
 
                     <div className={styles.card}>
-                        <div className={styles.cardHeader}>
-                            <FileText size={20} />
-                            <span className={styles.cardTitle}>HOA Settings</span>
+                        <div className={styles.cardHeader} style={{ justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FileText size={20} />
+                                <span className={styles.cardTitle}>HOA Settings</span>
+                            </div>
+                            <button
+                                onClick={refreshHoaSettings}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '4px',
+                                    color: 'var(--muted-foreground)',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                                title="Refresh Settings"
+                            >
+                                <RefreshCw size={16} />
+                            </button>
                         </div>
                         <div className={styles.cardContent}>
                             <div className={styles.formGroup}>

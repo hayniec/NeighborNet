@@ -50,12 +50,27 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         console.log("UserContext Effect - Status:", status);
         console.log("UserContext Effect - Session:", session);
+
+        // Try to recover settings from localStorage if available, to merge with session
+        let savedSettings = undefined;
+        try {
+            const saved = localStorage.getItem("neighborNet_user");
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.emergencyButtonSettings) {
+                    savedSettings = parsed.emergencyButtonSettings;
+                }
+            }
+        } catch (e) {
+            console.error("Failed to parse saved user settings", e);
+        }
+
         if (status === "authenticated" && session?.user) {
             // Get roles using helper function
             const finalRoles = getUserRoles(session.user).map(r => r.toLowerCase() as UserRole);
             const primaryRole = getPrimaryRole(session.user).toLowerCase() as UserRole;
 
-            setUserState({
+            setUserState(prev => ({
                 id: session.user.id,
                 name: session.user.name || "Neighbor",
                 email: session.user.email || "",
@@ -63,10 +78,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 roles: finalRoles,
                 avatar: session.user.image || "",
                 communityId: session.user.communityId || undefined,
-            });
+                // Preserve existing settings -> prefer local storage -> then current state -> then default
+                emergencyButtonSettings: savedSettings || prev.emergencyButtonSettings || {
+                    visible: true,
+                    position: 'bottom-left'
+                }
+            }));
         } else if (status === "unauthenticated" || status === "loading") {
             // MOCK USER FOR DEVELOPMENT/BYPASS
-            setUserState({
+            setUserState(prev => ({
                 id: "cd48f9df-4096-4f8d-b76c-9a6dca90ceab",
                 name: "Super Admin (Bypass)",
                 email: "admin@neighbornet.com",
@@ -74,7 +94,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 roles: ["admin", "resident"],
                 avatar: "SA",
                 communityId: "2bf6bc8a-899c-4e29-8ee7-f2038c804260",
-            });
+                // Preserve existing settings
+                emergencyButtonSettings: savedSettings || prev.emergencyButtonSettings || {
+                    visible: true,
+                    position: 'bottom-left'
+                }
+            }));
         }
     }, [session, status]);
 
