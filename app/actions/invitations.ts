@@ -1,5 +1,7 @@
 'use server'
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
 import { db } from "@/db";
 import { invitations, members, communities } from "@/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
@@ -17,19 +19,24 @@ function generateCode(): string {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
+// ...
+
 /**
  * Helper to verify admin status
  */
-async function isAdmin(memberId?: string): Promise<boolean> {
-    if (!memberId) return false;
-    // Allow mock super admin to bypass DB check
-    if (memberId === "mock-super-admin-id") return true;
+async function isAdmin(userId: string, communityId: string): Promise<boolean> {
+    if (!userId || !communityId) return false;
+    // Allow mock super admin
+    if (userId === "mock-super-admin-id") return true;
 
     try {
         const [member] = await db
             .select()
             .from(members)
-            .where(eq(members.id, memberId));
+            .where(and(
+                eq(members.userId, userId),
+                eq(members.communityId, communityId)
+            ));
         return member && member.role === 'Admin';
     } catch {
         return false;
@@ -43,18 +50,22 @@ export async function createInvitation(data: {
     communityId: string;
     email: string;
     role?: 'Admin' | 'Resident' | 'Board Member';
-    createdBy?: string;
+    createdBy?: string; // Legacy parameter, ignored in favor of session
 }): Promise<InvitationActionState> {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return { success: false, error: "Unauthorized" };
+        }
+
         // Feature Requirement: Only Admins can create invitations
-        if (data.createdBy) {
-            const isUserAdmin = await isAdmin(data.createdBy);
-            if (!isUserAdmin) {
-                return { success: false, error: "Only admins can send invitations." };
-            }
+        const isUserAdmin = await isAdmin(session.user.id, data.communityId);
+        if (!isUserAdmin) {
+            return { success: false, error: "Only admins can send invitations." };
         }
 
         const code = generateCode();
+
 
         const [invitation] = await db.insert(invitations).values({
             communityId: data.communityId,
