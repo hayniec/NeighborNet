@@ -84,11 +84,24 @@ export async function getThread(currentMemberId: string, otherMemberId: string):
     }
 }
 
-export async function sendMessage(senderId: string, recipientId: string, content: string): Promise<MessageActionState> {
+export async function sendMessage(senderUserId: string, recipientUserId: string, content: string): Promise<MessageActionState> {
     try {
+        // Look up sender member by user ID
+        const [senderMember] = await db.select().from(members).where(eq(members.userId, senderUserId));
+        if (!senderMember) {
+            return { success: false, error: 'Sender member not found.' };
+        }
+
+        // Look up recipient member by user ID
+        const [recipientMember] = await db.select().from(members).where(eq(members.userId, recipientUserId));
+        if (!recipientMember) {
+            return { success: false, error: 'Recipient member not found.' };
+        }
+
+        // Insert message using member IDs
         const [msg] = await db.insert(directMessages).values({
-            senderId,
-            recipientId,
+            senderId: senderMember.id,
+            recipientId: recipientMember.id,
             content
         }).returning();
 
