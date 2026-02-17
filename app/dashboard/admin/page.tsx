@@ -5,7 +5,7 @@ import { useTheme, THEMES } from "@/contexts/ThemeContext";
 import styles from "./admin.module.css";
 import { Palette, Shield, Users, FileText, Trash2, CheckCircle, UserPlus, Mail, X, Edit2, Wrench } from "lucide-react";
 import { createInvitation, getInvitations, deleteInvitation, bulkCreateInvitations, InvitationActionState } from "@/app/actions/invitations";
-import { getCommunities, updateCommunityHoaSettings } from "@/app/actions/communities";
+import { getCommunityById, updateCommunityHoaSettings } from "@/app/actions/communities";
 import { getNeighbors, deleteNeighbor, updateNeighbor } from "@/app/actions/neighbors";
 import { getCommunityResources, createResource, deleteResource } from "@/app/actions/resources";
 import { CreateResourceModal } from "@/components/dashboard/CreateResourceModal";
@@ -52,38 +52,68 @@ export default function AdminPage() {
     useEffect(() => {
         const fetchCommunityDetails = async () => {
             try {
-                const res = await getCommunities();
-                if (res.success && res.data && res.data.length > 0) {
-                    const current = res.data[0];
-                    setCommunityId(current.id);
-                    // Update theme context branding if needed, but it might handle itself.
-                    // Set HOA Settings locally
-                    if (current.hoaSettings) {
-                        setHoaDuesAmount(current.hoaSettings.duesAmount || "");
-                        setHoaDuesFrequency(current.hoaSettings.duesFrequency || "Monthly");
-                        setHoaDuesDate(current.hoaSettings.duesDate || "1st");
-                        setHoaContactEmail(current.hoaSettings.contactEmail || "");
+                // Use user's communityId directly if available
+                if (user.communityId) {
+                    console.log("[Admin] Using user.communityId:", user.communityId);
+                    setCommunityId(user.communityId);
+
+                    // Fetch community details by ID to load HOA settings
+                    const res = await getCommunityById(user.communityId);
+                    console.log("[Admin] getCommunityById response:", res);
+
+                    if (res.success && res.data) {
+                        const current = res.data;
+                        console.log("[Admin] Current community:", current);
+                        // Set HOA Settings locally
+                        if (current.hoaSettings) {
+                            console.log("[Admin] Loading HOA settings:", current.hoaSettings);
+                            setHoaDuesAmount(current.hoaSettings.duesAmount || "");
+                            setHoaDuesFrequency(current.hoaSettings.duesFrequency || "Monthly");
+                            setHoaDuesDate(current.hoaSettings.duesDate || "1st");
+                            setHoaContactEmail(current.hoaSettings.contactEmail || "");
+                        }
+                    } else {
+                        console.warn("[Admin] Failed to load community:", res.error);
                     }
+                } else {
+                    console.warn("[Admin] No user.communityId available");
                 }
             } catch (error) {
                 console.error("Failed to fetch community details", error);
             }
         };
         fetchCommunityDetails();
-    }, []);
+    }, [user.communityId]);
 
     const handleSaveHoaSettings = async () => {
-        if (!communityId) return;
+        console.log("[Admin] Attempting to save HOA settings. CommunityId:", communityId);
+
+        if (!communityId) {
+            alert("Error: No community ID found. Please refresh the page and try again.");
+            console.error("[Admin] Cannot save: communityId is empty");
+            return;
+        }
+
         setIsSavingHoa(true);
+        console.log("[Admin] Saving HOA settings:", {
+            duesAmount: hoaDuesAmount,
+            duesFrequency: hoaDuesFrequency,
+            duesDate: hoaDuesDate,
+            contactEmail: hoaContactEmail
+        });
+
         const res = await updateCommunityHoaSettings(communityId, {
             duesAmount: hoaDuesAmount,
             duesFrequency: hoaDuesFrequency,
             duesDate: hoaDuesDate,
             contactEmail: hoaContactEmail
         });
+
+        console.log("[Admin] Save HOA settings response:", res);
         setIsSavingHoa(false);
+
         if (res.success) {
-            alert("HOA settings saved.");
+            alert("HOA settings saved successfully!");
         } else {
             alert("Failed to save: " + res.error);
         }

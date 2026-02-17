@@ -54,7 +54,16 @@ import { members } from "@/db/schema";
 export async function getCommunities() {
     try {
         const session = await getServerSession(authOptions);
+        console.log("[getCommunities] Session check:", {
+            hasSession: !!session,
+            hasUser: !!session?.user,
+            hasUserId: !!session?.user?.id,
+            userId: session?.user?.id,
+            userEmail: session?.user?.email
+        });
+
         if (!session?.user?.id) {
+            console.error("[getCommunities] UNAUTHORIZED: No valid session found");
             return { success: false, error: "Unauthorized" };
         }
 
@@ -255,6 +264,54 @@ export async function updateCommunityHoaSettings(id: string, data: { duesAmount:
     } catch (e) {
         console.error("Failed to update HOA settings", e);
         return { success: false, error: "Failed to update HOA settings" };
+    }
+}
+
+/**
+ * Fetch community by ID without session check
+ * Used when we already have the communityId from client context
+ */
+export async function getCommunityById(id: string) {
+    try {
+        const [community] = await db
+            .select({
+                id: communities.id,
+                name: communities.name,
+                slug: communities.slug,
+                planTuple: communities.planTuple,
+                hasMarketplace: communities.hasMarketplace,
+                hasResources: communities.hasResources,
+                hasEvents: communities.hasEvents,
+                hasDocuments: communities.hasDocuments,
+                hasForum: communities.hasForum,
+                hasMessages: communities.hasMessages,
+                hasServicePros: communities.hasServicePros,
+                hasLocalGuide: communities.hasLocalGuide,
+                hasEmergency: communities.hasEmergency,
+                isActive: communities.isActive,
+                logoUrl: communities.logoUrl,
+                primaryColor: communities.primaryColor,
+                secondaryColor: communities.secondaryColor,
+                accentColor: communities.accentColor,
+                emergencyAccessCode: communities.emergencyAccessCode,
+                emergencyInstructions: communities.emergencyInstructions,
+                hoaDuesAmount: communities.hoaDuesAmount,
+                hoaDuesFrequency: communities.hoaDuesFrequency,
+                hoaDuesDate: communities.hoaDuesDate,
+                hoaContactEmail: communities.hoaContactEmail,
+                hoaExtendedSettings: communities.hoaExtendedSettings,
+            })
+            .from(communities)
+            .where(eq(communities.id, id));
+
+        if (!community) {
+            return { success: false, error: "Community not found" };
+        }
+
+        return { success: true, data: mapToUI(community) };
+    } catch (error: any) {
+        console.error("Failed to fetch community by ID:", error);
+        return { success: false, error: "Failed to fetch community" };
     }
 }
 
