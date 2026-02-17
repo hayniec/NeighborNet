@@ -88,8 +88,12 @@ export function EventCard({ event, onRsvp, onDelete }: EventCardProps) {
             <div className={styles.footer}>
                 <div className={styles.attendees}>
                     <Users size={16} style={{ marginRight: 6 }} />
-                    {event.attendees} going
-                    {event.userRsvp && event.userRsvp > 0 && <span style={{ marginLeft: 4, color: 'var(--primary)', fontSize: '0.75rem' }}>(You: {event.userRsvp})</span>}
+                    {event.attendees} {event.attendees === 1 ? 'going' : 'going'}
+                    {event.userRsvp && event.userRsvp > 0 && (
+                        <span style={{ marginLeft: 4, color: 'var(--primary)', fontSize: '0.75rem' }}>
+                            (You: {event.userRsvp})
+                        </span>
+                    )}
                 </div>
                 <button
                     className={styles.joinButton}
