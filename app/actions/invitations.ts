@@ -120,12 +120,28 @@ export async function bulkCreateInvitations(data: {
     createdBy: string;
 }): Promise<InvitationActionState> {
     try {
-        const isUserAdmin = await isAdmin(data.createdBy);
-        if (!isUserAdmin) {
-            return { success: false, error: "Only admins can perform bulk import." };
+        const session = await getServerSession(authOptions);
+        // Fallback to data.createdBy if session is missing (e.g. mock user), but prefer session
+        const userId = session?.user?.id || data.createdBy;
+
+        // Resolve Admin Member
+        const [adminMember] = await db
+            .select()
+            .from(members)
+            .where(and(
+                eq(members.userId, userId),
+                eq(members.communityId, data.communityId)
+            ));
+
+        // Permission Check
+        if (!adminMember || adminMember.role !== 'Admin') {
+            // Allow mock super admin bypass if needed, but for now strict check unless mock ID
+            if (userId !== "mock-super-admin-id") {
+                return { success: false, error: "Only admins can perform bulk import." };
+            }
         }
 
-        const safeCreatedBy = data.createdBy === "mock-super-admin-id" ? null : data.createdBy;
+        const safeCreatedBy = userId === "mock-super-admin-id" ? null : (adminMember?.id || null);
 
         const values = data.invitations.map(inv => ({
             communityId: data.communityId,
