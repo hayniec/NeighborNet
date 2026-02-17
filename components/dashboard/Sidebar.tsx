@@ -56,7 +56,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const filteredNavigation = navigation.filter(item => {
         // Role check
         if (item.name === "Admin Console") {
-            return user.role === "admin";
+            return user.role === "admin" || (user.roles && user.roles.includes("admin"));
         }
 
         // Emergency Visibility

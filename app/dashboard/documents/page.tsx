@@ -122,14 +122,15 @@ export default function DocumentsPage() {
             {activeTab === 'documents' && (
                 <div>
                     <div className={styles.flexEndContainer}>
-                        {/* Only admins might upload in future, for now allow all or check role */}
-                        <button
-                            className={styles.uploadButton}
-                            onClick={() => setIsUploadModalOpen(true)}
-                        >
-                            <Upload size={16} />
-                            Upload Document
-                        </button>
+                        {(user.roles?.some(r => ['admin', 'board member'].includes(r.toLowerCase())) || user.role === 'admin' || user.role === 'Board Member') && (
+                            <button
+                                className={styles.uploadButton}
+                                onClick={() => setIsUploadModalOpen(true)}
+                            >
+                                <Upload size={16} />
+                                Upload Document
+                            </button>
+                        )}
                     </div>
 
                     {isLoading ? (

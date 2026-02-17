@@ -138,6 +138,7 @@ export async function getNeighbors(communityId: string): Promise<NeighborActionS
             .select({
                 id: members.id,
                 role: members.role,
+                roles: members.roles,
                 address: members.address,
                 hoaPosition: members.hoaPosition,
                 joinedDate: members.joinedDate,
@@ -158,6 +159,7 @@ export async function getNeighbors(communityId: string): Promise<NeighborActionS
                 name: n.name,
                 email: n.email,
                 role: n.role,
+                roles: n.roles,
                 address: n.address,
                 hoaPosition: n.hoaPosition,
                 avatar: n.avatar || '👤',
@@ -191,17 +193,30 @@ export async function deleteNeighbor(memberId: string): Promise<NeighborActionSt
 export async function updateNeighbor(memberId: string, data: {
     name?: string;
     role?: 'Admin' | 'Resident' | 'Board Member';
+    roles?: string[];
     address?: string;
     hoaPosition?: string | null;
 }): Promise<NeighborActionState> {
     try {
+        // Prepare update object
+        const updateData: any = {
+            address: data.address,
+            hoaPosition: data.hoaPosition
+        };
+
+        // Handle Role Sync
+        if (data.roles) {
+            updateData.roles = data.roles;
+            // Sync legacy role (Primary Role)
+            updateData.role = data.roles.length > 0 ? data.roles[0] : 'Resident';
+        } else if (data.role) {
+            updateData.role = data.role;
+            updateData.roles = [data.role];
+        }
+
         // Update member specific fields
         await db.update(members)
-            .set({
-                role: data.role,
-                address: data.address,
-                hoaPosition: data.hoaPosition
-            })
+            .set(updateData)
             .where(eq(members.id, memberId));
 
         // If name changes, we need to update 'users' table, but that affects global profile.

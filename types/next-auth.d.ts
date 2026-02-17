@@ -10,6 +10,8 @@ declare module "next-auth" {
         user: {
             /** The user's role. */
             role: string
+            /** The user's multiple roles. */
+            roles?: string[]
             /** The user's community ID. */
             communityId?: string | null
             /** The user's ID. */
@@ -19,6 +21,7 @@ declare module "next-auth" {
 
     interface User {
         role?: string
+        roles?: string[]
         communityId?: string | null
         id: string
         avatar?: string | null
@@ -31,7 +34,9 @@ declare module "next-auth/jwt" {
         /** OpenID ID Token */
         idToken?: string
         role?: string
+        roles?: string[]
         communityId?: string | null
         id?: string
+        memberId?: string
     }
 }

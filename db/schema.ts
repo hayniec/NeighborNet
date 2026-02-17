@@ -61,6 +61,7 @@ export const members = pgTable('neighbors', {
     userId: uuid('user_id').references(() => users.id),
     communityId: uuid('community_id').references(() => communities.id).notNull(),
 
+    roles: text('roles').array().default(['Resident']),
     role: text('role', { enum: ['Admin', 'Resident', 'Board Member', 'Event Manager'] }).default('Resident'),
     hoaPosition: text('hoa_position'),
     address: text('address'),

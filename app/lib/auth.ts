@@ -148,6 +148,7 @@ export const authOptions: NextAuthOptions = {
                         .select({
                             communityId: members.communityId,
                             role: members.role,
+                            roles: members.roles,
                             memberId: members.id,
                         })
                         .from(members)
@@ -160,6 +161,7 @@ export const authOptions: NextAuthOptions = {
                         if (activeMembership) {
                             // Keep existing selection
                             token.role = activeMembership.role || "Resident";
+                            token.roles = activeMembership.roles || ["Resident"];
                             token.memberId = activeMembership.memberId;
                             // Ensure token has the communityId (it might be there, but let's be explicit)
                             token.communityId = activeMembership.communityId;
@@ -168,12 +170,14 @@ export const authOptions: NextAuthOptions = {
                             const defaultMember = userMemberships[0];
                             token.communityId = defaultMember.communityId;
                             token.role = defaultMember.role || "Resident";
+                            token.roles = defaultMember.roles || ["Resident"];
                             token.memberId = defaultMember.memberId;
                         }
                     } else {
                         // User has NO communities.
                         delete token.communityId;
                         delete token.role;
+                        delete token.roles;
                         delete token.memberId;
                     }
                 }
@@ -185,6 +189,7 @@ export const authOptions: NextAuthOptions = {
             if (token && session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role as string;
+                session.user.roles = token.roles as string[];
                 session.user.communityId = token.communityId as string | null | undefined;
                 session.user.name = token.name;
                 session.user.image = token.picture;

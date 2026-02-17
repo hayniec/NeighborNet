@@ -37,7 +37,7 @@ async function isAdmin(userId: string, communityId: string): Promise<boolean> {
                 eq(members.userId, userId),
                 eq(members.communityId, communityId)
             ));
-        return member && member.role === 'Admin';
+        return !!(member && (member.role === 'Admin' || (member.roles && member.roles.includes('Admin'))));
     } catch {
         return false;
     }
@@ -68,7 +68,7 @@ export async function createInvitation(data: {
                 eq(members.communityId, data.communityId)
             ));
 
-        if (!adminMember || adminMember.role !== 'Admin') {
+        if (!adminMember || (adminMember.role !== 'Admin' && (!adminMember.roles || !adminMember.roles.includes('Admin')))) {
             return { success: false, error: "Only admins can send invitations." };
         }
 

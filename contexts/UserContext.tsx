@@ -11,6 +11,7 @@ interface UserProfile {
     email?: string;
     name: string;
     role: UserRole;
+    roles: UserRole[]; // New multi-role support
     avatar: string;
     address?: string;
     personalEmergencyCode?: string;
@@ -28,10 +29,11 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [user, setUserState] = useState<UserProfile>({
         name: "Eric H.",
-        role: "admin", // Default to admin for first-time ease of use
+        role: "admin",
+        roles: ["admin"],
         avatar: "EH",
         address: "123 Oak St, Unit 4",
-        communityId: "00000000-0000-0000-0000-000000000000" // Mock Community ID
+        communityId: "00000000-0000-0000-0000-000000000000"
     });
 
     const { data: session, status } = useSession();
@@ -40,11 +42,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         console.log("UserContext Effect - Status:", status);
         console.log("UserContext Effect - Session:", session);
         if (status === "authenticated" && session?.user) {
+            // Normalize roles to lowercase
+            const sessionRoles = (session.user.roles || []).map(r => r.toLowerCase() as UserRole);
+            const primaryRole = (session.user.role?.toLowerCase() as UserRole) || "resident";
+
+            // Ensure roles array includes primary role if missing
+            const finalRoles = sessionRoles.length > 0 ? sessionRoles : [primaryRole];
+
             setUserState({
                 id: session.user.id,
                 name: session.user.name || "Neighbor",
                 email: session.user.email || "",
-                role: (session.user.role?.toLowerCase() as UserRole) || "resident",
+                role: primaryRole,
+                roles: finalRoles,
                 avatar: session.user.image || "",
                 communityId: session.user.communityId || undefined,
             });
@@ -54,7 +64,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 id: "cd48f9df-4096-4f8d-b76c-9a6dca90ceab",
                 name: "Super Admin (Bypass)",
                 email: "admin@neighbornet.com",
-                role: "admin", // 'admin' role grants access to Super Admin features
+                role: "admin",
+                roles: ["admin", "resident"],
                 avatar: "SA",
                 communityId: "2bf6bc8a-899c-4e29-8ee7-f2038c804260",
             });

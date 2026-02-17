@@ -32,6 +32,7 @@ interface NeighborUser {
     joinedDate?: Date;
     isHoaOfficer?: boolean;
     hoaPosition?: string;
+    roles?: string[];
 }
 
 export default function AdminPage() {
@@ -279,9 +280,9 @@ export default function AdminPage() {
         try {
             const result = await updateNeighbor(editingUser.id, {
                 name: editingUser.name,
-                role: isHoaOfficer ? 'Board Member' : (editingUser.role === 'Board Member' ? 'Resident' : editingUser.role as 'Admin' | 'Resident' | 'Board Member'),
+                roles: editingUser.roles || (editingUser.role ? [editingUser.role] : ['Resident']),
                 address: editingUser.address,
-                hoaPosition: isHoaOfficer ? hoaPosition : null
+                hoaPosition: editingUser.isHoaOfficer ? editingUser.hoaPosition : null
             });
 
             if (result.success) {
@@ -708,15 +709,19 @@ export default function AdminPage() {
                                                     </div>
                                                 </td>
                                                 <td style={{ padding: '0.5rem' }}>
-                                                    <span style={{
-                                                        padding: '0.25rem 0.5rem',
-                                                        borderRadius: '1rem',
-                                                        fontSize: '0.75rem',
-                                                        background: user.role && user.role.includes('Board') ? 'var(--primary)' : 'var(--muted)',
-                                                        color: user.role && user.role.includes('Board') ? 'white' : 'var(--foreground)'
-                                                    }}>
-                                                        {user.role}
-                                                    </span>
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                                                        {(user.roles && user.roles.length > 0 ? user.roles : [user.role || 'Resident']).map((role, idx) => (
+                                                            <span key={idx} style={{
+                                                                padding: '0.25rem 0.5rem',
+                                                                borderRadius: '1rem',
+                                                                fontSize: '0.75rem',
+                                                                background: role === 'Admin' ? 'var(--primary)' : (role === 'Board Member' ? 'var(--accent)' : 'var(--muted)'),
+                                                                color: role === 'Admin' ? 'white' : (role === 'Board Member' ? 'var(--primary)' : 'var(--foreground)')
+                                                            }}>
+                                                                {role}
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 </td>
                                                 <td style={{ padding: '0.5rem' }}>{user.address}</td>
                                                 <td style={{ padding: '0.5rem' }}>
@@ -1101,29 +1106,50 @@ export default function AdminPage() {
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label htmlFor="edit-role" className={styles.label}>Role</label>
-                                <select
-                                    id="edit-role"
-                                    className={styles.input}
-                                    value={editingUser.role || 'Resident'}
-                                    onChange={(e) => {
-                                        const newRole = e.target.value as 'Admin' | 'Resident' | 'Board Member';
-                                        setEditingUser({ ...editingUser, role: newRole });
-                                        if (newRole === 'Board Member') {
-                                            // Assuming setIsHoaOfficer is defined in the component's state
-                                            // and hoaPosition is also managed by state.
-                                            // This part of the logic needs to be handled by the component.
-                                            // For now, just setting the role.
-                                        } else {
-                                            // If not a Board Member, clear HOA position
-                                            // This part of the logic needs to be handled by the component.
-                                        }
-                                    }}
-                                >
-                                    <option value="Resident">Resident</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="Board Member">Board Member</option>
-                                </select>
+                                <label className={styles.label}>Roles</label>
+                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                    {['Resident', 'Admin', 'Board Member', 'Event Manager'].map((role) => {
+                                        const currentRoles = editingUser.roles || (editingUser.role ? [editingUser.role] : []);
+                                        const isChecked = currentRoles.includes(role);
+                                        return (
+                                            <label key={role} style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.5rem',
+                                                padding: '0.5rem',
+                                                borderRadius: 'var(--radius)',
+                                                border: isChecked ? '1px solid var(--primary)' : '1px solid var(--border)',
+                                                background: isChecked ? 'var(--muted)' : 'transparent',
+                                                cursor: 'pointer'
+                                            }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isChecked}
+                                                    onChange={(e) => {
+                                                        let newRoles = [...currentRoles];
+                                                        if (e.target.checked) {
+                                                            newRoles.push(role);
+                                                        } else {
+                                                            newRoles = newRoles.filter(r => r !== role);
+                                                        }
+                                                        // Ensure at least one role
+                                                        if (newRoles.length === 0) newRoles = ['Resident'];
+
+                                                        // Handle Board Member side effects
+                                                        const isBoard = newRoles.includes('Board Member');
+                                                        setEditingUser({
+                                                            ...editingUser,
+                                                            roles: newRoles,
+                                                            isHoaOfficer: isBoard, // Auto-toggle HOA officer
+                                                            // Clear position if unchecking board member? Maybe keep it for UX.
+                                                        });
+                                                    }}
+                                                />
+                                                <span style={{ fontSize: '0.9rem' }}>{role}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             <div className={styles.formGroup}>
