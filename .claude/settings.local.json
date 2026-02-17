@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd.exe /c \"code --install-extension anthropic.claude-code\")",
+      "Bash(powershell.exe -Command \"code --install-extension anthropic.claude-code\")"
+    ]
+  }
+}

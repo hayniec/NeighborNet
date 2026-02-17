@@ -10,42 +10,44 @@ export type CommunityActionState =
     | { success: false; error: string };
 
 // Map DB row to UI Community type
-const mapToUI = (row: any) => ({
-    id: row.id,
-    name: row.name,
-    slug: row.slug || '',
-    plan: row.planTuple || 'starter_100',
-    features: {
-        marketplace: row.hasMarketplace,
-        resources: row.hasResources,
-        events: row.hasEvents,
-        documents: row.hasDocuments,
-        forum: row.hasForum,
-        messages: row.hasMessages,
-        services: row.hasServicePros,
+const mapToUI = (row: any) => {
+    return {
+        id: row.id,
+        name: row.name,
+        slug: row.slug || '',
+        plan: row.planTuple || 'starter_100',
+        features: {
+            marketplace: row.hasMarketplace,
+            resources: row.hasResources,
+            events: row.hasEvents,
+            documents: row.hasDocuments,
+            forum: row.hasForum,
+            messages: row.hasMessages,
+            services: row.hasServicePros,
 
-        local: row.hasLocalGuide,
-        emergency: row.hasEmergency,
-    },
-    isActive: row.isActive,
-    branding: {
-        logoUrl: row.logoUrl || '',
-        primaryColor: row.primaryColor || '#4f46e5',
-        secondaryColor: row.secondaryColor || '#1e1b4b',
-        accentColor: row.accentColor || '#f59e0b',
-    },
-    emergency: {
-        accessCode: row.emergencyAccessCode || '',
-        instructions: row.emergencyInstructions || ''
-    },
-    hoaSettings: {
-        duesAmount: row.hoaDuesAmount || null,
-        duesFrequency: row.hoaDuesFrequency || 'Monthly',
-        duesDate: row.hoaDuesDate || '1st',
-        contactEmail: row.hoaContactEmail || ''
-    },
-    hoaExtendedSettings: row.hoaExtendedSettings || null
-});
+            local: row.hasLocalGuide,
+            emergency: row.hasEmergency,
+        },
+        isActive: row.isActive,
+        branding: {
+            logoUrl: row.logoUrl || '',
+            primaryColor: row.primaryColor || '#4f46e5',
+            secondaryColor: row.secondaryColor || '#1e1b4b',
+            accentColor: row.accentColor || '#f59e0b',
+        },
+        emergency: {
+            accessCode: row.emergencyAccessCode || '',
+            instructions: row.emergencyInstructions || ''
+        },
+        hoaSettings: {
+            duesAmount: row.hoaDuesAmount || null,
+            duesFrequency: row.hoaDuesFrequency || 'Monthly',
+            duesDate: row.hoaDuesDate || '1st',
+            contactEmail: row.hoaContactEmail || ''
+        },
+        hoaExtendedSettings: row.hoaExtendedSettings || null
+    };
+};
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
@@ -251,8 +253,16 @@ export async function updateEmergencySettings(id: string, data: { accessCode: st
 
 export async function updateCommunityHoaSettings(id: string, data: { duesAmount: string; duesFrequency: string; duesDate: string; contactEmail: string }) {
     try {
-        // Parse duesAmount as a string for decimal field, ensure it's valid
-        const amount = parseFloat(data.duesAmount).toFixed(2);
+        // Parse duesAmount - if empty or invalid, store null
+        let amount: string | null = null;
+        if (data.duesAmount && data.duesAmount.trim() !== '') {
+            const parsed = parseFloat(data.duesAmount);
+            if (!isNaN(parsed)) {
+                amount = parsed.toFixed(2);
+            }
+        }
+
+        console.log('[updateCommunityHoaSettings] Saving amount:', amount, 'from input:', data.duesAmount);
 
         await db.update(communities).set({
             hoaDuesAmount: amount,
