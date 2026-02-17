@@ -9,7 +9,7 @@ import { getCommunityEvents } from "@/app/actions/events";
 import { getCommunityAnnouncements, createAnnouncement, deleteAnnouncement } from "@/app/actions/announcements";
 import { getCommunityDocuments, createDocument } from "@/app/actions/documents";
 import { getCommunityOfficers } from "@/app/actions/neighbors";
-import { getCommunities } from "@/app/actions/communities";
+import { getCommunityById } from "@/app/actions/communities";
 import { Event } from "@/types/event";
 import { Plus, Trash2, Megaphone, FileText, Download, Upload, Mail, Phone, MapPin, MessageSquare, X, ChevronDown } from "lucide-react";
 import { CreateAnnouncementModal } from "@/components/dashboard/CreateAnnouncementModal";
@@ -136,22 +136,20 @@ export default function DashboardPage() {
     const fetchCommunitySettings = async () => {
         if (!user?.communityId) return;
         try {
-            const res = await getCommunities();
+            const res = await getCommunityById(user.communityId);
             if (res.success && res.data) {
-                const current = res.data.find((c: any) => c.id === user.communityId);
-                if (current) {
-                    // Set community name
-                    setDbCommunityName(current.name || "Community HOA");
+                const current = res.data;
+                // Set community name
+                setDbCommunityName(current.name || "Community HOA");
 
-                    // Set basic HOA settings
-                    if (current.hoaSettings) {
-                        setHoaSettings(current.hoaSettings);
-                    }
+                // Set basic HOA settings
+                if (current.hoaSettings) {
+                    setHoaSettings(current.hoaSettings);
+                }
 
-                    // Set extended settings (amenities, rules, vendors)
-                    if (current.hoaExtendedSettings) {
-                        setExtendedSettings(current.hoaExtendedSettings);
-                    }
+                // Set extended settings (amenities, rules, vendors)
+                if (current.hoaExtendedSettings) {
+                    setExtendedSettings(current.hoaExtendedSettings);
                 }
             }
         } catch (e) {
