@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { communities } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 // Type definition matching the UI but mapped from DB
 export type CommunityActionState =
@@ -10,15 +11,8 @@ export type CommunityActionState =
     | { success: false; error: string };
 
 // Map DB row to UI Community type
+// Map DB row to UI Community type
 const mapToUI = (row: any) => {
-    console.log('[mapToUI] BEFORE mapping - row.hoaDuesAmount:', row.hoaDuesAmount, 'type:', typeof row.hoaDuesAmount);
-    console.log('[mapToUI] BEFORE mapping - Full row HOA fields:', {
-        hoaDuesAmount: row.hoaDuesAmount,
-        hoaDuesFrequency: row.hoaDuesFrequency,
-        hoaDuesDate: row.hoaDuesDate,
-        hoaContactEmail: row.hoaContactEmail
-    });
-
     const mapped = {
         id: row.id,
         name: row.name,
@@ -55,10 +49,6 @@ const mapToUI = (row: any) => {
         },
         hoaExtendedSettings: row.hoaExtendedSettings || null
     };
-
-    console.log('[mapToUI] AFTER mapping - hoaSettings:', mapped.hoaSettings);
-    console.log('[mapToUI] AFTER mapping - duesAmount specifically:', mapped.hoaSettings.duesAmount, 'type:', typeof mapped.hoaSettings.duesAmount);
-
     return mapped;
 };
 
@@ -283,6 +273,10 @@ export async function updateCommunityHoaSettings(id: string, data: { duesAmount:
             hoaDuesDate: data.duesDate,
             hoaContactEmail: data.contactEmail
         }).where(eq(communities.id, id));
+
+        revalidatePath('/dashboard');
+        revalidatePath('/dashboard/admin');
+
         return { success: true };
     } catch (e) {
         console.error("Failed to update HOA settings", e);
@@ -296,8 +290,6 @@ export async function updateCommunityHoaSettings(id: string, data: { duesAmount:
  */
 export async function getCommunityById(id: string) {
     try {
-        console.log('[getCommunityById] Starting query for ID:', id);
-
         const [community] = await db
             .select({
                 id: communities.id,
@@ -329,30 +321,15 @@ export async function getCommunityById(id: string) {
             .from(communities)
             .where(eq(communities.id, id));
 
-        console.log('[getCommunityById] Query completed successfully');
-
         if (!community) {
-            console.log('[getCommunityById] No community found with ID:', id);
             return { success: false, error: "Community not found" };
         }
 
-        console.log('[getCommunityById] Raw DB values:', {
-            hoaDuesAmount: community.hoaDuesAmount,
-            hoaDuesAmountType: typeof community.hoaDuesAmount,
-            hoaDuesFrequency: community.hoaDuesFrequency,
-            hoaDuesDate: community.hoaDuesDate,
-            hoaContactEmail: community.hoaContactEmail
-        });
-
         const mapped = mapToUI(community);
-
-        console.log('[getCommunityById] Mapped hoaSettings:', mapped.hoaSettings);
 
         return { success: true, data: mapped };
     } catch (error: any) {
-        console.error("[getCommunityById] ERROR DETAILS:", error);
-        console.error("[getCommunityById] Error message:", error.message);
-        console.error("[getCommunityById] Error stack:", error.stack);
+        console.error("Failed to fetch community by ID:", error);
         return { success: false, error: "Failed to fetch community" };
     }
 }
