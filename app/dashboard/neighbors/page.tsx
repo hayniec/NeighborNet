@@ -7,14 +7,18 @@ import { Search, Filter, Mail, X } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { getNeighbors } from "@/app/actions/neighbors";
 import { getUserProfile, switchCommunity } from "@/app/actions/user";
+import { getCommunities } from "@/app/actions/communities";
+import { useTheme } from "@/contexts/ThemeContext";
 import { createInvitation } from "@/app/actions/invitations";
 import { Neighbor } from "@/types/neighbor";
 import { isAdmin, getUserRoles } from "@/utils/roleHelpers";
 
 export default function NeighborsPage() {
     const { user, setUser } = useUser();
+    const { communityName: themeCommunityName } = useTheme();
     const [neighbors, setNeighbors] = useState<Neighbor[]>([]);
     const [communityName, setCommunityName] = useState("");
+    const [mismatchId, setMismatchId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [inviteEmail, setInviteEmail] = useState("");
@@ -51,6 +55,17 @@ export default function NeighborsPage() {
                             isOnline: n.isOnline || false
                         }));
                         setNeighbors(mapped);
+                    }
+
+                    // Check for context mismatch
+                    if (result.communityName && themeCommunityName && result.communityName !== themeCommunityName) {
+                        const coms = await getCommunities();
+                        if (coms.success && coms.data) {
+                            const target = coms.data.find((c: any) => c.name === themeCommunityName);
+                            if (target) {
+                                setMismatchId(target.id);
+                            }
+                        }
                     }
                 }
             } catch (e) {
@@ -329,6 +344,37 @@ export default function NeighborsPage() {
                     </button>
                 </div>
             </div>
+
+            {/* Mismatch Warning */}
+            {mismatchId && (
+                <div style={{ padding: '1rem', background: '#fff7ed', border: '1px solid #fdba74', borderRadius: '8px', marginBottom: '1rem', color: '#c2410c' }}>
+                    <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Context Mismatch Detected</div>
+                    <p style={{ marginBottom: '0.5rem' }}>
+                        You are viewing the <strong>{themeCommunityName}</strong> dashboard, but the data is loaded for <strong>{communityName}</strong>.
+                    </p>
+                    <button
+                        onClick={async () => {
+                            if (!user?.id) return;
+                            const res = await switchCommunity(user.id, mismatchId);
+                            if (res.success) {
+                                window.location.href = '/api/auth/signout?callbackUrl=/login';
+                            } else {
+                                alert("Failed to switch: " + ((res as any).error || "Unknown"));
+                            }
+                        }}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: '#ea580c',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Switch Data to {themeCommunityName}
+                    </button>
+                </div>
+            )}
 
             {isLoading ? (
                 <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>Loading neighbors...</div>
