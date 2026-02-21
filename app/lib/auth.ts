@@ -161,7 +161,7 @@ export const authOptions: NextAuthOptions = {
                         if (activeMembership) {
                             // Keep existing selection
                             token.role = activeMembership.role || "Resident";
-                            token.roles = activeMembership.roles || ["Resident"];
+                            token.roles = activeMembership.roles || [activeMembership.role || "Resident"];
                             token.memberId = activeMembership.memberId;
                             // Ensure token has the communityId (it might be there, but let's be explicit)
                             token.communityId = activeMembership.communityId;
@@ -170,7 +170,7 @@ export const authOptions: NextAuthOptions = {
                             const defaultMember = userMemberships[0];
                             token.communityId = defaultMember.communityId;
                             token.role = defaultMember.role || "Resident";
-                            token.roles = defaultMember.roles || ["Resident"];
+                            token.roles = defaultMember.roles || [defaultMember.role || "Resident"];
                             token.memberId = defaultMember.memberId;
                         }
                     } else {
