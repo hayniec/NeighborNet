@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import { getCommunities } from "@/app/actions/communities";
 import { useEffect } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function DashboardLayoutClient({
     children,
@@ -21,6 +22,7 @@ export default function DashboardLayoutClient({
     const [sosMessage, setSosMessage] = useState("");
     const router = useRouter();
     const { user } = useUser();
+    const { communityName, setCommunityName } = useTheme();
 
     useEffect(() => {
         const prepareSOS = async () => {
@@ -34,12 +36,17 @@ export default function DashboardLayoutClient({
                     const res = await getCommunities();
                     if (res.success && res.data) {
                         const com = res.data.find((c: any) => c.id === user.communityId);
-                        if (com && com.emergency?.accessCode) {
-                            message = `Community Gate Code: ${com.emergency.accessCode}`;
-                            if (com.emergency.instructions) {
-                                message += `\nGate Instructions: ${com.emergency.instructions}`;
+                        if (com) {
+                            if (com.name && com.name !== communityName) {
+                                setCommunityName(com.name);
                             }
-                            hasCode = true;
+                            if (com.emergency?.accessCode) {
+                                message = `Community Gate Code: ${com.emergency.accessCode}`;
+                                if (com.emergency.instructions) {
+                                    message += `\nGate Instructions: ${com.emergency.instructions}`;
+                                }
+                                hasCode = true;
+                            }
                         }
                     }
                 } catch (err) {
