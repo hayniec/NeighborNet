@@ -174,35 +174,12 @@ export const authOptions: NextAuthOptions = {
                             token.memberId = defaultMember.memberId;
                         }
                     } else {
-                        // User has NO communities. Auto-join the first available one to prevent "Limbo" state.
-                        console.log(`[AUTH] Orphan user detected: ${token.email}. Attempting auto-join...`);
-
-                        const [defaultComm] = await db
-                            .select()
-                            .from(communities)
-                            .where(eq(communities.isActive, true))
-                            .limit(1);
-
-                        if (defaultComm) {
-                            console.log(`[AUTH] Auto-joining user to ${defaultComm.name} (${defaultComm.id})`);
-                            const [newMember] = await db.insert(members).values({
-                                userId: dbUser.id,
-                                communityId: defaultComm.id,
-                                role: 'Resident',
-                                joinedDate: new Date()
-                            }).returning();
-
-                            token.communityId = newMember.communityId;
-                            token.role = newMember.role || "Resident";
-                            token.roles = ["Resident"];
-                            token.memberId = newMember.id;
-                        } else {
-                            console.error("[AUTH] No active communities found for orphan user.");
-                            delete token.communityId;
-                            delete token.role;
-                            delete token.roles;
-                            delete token.memberId;
-                        }
+                        // User has NO communities. Leave them in "Limbo" state so the application routes them to the /join page.
+                        console.log(`[AUTH] Orphan user detected: ${token.email}. Retaining Limbo state...`);
+                        delete token.communityId;
+                        delete token.role;
+                        delete token.roles;
+                        delete token.memberId;
                     }
                 }
             }
