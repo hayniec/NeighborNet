@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Admin User",
+    "email": "admin@valleycove.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Super Admin",
+    "email": "erich.haynie@gmail.com",
+    "role": "Admin",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Super Admin",
+    "email": "erich.haynie@gmail.com",
+    "role": "Admin",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Super Admin",
+    "email": "erich.haynie@gmail.com",
+    "role": "Admin",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Alice Baker",
+    "email": "alice@maplegrove.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Bob Carter",
+    "email": "bob@maplegrove.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Charlie Davis",
+    "email": "charlie@maplegrove.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "David Evans",
+    "email": "david@rivervalley.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Eve Foster",
+    "email": "eve@rivervalley.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Frank Green",
+    "email": "frank@rivervalley.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Grace Harris",
+    "email": "grace@sunsetheights.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Henry Irving",
+    "email": "henry@sunsetheights.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Isabel Jones",
+    "email": "isabel@sunsetheights.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Recovered User",
+    "email": "eric.haynie@gmail.com",
+    "role": "Admin",
+    "roles": [
+      "Resident"
+    ]
+  },
+  {
+    "name": "Allison Haynie",
+    "email": "allison.haynie35@gmail.com",
+    "role": "Resident",
+    "roles": [
+      "Resident"
+    ]
+  }
+]

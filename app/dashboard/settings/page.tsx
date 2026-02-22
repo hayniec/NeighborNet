@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./settings.module.css";
 import { User, Bell, Wrench, X, Save, Stethoscope, Phone, Plus, Trash2, Palette, Key, Moon, Sun, Monitor, Laptop, Smartphone } from "lucide-react";
-import { MOCK_NEIGHBORS } from "@/lib/data";
+
 import { useTheme, THEMES } from "@/contexts/ThemeContext";
 import { useUser } from "@/contexts/UserContext";
 import { isAdmin } from "@/utils/roleHelpers";
@@ -42,12 +42,8 @@ export default function SettingsPage() {
     const { user, toggleRole, setUser } = useUser();
     const medicalKeywords = ["Nurse", "Doctor", "EMT", "Paramedic", "First Aid", "CPR", "Medical"];
 
-    // Filter neighbors with medical skills
-    const medicalNeighbors = MOCK_NEIGHBORS.filter(neighbor =>
-        neighbor.skills.some(skill =>
-            medicalKeywords.some(keyword => skill.toLowerCase().includes(keyword.toLowerCase()))
-        )
-    );
+    // Filter neighbors with medical skills - to be fetched dynamically
+    const medicalNeighbors: any[] = [];
 
     const [profile, setProfile] = useState<UserProfile>({
         firstName: "",
@@ -378,7 +374,7 @@ export default function SettingsPage() {
                         <label className={styles.switch}>
                             <input
                                 type="checkbox"
-                                checked={user.emergencyButtonSettings?.visible ?? true}
+                                checked={user.emergencyButtonSettings?.visible ?? false}
                                 onChange={e => setUser({
                                     ...user,
                                     emergencyButtonSettings: {
@@ -404,7 +400,7 @@ export default function SettingsPage() {
                                 onClick={() => setUser({
                                     ...user,
                                     emergencyButtonSettings: {
-                                        visible: user.emergencyButtonSettings?.visible ?? true,
+                                        visible: user.emergencyButtonSettings?.visible ?? false,
                                         position: 'bottom-left'
                                     }
                                 })}
@@ -417,7 +413,7 @@ export default function SettingsPage() {
                                 onClick={() => setUser({
                                     ...user,
                                     emergencyButtonSettings: {
-                                        visible: user.emergencyButtonSettings?.visible ?? true,
+                                        visible: user.emergencyButtonSettings?.visible ?? false,
                                         position: 'bottom-right'
                                     }
                                 })}
@@ -430,7 +426,7 @@ export default function SettingsPage() {
                                 onClick={() => setUser({
                                     ...user,
                                     emergencyButtonSettings: {
-                                        visible: user.emergencyButtonSettings?.visible ?? true,
+                                        visible: user.emergencyButtonSettings?.visible ?? false,
                                         position: 'top-left'
                                     }
                                 })}
@@ -443,7 +439,7 @@ export default function SettingsPage() {
                                 onClick={() => setUser({
                                     ...user,
                                     emergencyButtonSettings: {
-                                        visible: user.emergencyButtonSettings?.visible ?? true,
+                                        visible: user.emergencyButtonSettings?.visible ?? false,
                                         position: 'top-right'
                                     }
                                 })}

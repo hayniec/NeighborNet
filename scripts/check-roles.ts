@@ -21,7 +21,7 @@ async function main() {
         `);
 
         console.log("Sample members:");
-        console.table(result.rows);
+        console.log(JSON.stringify(result.rows, null, 2));
 
         const nullRolesCount = await db.execute(sql`
             SELECT COUNT(*) as count

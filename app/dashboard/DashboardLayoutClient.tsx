@@ -98,7 +98,7 @@ export default function DashboardLayoutClient({
             </div>
 
             {/* SOS Floating Button */}
-            {showSOSButton && (user.emergencyButtonSettings?.visible ?? true) && (
+            {showSOSButton && (user.emergencyButtonSettings?.visible ?? false) && (
                 <button
                     className={`${styles.sosButton} ${styles[
                         user.emergencyButtonSettings?.position === 'bottom-right' ? 'bottomRight' :

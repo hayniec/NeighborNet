@@ -40,7 +40,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         address: "",
         communityId: "",
         emergencyButtonSettings: {
-            visible: true,
+            visible: false,
             position: 'bottom-left'
         }
     });
@@ -48,8 +48,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
 
     useEffect(() => {
-        console.log("UserContext Effect - Status:", status);
-        console.log("UserContext Effect - Session:", session);
 
         // Try to recover settings from localStorage if available, to merge with session
         let savedSettings = undefined;
@@ -80,7 +78,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 communityId: session.user.communityId || undefined,
                 // Preserve existing settings -> prefer local storage -> then current state -> then default
                 emergencyButtonSettings: savedSettings || prev.emergencyButtonSettings || {
-                    visible: true,
+                    visible: false,
                     position: 'bottom-left'
                 }
             }));
@@ -96,7 +94,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 communityId: "2bf6bc8a-899c-4e29-8ee7-f2038c804260",
                 // Preserve existing settings
                 emergencyButtonSettings: savedSettings || prev.emergencyButtonSettings || {
-                    visible: true,
+                    visible: false,
                     position: 'bottom-left'
                 }
             }));
